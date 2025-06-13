@@ -1,155 +1,385 @@
-<nav th:fragment="nav" class="navbar">
-    <!-- Top Navigation Row -->
-    <div class="nav-top">
-        <div class="nav-wrapper">
-            <a href="/" class="logo">
-                <img th:src="@{/static/images/logo.jpg}" alt="MSN Logo" width="100"> 
-            </a>
-            <div class="search-box-large">
-                <input type="search" placeholder="Tìm kiếm...">
-                <button type="button"><i class="fas fa-search"></i></button>
-            </div>
-            <div class="nav-top-right">
-                <div class="weather-widget" id="current-weather">
-                    <i class="fas fa-cloud"></i>
-                    <span>Loading...</span>
-                </div>
-                <!-- Thay thế nút đăng nhập bằng menu user -->
-                <div th:if="${session.user}" class="user-menu">
-                    <button class="user-button">
-                        <i class="fas fa-user"></i>
-                        <span th:text="${session.user.hoTen}">Người dùng</span>
-                    </button>
-                    <div class="user-dropdown">
-                        <a href="/user/profile"><i class="fas fa-id-card"></i> Thông tin cá nhân</a>
-                        <a href="/user/saved-posts"><i class="fas fa-bookmark"></i> Bài viết đã lưu</a>
-                        <a href="/auth/logout"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a>
-                    </div>
-                </div>
-                <button th:unless="${session.user}" class="signin-btn">
-                    <i class="fas fa-user"></i>
-                    <span>Đăng nhập</span>
-                </button>
-            </div>
-        </div>
-    </div>
+<nav
+  th:fragment="nav"
+  class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top"
+>
+  <div class="container">
+    <!-- Logo và phần tử hiển thị trên mọi kích thước màn hình -->
+    <a href="/" class="navbar-brand">
+      <img
+        th:src="@{/static/images/logo.jpg}"
+        alt="MSN Logo"
+        width="80"
+        class="img-fluid"
+      />
+    </a>
 
-    <!-- Bottom Navigation Row -->
-    <div class="nav-bottom">
-        <div class="nav-wrapper">
-            <div class="menu-left">
-                <button class="menu-toggle" id="menu-toggle">
-                    <i class="fas fa-bars"></i>
-                </button>
-                <!-- Side Menu -->
-                <div class="side-menu" id="side-menu">
-                    <button class="side-menu-close" id="side-menu-close">
-                        <i class="fas fa-times"></i>
-                    </button>
-                    <ul>
-                        <li><a href="/preferences"><i class="fas fa-heart"></i> Sở thích của tôi</a></li>
-                        <li><a href="/lich-su-xem"><i class="fas fa-history"></i> Lịch sử đã xem</a></li>
-                        <!-- Add Admin Section -->
-                        <li class="admin-section" th:if="${session.user != null && (session.user.vaiTro == 'admin' || session.user.vaiTro == 'reporter')}">
-                            <h3>Quản trị</h3>
-                            <ul>
-                                <!-- Chỉ admin mới thấy quản lý danh mục và người dùng -->
-                                <li th:if="${session.user.vaiTro == 'admin'}">
-                                    <a href="/admin/danhmuc"><i class="fas fa-folder"></i> Quản lý danh mục</a>
-                                </li>
-                                <li>
-                                    <a href="/admin/baiviet"><i class="fas fa-newspaper"></i>
-                                        <span th:text="${session.user.vaiTro == 'admin' ? 'Quản lý bài viết' : 'Bài viết của tôi'}"></span>
-                                    </a>
-                                </li>
-                                <li th:if="${session.user.vaiTro == 'admin'}">
-                                    <a href="/admin/nguoidung"><i class="fas fa-users"></i> Quản lý người dùng</a>
-                                </li>
-                            </ul>
-                        </li>
-                    </ul>
-                </div>
-                <!-- Menu Overlay -->
-                <div class="menu-overlay" id="menu-overlay"></div>
-            </div>
-            <ul class="main-menu">
-                <!-- Sửa lại menu Tin tức trỏ về trang chủ -->
-                <li>
-                    <a href="/" >
-                        Tin tức
-                    </a>
-                </li>
-                <!-- Sửa đường dẫn của danh mục -->
-                <li th:each="danhmuc : ${danhmucs}">
-                    <a th:href="@{'/danh-muc/' + ${danhmuc.duongDan}}" th:text="${danhmuc.tenDanhMuc}"></a>
-                </li>
+    <!-- Nút toggle menu trên mobile -->
+    <button
+      class="navbar-toggler"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#mainNavbar"
+      aria-controls="mainNavbar"
+      aria-expanded="false"
+      aria-label="Toggle navigation"
+    >
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <!-- Phần nội dung có thể collapse trên mobile -->
+    <div class="collapse navbar-collapse" id="mainNavbar">
+      <!-- Menu chính -->
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <!-- Trang chủ -->
+        <li class="nav-item">
+          <a class="nav-link fw-bold" href="/">Trang chủ</a>
+        </li>
+
+        <!-- Danh mục dropdown -->
+        <li class="nav-item dropdown">
+          <a
+            class="nav-link dropdown-toggle"
+            href="#"
+            id="categoriesDropdown"
+            role="button"
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
+          >
+            Danh mục
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="categoriesDropdown">
+            <li th:each="danhmuc : ${danhmucs}">
+              <a
+                class="dropdown-item"
+                th:href="@{'/danh-muc/' + ${danhmuc.duongDan}}"
+                th:text="${danhmuc.tenDanhMuc}"
+              ></a>
+            </li>
+            <li th:if="${#lists.isEmpty(danhmucs)}">
+              <span class="dropdown-item text-muted">Không có danh mục</span>
+            </li>
+          </ul>
+        </li>
+
+        <!-- Tin tức -->
+        <li class="nav-item">
+          <a class="nav-link" href="/tin-moi-nhat">Tin mới nhất</a>
+        </li>
+
+        <!-- Xem nhiều -->
+        <li class="nav-item">
+          <a class="nav-link" href="/xem-nhieu">Xem nhiều</a>
+        </li>
+      </ul>
+
+      <!-- Menu bên phải -->
+      <ul class="navbar-nav ms-auto mb-2 mb-lg-0 d-flex align-items-center">
+        <!-- Nút tìm kiếm -->
+        <li class="nav-item me-2 position-relative">
+          <button type="button" class="search-toggle" id="searchToggle">
+            <i class="fas fa-search"></i>
+          </button>
+          <!-- Form tìm kiếm popup -->
+          <div class="search-popup" id="searchPopup">
+            <form class="d-flex position-relative">
+              <input
+                type="search"
+                class="form-control"
+                placeholder="Nhập từ khóa..."
+                aria-label="Search"
+              />
+              <button
+                class="btn btn-primary position-absolute end-0 top-0 bottom-0"
+                type="submit"
+              >
+                <i class="fas fa-search"></i>
+              </button>
+            </form>
+          </div>
+        </li>
+
+        <!-- Weather widget - chỉ hiển thị trên màn hình lớn -->
+        <li class="nav-item d-none d-lg-block me-2">
+          <div class="weather-widget" id="current-weather">
+            <i class="fas fa-cloud me-1"></i>
+            <span>Hà Nội, 25°C</span>
+          </div>
+        </li>
+
+        <!-- Lịch sử -->
+        <li class="nav-item">
+          <a class="nav-link" href="/lich-su-xem">
+            <i class="fas fa-history me-1"></i> Lịch sử
+          </a>
+        </li>
+
+        <!-- Admin links - chỉ hiển thị cho admin/reporter -->
+        <li
+          class="nav-item dropdown"
+          th:if="${session.user != null && (session.user.vaiTro == 'admin' || session.user.vaiTro == 'reporter')}"
+        >
+          <a
+            class="nav-link dropdown-toggle"
+            href="#"
+            id="adminDropdown"
+            role="button"
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
+          >
+            <i class="fas fa-cog me-1"></i> Quản trị
+          </a>
+          <ul
+            class="dropdown-menu dropdown-menu-end"
+            aria-labelledby="adminDropdown"
+          >
+            <li th:if="${session.user.vaiTro == 'admin'}">
+              <a class="dropdown-item" href="/admin/danhmuc"
+                ><i class="fas fa-folder me-2"></i> Quản lý danh mục</a
+              >
+            </li>
+            <li>
+              <a class="dropdown-item" href="/admin/baiviet">
+                <i class="fas fa-newspaper me-2"></i>
+                <span
+                  th:text="${session.user.vaiTro == 'admin' ? 'Quản lý bài viết' : 'Bài viết của tôi'}"
+                ></span>
+              </a>
+            </li>
+            <li th:if="${session.user.vaiTro == 'admin'}">
+              <a class="dropdown-item" href="/admin/nguoidung"
+                ><i class="fas fa-users me-2"></i> Quản lý người dùng</a
+              >
+            </li>
+          </ul>
+        </li>
+
+        <!-- User menu hoặc đăng nhập -->
+        <li class="nav-item ms-lg-2" th:if="${session.user}">
+          <div class="dropdown">
+            <button
+              class="btn btn-outline-primary dropdown-toggle"
+              type="button"
+              id="userMenuDropdown"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              <i class="fas fa-user me-1"></i>
+              <span th:text="${session.user.hoTen}" class="d-none d-md-inline"
+                >Người dùng</span
+              >
+            </button>
+            <ul
+              class="dropdown-menu dropdown-menu-end"
+              aria-labelledby="userMenuDropdown"
+            >
+              <li>
+                <a class="dropdown-item" href="/user/profile"
+                  ><i class="fas fa-id-card me-2"></i> Thông tin cá nhân</a
+                >
+              </li>
+              <li>
+                <a class="dropdown-item" href="/user/saved-posts"
+                  ><i class="fas fa-bookmark me-2"></i> Bài viết đã lưu</a
+                >
+              </li>
+              <li><hr class="dropdown-divider" /></li>
+              <li>
+                <a class="dropdown-item" href="/auth/logout"
+                  ><i class="fas fa-sign-out-alt me-2"></i> Đăng xuất</a
+                >
+              </li>
             </ul>
-        </div>
+          </div>
+        </li>
+        <li class="nav-item ms-lg-2" th:unless="${session.user}">
+          <button class="btn btn-primary signin-btn">
+            <i class="fas fa-user me-1"></i>
+            <span class="d-none d-md-inline">Đăng nhập</span>
+          </button>
+        </li>
+      </ul>
     </div>
+  </div>
 
-    <!-- Auth Modal -->
-    <div id="authModal" class="auth-modal">
-        <div class="auth-modal-content">
-            <span class="close-modal">&times;</span>
-            
-            <!-- Tab buttons -->
-            <div class="auth-tabs">
-                <button class="auth-tab-btn active" data-tab="login">Đăng nhập</button>
-                <button class="auth-tab-btn" data-tab="register">Đăng ký</button>
-            </div>
+  <!-- Auth Modal -->
+  <div
+    class="modal fade"
+    id="authModal"
+    tabindex="-1"
+    aria-labelledby="authModalLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="authModalLabel">Đăng nhập/Đăng ký</h5>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <!-- Tab buttons -->
+          <ul class="nav nav-tabs" id="authTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button
+                class="nav-link active"
+                id="login-tab"
+                data-bs-toggle="tab"
+                data-bs-target="#loginForm"
+                type="button"
+                role="tab"
+                aria-controls="loginForm"
+                aria-selected="true"
+              >
+                Đăng nhập
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button
+                class="nav-link"
+                id="register-tab"
+                data-bs-toggle="tab"
+                data-bs-target="#registerForm"
+                type="button"
+                role="tab"
+                aria-controls="registerForm"
+                aria-selected="false"
+              >
+                Đăng ký
+              </button>
+            </li>
+          </ul>
 
+          <!-- Tab content -->
+          <div class="tab-content pt-3" id="authTabContent">
             <!-- Login Form -->
-            <div id="loginForm" class="auth-form active">
-                <form th:action="@{/auth/login}" method="post">
-                    <div class="form-group">
-                        <i class="fas fa-envelope"></i>
-                        <input type="email" name="email" placeholder="Email" required>
-                    </div>
-                    <div class="form-group">
-                        <i class="fas fa-lock"></i>
-                        <input type="password" name="password" placeholder="Mật khẩu" required>
-                    </div>
-                    <div class="form-options">
-                        <label><input type="checkbox" name="remember"> Ghi nhớ đăng nhập</label>
-                    </div>
-                    <button type="submit" class="auth-button">Đăng nhập</button>
-                </form>
+            <div
+              class="tab-pane fade show active"
+              id="loginForm"
+              role="tabpanel"
+              aria-labelledby="login-tab"
+            >
+              <form th:action="@{/auth/login}" method="post">
+                <div class="mb-3">
+                  <div class="input-group">
+                    <span class="input-group-text"
+                      ><i class="fas fa-envelope"></i
+                    ></span>
+                    <input
+                      type="email"
+                      class="form-control"
+                      name="email"
+                      placeholder="Email"
+                      required
+                    />
+                  </div>
+                </div>
+                <div class="mb-3">
+                  <div class="input-group">
+                    <span class="input-group-text"
+                      ><i class="fas fa-lock"></i
+                    ></span>
+                    <input
+                      type="password"
+                      class="form-control"
+                      name="password"
+                      placeholder="Mật khẩu"
+                      required
+                    />
+                  </div>
+                </div>
+                <div class="mb-3 form-check">
+                  <input
+                    type="checkbox"
+                    class="form-check-input"
+                    id="rememberCheck"
+                    name="remember"
+                  />
+                  <label class="form-check-label" for="rememberCheck"
+                    >Ghi nhớ đăng nhập</label
+                  >
+                </div>
+                <button type="submit" class="btn btn-primary w-100">
+                  Đăng nhập
+                </button>
+              </form>
             </div>
 
             <!-- Register Form -->
-            <div id="registerForm" class="auth-form">
-                <form th:action="@{/auth/register}" method="post">
-                    <div class="form-group">
-                        <i class="fas fa-envelope"></i>
-                        <input type="email" name="email" placeholder="Email" required>
-                    </div>
-                    <div class="form-group">
-                        <i class="fas fa-user"></i>
-                        <input type="text" name="hoTen" placeholder="Họ tên" required>
-                    </div>
-                    <div class="form-group">
-                        <i class="fas fa-lock"></i>
-                        <input type="password" name="matKhau" placeholder="Mật khẩu" required>
-                    </div>
-                    <div class="form-group">
-                        <i class="fas fa-lock"></i>
-                        <input type="password" name="xacNhanMatKhau" placeholder="Xác nhận mật khẩu" required>
-                    </div>
-                    <button type="submit" class="auth-button">Đăng ký</button>
-                </form>
+            <div
+              class="tab-pane fade"
+              id="registerForm"
+              role="tabpanel"
+              aria-labelledby="register-tab"
+            >
+              <form th:action="@{/auth/register}" method="post">
+                <div class="mb-3">
+                  <div class="input-group">
+                    <span class="input-group-text"
+                      ><i class="fas fa-envelope"></i
+                    ></span>
+                    <input
+                      type="email"
+                      class="form-control"
+                      name="email"
+                      placeholder="Email"
+                      required
+                    />
+                  </div>
+                </div>
+                <div class="mb-3">
+                  <div class="input-group">
+                    <span class="input-group-text"
+                      ><i class="fas fa-user"></i
+                    ></span>
+                    <input
+                      type="text"
+                      class="form-control"
+                      name="hoTen"
+                      placeholder="Họ tên"
+                      required
+                    />
+                  </div>
+                </div>
+                <div class="mb-3">
+                  <div class="input-group">
+                    <span class="input-group-text"
+                      ><i class="fas fa-lock"></i
+                    ></span>
+                    <input
+                      type="password"
+                      class="form-control"
+                      name="matKhau"
+                      placeholder="Mật khẩu"
+                      required
+                    />
+                  </div>
+                </div>
+                <div class="mb-3">
+                  <div class="input-group">
+                    <span class="input-group-text"
+                      ><i class="fas fa-lock"></i
+                    ></span>
+                    <input
+                      type="password"
+                      class="form-control"
+                      name="xacNhanMatKhau"
+                      placeholder="Xác nhận mật khẩu"
+                      required
+                    />
+                  </div>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">
+                  Đăng ký
+                </button>
+              </form>
             </div>
-
-            <!-- Verification Form -->
-            <div id="verifyForm" class="auth-form">
-                <form th:action="@{/auth/verify}" method="post">
-                    <div class="form-group">
-                        <i class="fas fa-key"></i>
-                        <input type="text" name="code" placeholder="Nhập mã xác thực" required>
-                    </div>
-                    <button type="submit" class="auth-button">Xác thực</button>
-                </form>
-            </div>
+          </div>
         </div>
+      </div>
     </div>
+  </div>
 </nav>
-
