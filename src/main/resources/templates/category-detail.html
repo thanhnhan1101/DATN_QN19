@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trang chủ</title>
+    <!-- CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/nav.css}">
+    <link rel="stylesheet" th:href="@{/css/footer.css}">
+    <link rel="stylesheet" th:href="@{/css/content.css}">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <!-- JavaScript -->
+    <script th:src="@{/static/js/nav.js}" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+</head>
+
+<body>
+  
+    <!-- Navigation -->
+    <div th:replace="~{Giaodien/Nav :: nav}"></div>
+
+   <!-- Main Content Area -->
+    <div class="content-wrapper">
+        <!-- Category Header -->
+        <div class="category-header">
+            <h1 class="category-title" th:text="${currentDanhMuc.tenDanhMuc}">Tên danh mục</h1>
+        </div>
+
+        <!-- Main Grid Layout -->
+        <div class="main-grid">
+            <!-- Main Content -->
+            <main class="main-content">
+                <!-- Category Posts -->
+                <div class="category-posts">
+                    <div class="news-grid">
+                        <!-- Loop through posts -->
+                        <th:block th:each="post : ${baiViets}">
+                            <article class="news-item horizontal">
+                                <div class="news-image">
+                                    <a th:href="@{'/baiviet/' + ${post.duongDan}}">
+                                        <img th:src="${post.hinhAnh}" th:alt="${post.tieuDe}" />
+                                    </a>
+                                </div>
+                                <div class="news-content">
+                                    <h3 class="news-title">
+                                        <a th:href="@{'/baiviet/' + ${post.duongDan}}" 
+                                           th:text="${post.tieuDe}">Tiêu đề bài viết</a>
+                                    </h3>
+                                    <p class="news-description" th:text="${post.tomTat}">Tóm tắt bài viết</p>
+                                    <div class="news-meta">
+                                        <span class="news-category" th:text="${post.danhMuc.tenDanhMuc}">Danh mục</span>
+                                        <span class="news-date" th:text="${#temporals.format(post.ngayDang, 'dd/MM/yyyy')}">Ngày đăng</span>
+                                        <span class="view-count">
+                                            <i class="fas fa-eye"></i> 
+                                            <span th:text="${post.luotXem}">0</span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </article>
+                        </th:block>
+                    </div>
+                </div>
+
+                <!-- No Posts Message -->
+                <div th:if="${#lists.isEmpty(baiViets)}" class="no-posts">
+                    <p>Chưa có bài viết nào trong danh mục này.</p>
+                </div>
+            </main>
+
+            <!-- Right Sidebar -->
+            <aside class="right-sidebar">
+                <!-- Latest Posts in Category -->
+                <div class="sidebar-section">
+                    <h3 class="section-title">Bài viết mới nhất</h3>
+                    <div class="sidebar-posts">
+                        <th:block th:each="post : ${baiViets.size() > 5 ? #lists.subList(baiViets, 0, 5) : baiViets}">
+                            <article class="sidebar-post">
+                                <div class="post-image">
+                                    <a th:href="@{'/baiviet/' + ${post.duongDan}}">
+                                        <img th:src="${post.hinhAnh}" th:alt="${post.tieuDe}" />
+                                    </a>
+                                </div>
+                                <div class="post-content">
+                                    <h4>
+                                        <a th:href="@{'/baiviet/' + ${post.duongDan}}" 
+                                           th:text="${post.tieuDe}">Tiêu đề bài viết</a>
+                                    </h4>
+                                    <span class="post-date" th:text="${#temporals.format(post.ngayDang, 'dd/MM/yyyy')}">Ngày đăng</span>
+                                </div>
+                            </article>
+                        </th:block>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div th:replace="~{Giaodien/Foter :: footer}"></div>
+</body>
+</html>

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="${baiviet?.tieuDe} ?: 'Chi tiết bài viết'">Chi tiết bài viết</title>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.7;
+            padding: 40px;
+            background-color: #f5f5f5;
+            max-width: 800px;
+            margin: auto;
+        }
+        h1 {
+            color: #333;
+        }
+        .meta {
+            color: #777;
+            margin-bottom: 20px;
+        }
+        img {
+            width: 100%;
+            max-height: 400px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .content {
+            font-size: 18px;
+            color: #222;
+        }
+    </style>
+</head>
+<body>
+    <h1 th:text="${baiviet?.tieuDe} ?: 'Không có tiêu đề'">Tiêu đề bài viết</h1>
+
+    <div class="meta">
+        Tác giả: <span th:text="${baiviet?.tacGia?.hoTen} ?: 'Không rõ'">Tên tác giả</span> |
+        Ngày đăng: <span th:text="${baiviet?.ngayDang != null} ? ${#temporals.format(baiviet.ngayDang, 'dd/MM/yyyy HH:mm')} : 'Không có ngày'">01/01/2024</span> |
+        Thể loại: <span th:text="${baiviet?.danhMuc?.tenDanhMuc} ?: 'Không có danh mục'">Thể loại</span> |
+        Nguồn tin: <span th:text="${baiviet?.nguonTin?.tenNguonTin} ?: 'Không có nguồn'">Nguồn</span>
+    </div>
+
+    <img th:if="${baiviet?.hinhAnh}" th:src="'data:image/jpeg;base64,' + ${baiviet.hinhAnh}" alt="Hình ảnh bài viết">
+
+    <div class="content" th:utext="${baiviet?.noiDung} ?: 'Không có nội dung'">
+        Nội dung bài viết
+    </div>
+
+    
+
+
+</body>
+</html>

@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý bài viết</title>
+    <!-- CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/static/css/nav.css}">
+    <link rel="stylesheet" th:href="@{/static/css/footer.css}">
+    <link rel="stylesheet" th:href="@{/static/css/baiviet.css}">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <!-- JavaScript -->
+    <script th:src="@{/static/js/nav.js}" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script th:src="@{/static/js/baiviet.js}"></script>
+</head>
+<body>
+    <input type="hidden" id="message" th:value="${message}" />
+    <input type="hidden" id="messageType" th:value="${messageType}" />
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        document.addEventListener('DOMContentLoaded', function() {
+            const message = /*[[${message}]]*/ null;
+            const messageType = /*[[${messageType}]]*/ null;
+            if (message) {
+                showToast(message, messageType);
+            }
+        });
+        /*]]>*/
+    </script>
+
+    <!-- Navigation -->
+    <div th:replace="~{Giaodien/Nav :: nav}"></div>
+    
+    <!-- Main Content -->
+    <main>
+        <div class="admin-container">
+            <div class="admin-header">
+                <h2>Quản lý bài viết</h2>
+            </div>
+            
+            <!-- Search Form -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form th:action="@{/admin/baiviet}" method="get" class="search-form">
+                        <div class="row">
+                            <div class="col">
+                                <input type="text" name="keyword" class="form-control" placeholder="Tìm theo tiêu đề...">
+                            </div>
+                            <div class="col">
+                                <select name="maDanhMuc" class="form-control">
+                                    <option value="">-- Chọn danh mục --</option>
+                                    <option th:each="dm : ${danhmucs}" 
+                                            th:value="${dm.maDanhMuc}"
+                                            th:text="${dm.tenDanhMuc}"></option>
+                                </select>
+                            </div>
+                            <div class="col">
+                                <select name="trangThai" class="form-control">
+                                    <option value="">-- Trạng thái --</option>
+                                    <option value="Nháp">Nháp</option>
+                                    <option value="Đã đăng">Đã đăng</option>
+                                </select>
+                            </div>
+                            <div class="col">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-search"></i> Tìm kiếm
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Form thêm/sửa bài viết -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form id="baiVietForm" th:action="@{/admin/baiviet}" method="post" 
+                          th:object="${baiviet}" enctype="multipart/form-data">
+                        <input type="hidden" th:field="*{maBaiViet}">
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Tiêu đề</label>
+                            <input type="text" th:field="*{tieuDe}" class="form-control" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Tóm tắt</label>
+                            <textarea th:field="*{tomTat}" class="form-control" rows="3"></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Nội dung</label>
+                            <textarea th:field="*{noiDung}" class="form-control" rows="10" required></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Hình ảnh</label>
+                            <input type="file" name="imageFile" class="form-control" accept="image/*">
+                            <img th:if="${baiviet.hinhAnh}" th:src="${baiviet.hinhAnh}" 
+                                 class="img-preview mt-2" style="max-width: 200px;">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Danh mục</label>
+                            <select th:field="*{danhMuc.maDanhMuc}" class="form-control" required>
+                                <option value="">-- Chọn danh mục --</option>
+                                <option th:each="dm : ${danhmucs}" 
+                                        th:value="${dm.maDanhMuc}"
+                                        th:text="${dm.tenDanhMuc}"></option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Trạng thái</label>
+                            <select th:field="*{trangThai}" class="form-control">
+                                <option value="Nháp">Nháp</option>
+                                <option value="Đã đăng">Đã đăng</option>
+                                <option value="Ẩn">Ẩn</option>
+                            </select>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <span th:text="${baiviet.maBaiViet == null ? 'Thêm bài viết' : 'Cập nhật'}"></span>
+                            </button>
+                            <button type="button" class="btn btn-secondary" onclick="resetForm()">Reset</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Danh sách bài viết -->
+            <div class="card mb-4">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Hình ảnh</th>
+                                    <th>Tiêu đề</th>
+                                    <th>Danh mục</th>
+                                    <th>Trạng thái</th>
+                                    <th>Lượt xem</th>
+                                    <th>Ngày đăng</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="item : ${baiViets}">
+                                    <td th:text="${item.maBaiViet}"></td>
+                                    <td>
+                                        <img th:if="${item.hinhAnh}" th:src="${item.hinhAnh}" 
+                                             style="max-width: 50px; height: auto;">
+                                    </td>
+                                    <td th:text="${item.tieuDe}"></td>
+                                    <td th:text="${item.danhMuc?.tenDanhMuc}"></td>
+                                    <td>
+                                        <span th:text="${item.trangThai}"
+                                              th:class="${item.trangThai == 'Đã đăng' ? 'badge bg-success' : 'badge bg-warning'}">
+                                        </span>
+                                    </td>
+                                    <td th:text="${item.luotXem}"></td>
+                                    <td th:text="${#temporals.format(item.ngayDang, 'dd-MM-yyyy HH:mm')}"></td>
+                                    <td>
+                                        <a th:href="@{/admin/baiviet/edit/{id}(id=${item.maBaiViet})}" 
+                                           class="btn btn-sm btn-warning">
+                                           <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="javascript:void(0)" 
+                                           class="btn btn-sm"
+                                           th:classappend="${item.trangThai == 'Ẩn' ? 'btn-success' : 'btn-danger'}"
+                                           th:onclick="'toggleVisibility(' + ${item.maBaiViet} + ')'"
+                                           th:title="${item.trangThai == 'Ẩn' ? 'Hiện bài viết' : 'Ẩn bài viết'}">
+                                           <i class="fas" th:classappend="${item.trangThai == 'Ẩn' ? 'fa-eye' : 'fa-eye-slash'}"></i>
+                                        </a>
+                                        <button th:if="${item.trangThai == 'Chờ duyệt' and session.user.vaiTro == 'admin'}"
+                                                th:onclick="'window.location.href=\'/admin/baiviet/approve/' + ${item.maBaiViet} + '\';'">
+                                            Duyệt
+                                        </button>
+                                        <button th:if="${item.trangThai == 'Chờ duyệt' and session.user.vaiTro == 'admin'}"
+                                                th:onclick="'window.location.href=\'/admin/baiviet/reject/' + ${item.maBaiViet} + '\';'">
+                                            Từ chối
+                                        </button>
+                                        <button th:if="${item.trangThai == 'Chờ ẩn' and session.user.vaiTro == 'admin'}"
+                                                th:onclick="'window.location.href=\'/admin/baiviet/approve-hide/' + ${item.maBaiViet} + '\';'">
+                                            Duyệt ẩn
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <div th:replace="~{Giaodien/Foter :: footer}"></div>
+</body>
+</html>

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trang chủ</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/static/css/nav.css}">
+    <link rel="stylesheet" th:href="@{/static/css/footer.css}">
+    <script th:src="@{/static/js/nav.js}" defer></script>
+</head>
+<body>
+ 
+    <div th:replace="~{Giaodien/Nav :: nav}"></div>
+    
+    <main>
+    
+    </main>
+    
+    <div th:replace="~{Giaodien/Foter :: footer}"></div>
+</body>
+</html>

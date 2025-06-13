@@ -1,0 +1,155 @@
+<nav th:fragment="nav" class="navbar">
+    <!-- Top Navigation Row -->
+    <div class="nav-top">
+        <div class="nav-wrapper">
+            <a href="/" class="logo">
+                <img th:src="@{/static/images/logo.jpg}" alt="MSN Logo" width="100"> 
+            </a>
+            <div class="search-box-large">
+                <input type="search" placeholder="Tìm kiếm...">
+                <button type="button"><i class="fas fa-search"></i></button>
+            </div>
+            <div class="nav-top-right">
+                <div class="weather-widget" id="current-weather">
+                    <i class="fas fa-cloud"></i>
+                    <span>Loading...</span>
+                </div>
+                <!-- Thay thế nút đăng nhập bằng menu user -->
+                <div th:if="${session.user}" class="user-menu">
+                    <button class="user-button">
+                        <i class="fas fa-user"></i>
+                        <span th:text="${session.user.hoTen}">Người dùng</span>
+                    </button>
+                    <div class="user-dropdown">
+                        <a href="/user/profile"><i class="fas fa-id-card"></i> Thông tin cá nhân</a>
+                        <a href="/user/saved-posts"><i class="fas fa-bookmark"></i> Bài viết đã lưu</a>
+                        <a href="/auth/logout"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a>
+                    </div>
+                </div>
+                <button th:unless="${session.user}" class="signin-btn">
+                    <i class="fas fa-user"></i>
+                    <span>Đăng nhập</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation Row -->
+    <div class="nav-bottom">
+        <div class="nav-wrapper">
+            <div class="menu-left">
+                <button class="menu-toggle" id="menu-toggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <!-- Side Menu -->
+                <div class="side-menu" id="side-menu">
+                    <button class="side-menu-close" id="side-menu-close">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <ul>
+                        <li><a href="/preferences"><i class="fas fa-heart"></i> Sở thích của tôi</a></li>
+                        <li><a href="/lich-su-xem"><i class="fas fa-history"></i> Lịch sử đã xem</a></li>
+                        <!-- Add Admin Section -->
+                        <li class="admin-section" th:if="${session.user != null && (session.user.vaiTro == 'admin' || session.user.vaiTro == 'reporter')}">
+                            <h3>Quản trị</h3>
+                            <ul>
+                                <!-- Chỉ admin mới thấy quản lý danh mục và người dùng -->
+                                <li th:if="${session.user.vaiTro == 'admin'}">
+                                    <a href="/admin/danhmuc"><i class="fas fa-folder"></i> Quản lý danh mục</a>
+                                </li>
+                                <li>
+                                    <a href="/admin/baiviet"><i class="fas fa-newspaper"></i>
+                                        <span th:text="${session.user.vaiTro == 'admin' ? 'Quản lý bài viết' : 'Bài viết của tôi'}"></span>
+                                    </a>
+                                </li>
+                                <li th:if="${session.user.vaiTro == 'admin'}">
+                                    <a href="/admin/nguoidung"><i class="fas fa-users"></i> Quản lý người dùng</a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+                <!-- Menu Overlay -->
+                <div class="menu-overlay" id="menu-overlay"></div>
+            </div>
+            <ul class="main-menu">
+                <!-- Sửa lại menu Tin tức trỏ về trang chủ -->
+                <li>
+                    <a href="/" >
+                        Tin tức
+                    </a>
+                </li>
+                <!-- Sửa đường dẫn của danh mục -->
+                <li th:each="danhmuc : ${danhmucs}">
+                    <a th:href="@{'/danh-muc/' + ${danhmuc.duongDan}}" th:text="${danhmuc.tenDanhMuc}"></a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Auth Modal -->
+    <div id="authModal" class="auth-modal">
+        <div class="auth-modal-content">
+            <span class="close-modal">&times;</span>
+            
+            <!-- Tab buttons -->
+            <div class="auth-tabs">
+                <button class="auth-tab-btn active" data-tab="login">Đăng nhập</button>
+                <button class="auth-tab-btn" data-tab="register">Đăng ký</button>
+            </div>
+
+            <!-- Login Form -->
+            <div id="loginForm" class="auth-form active">
+                <form th:action="@{/auth/login}" method="post">
+                    <div class="form-group">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" name="email" placeholder="Email" required>
+                    </div>
+                    <div class="form-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" name="password" placeholder="Mật khẩu" required>
+                    </div>
+                    <div class="form-options">
+                        <label><input type="checkbox" name="remember"> Ghi nhớ đăng nhập</label>
+                    </div>
+                    <button type="submit" class="auth-button">Đăng nhập</button>
+                </form>
+            </div>
+
+            <!-- Register Form -->
+            <div id="registerForm" class="auth-form">
+                <form th:action="@{/auth/register}" method="post">
+                    <div class="form-group">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" name="email" placeholder="Email" required>
+                    </div>
+                    <div class="form-group">
+                        <i class="fas fa-user"></i>
+                        <input type="text" name="hoTen" placeholder="Họ tên" required>
+                    </div>
+                    <div class="form-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" name="matKhau" placeholder="Mật khẩu" required>
+                    </div>
+                    <div class="form-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" name="xacNhanMatKhau" placeholder="Xác nhận mật khẩu" required>
+                    </div>
+                    <button type="submit" class="auth-button">Đăng ký</button>
+                </form>
+            </div>
+
+            <!-- Verification Form -->
+            <div id="verifyForm" class="auth-form">
+                <form th:action="@{/auth/verify}" method="post">
+                    <div class="form-group">
+                        <i class="fas fa-key"></i>
+                        <input type="text" name="code" placeholder="Nhập mã xác thực" required>
+                    </div>
+                    <button type="submit" class="auth-button">Xác thực</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</nav>
+

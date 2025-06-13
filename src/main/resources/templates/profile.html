@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thông tin cá nhân</title>
+    <!-- CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/nav.css}">
+    <link rel="stylesheet" th:href="@{/css/footer.css}">
+    <link rel="stylesheet" th:href="@{/css/profile.css}">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <!-- JavaScript -->
+    <script th:src="@{/static/js/nav.js}" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+</head>
+<body>
+    <!-- Navigation -->
+    <div th:replace="~{Giaodien/Nav :: nav}"></div>
+
+    <!-- Main Content -->
+    <main class="content">
+        <!-- Thông báo -->
+        <div th:if="${message}" class="alert alert-success" role="alert" th:text="${message}"></div>
+        <div th:if="${error}" class="alert alert-danger" role="alert" th:text="${error}"></div>
+
+        <div class="profile-container">
+            <div class="profile-card">
+                <div class="profile-avatar">
+                    <span th:if="${user.anhDaiDien == null || user.anhDaiDien == ''}" 
+                          class="avatar-circle" 
+                          th:text="${#strings.substring(user.hoTen, 0, 1).toUpperCase()}"></span>
+                    <img th:if="${user.anhDaiDien != null && user.anhDaiDien != ''}" 
+                         th:src="${user.anhDaiDien}" 
+                         class="avatar-img" alt="avatar"/>
+                </div>
+                <h2 th:text="${user.hoTen}">Tên người dùng</h2>
+                <span class="role-badge" th:text="${user.vaiTro}">Vai trò</span>
+                <form th:action="@{/user/profile/update}" method="post" enctype="multipart/form-data" class="profile-update-form">
+                    <div class="profile-info">
+                        <p>
+                            <i class="fas fa-envelope"></i>
+                            <input type="email" name="email" th:value="${user.email}" readonly style="background:#f5f6fa; border:none; color:#888;">
+                        </p>
+                        <p>
+                            <i class="fas fa-phone"></i>
+                            <input type="text" name="soDienThoai" th:value="${user.soDienThoai}" placeholder="Số điện thoại">
+                        </p>
+                        <p>
+                            <i class="fas fa-map-marker-alt"></i>
+                            <input type="text" name="diaChi" th:value="${user.diaChi}" placeholder="Địa chỉ">
+                        </p>
+                        <p>
+                            <i class="fas fa-image"></i>
+                            <input type="file" name="avatarFile" accept="image/*">
+                        </p>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Cập nhật thông tin</button>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <div th:replace="~{Giaodien/Foter :: footer}"></div>
+
+    <!-- Script -->
+    <script th:src="@{/js/profile.js}"></script>
+</body>
+</html>

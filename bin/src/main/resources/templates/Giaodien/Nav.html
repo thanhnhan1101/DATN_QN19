@@ -1,0 +1,72 @@
+<nav th:fragment="nav" class="navbar">
+    <!-- Top Navigation Row -->
+    <div class="nav-top">
+        <div class="nav-wrapper">
+            <a href="/" class="logo">
+                <img th:src="@{/static/images/msn-logo.png}" alt="MSN Logo">
+            </a>
+            <div class="search-box-large">
+                <input type="search" placeholder="Tìm kiếm...">
+                <button type="button"><i class="fas fa-search"></i></button>
+            </div>
+            <div class="nav-top-right">
+                <div class="weather-widget" id="current-weather">
+                    <i class="fas fa-cloud"></i>
+                    <span>Loading...</span>
+                </div>
+                <button class="theme-toggle" id="theme-toggle">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <button class="signin-btn" onclick="window.location.href='/login'">
+                    <i class="fas fa-user"></i>
+                    <span>Đăng nhập</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation Row -->
+    <div class="nav-bottom">
+        <div class="nav-wrapper">
+            <div class="menu-left">
+                <button class="menu-toggle" id="menu-toggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <!-- Side Menu -->
+                <div class="side-menu" id="side-menu">
+                    <button class="side-menu-close" id="side-menu-close">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <ul>
+                        <li><a href="/preferences"><i class="fas fa-heart"></i> Sở thích của tôi</a></li>
+                        <li><a href="/history"><i class="fas fa-history"></i> Lịch sử đã xem</a></li>
+                        <!-- Add Admin Section -->
+                        <li class="admin-section">
+                            <h3>Quản trị</h3>
+                            <ul>
+                                <li><a href="/admin/danhmuc"><i class="fas fa-folder"></i> Quản lý danh mục</a></li>
+                                <li><a href="/admin/baiviet"><i class="fas fa-newspaper"></i> Quản lý bài viết</a></li>
+                                <li><a href="/admin/users"><i class="fas fa-users"></i> Quản lý người dùng</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+                <!-- Menu Overlay -->
+                <div class="menu-overlay" id="menu-overlay"></div>
+            </div>
+            <ul class="main-menu">
+                <!-- Sửa lại menu Tin tức trỏ về trang chủ -->
+                <li>
+                    <a href="/" class="menu-tintuc active">
+                        <i class="fas fa-newspaper"></i> Tin tức
+                    </a>
+                </li>
+                <!-- Danh mục động từ database -->
+                <li th:each="danhmuc : ${danhmucs}">
+                    <a th:href="@{${danhmuc.duongDan}}" th:text="${danhmuc.tenDanhMuc}"></a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+

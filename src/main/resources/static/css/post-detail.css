@@ -1,0 +1,273 @@
+/* Main layout */
+.main-detail-layout {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 30px;
+}
+
+/* Main article */
+.main-article {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    padding: 30px;
+}
+
+.post-header {
+    margin-bottom: 30px;
+}
+
+.post-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 15px;
+    line-height: 1.3;
+}
+
+.post-meta {
+    display: flex;
+    gap: 20px;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.post-category {
+    color: #e74c3c;
+    font-weight: 500;
+}
+
+.post-image {
+    margin-bottom: 30px;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.post-image img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.post-content {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: #333;
+}
+
+.post-content p {
+    margin-bottom: 1.5em;
+}
+
+/* Sidebar */
+.sidebar {
+    position: sticky;
+    top: 20px;
+}
+
+.sidebar-section {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.sidebar-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #e74c3c;
+    color: #333;
+}
+
+.sidebar-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.sidebar-item {
+    display: grid;
+    grid-template-columns: 100px 1fr;
+    gap: 15px;
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.3s ease;
+}
+
+.sidebar-item:hover {
+    transform: translateX(5px);
+}
+
+.sidebar-thumb {
+    width: 100px;
+    height: 70px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.sidebar-item-title {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 5px;
+    line-height: 1.4;
+}
+
+.sidebar-item-date {
+    font-size: 0.8rem;
+    color: #666;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+    .main-detail-layout {
+        grid-template-columns: 1fr;
+    }
+    
+    .sidebar {
+        position: static;
+    }
+}
+
+@media (max-width: 768px) {
+    .main-detail-layout {
+        padding: 10px;
+    }
+    
+    .main-article {
+        padding: 20px;
+    }
+    
+    .post-title {
+        font-size: 2rem;
+    }
+    
+    .post-meta {
+        flex-direction: column;
+        gap: 10px;
+    }
+}
+
+.interaction-buttons {
+    display: flex;
+    gap: 1rem;
+    margin-top: 0.5rem;
+}
+
+.like-btn, .dislike-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 4px;
+    background: #f0f0f0;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.like-btn:hover, .dislike-btn:hover {
+    background: #e0e0e0;
+}
+
+.like-btn.active {
+    background: #4CAF50;
+    color: white;
+}
+
+.dislike-btn.active {
+    background: #f44336;
+    color: white;
+}
+
+.like-btn i, .dislike-btn i {
+    font-size: 1.1rem;
+}
+
+.like-count, .dislike-count {
+    font-weight: 500;
+}
+
+.share-btn {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background-color 0.3s;
+}
+
+.share-btn:hover {
+    background-color: #45a049;
+}
+
+.share-btn i {
+    font-size: 16px;
+}
+
+/* Modal styles */
+.share-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+}
+
+.share-modal-content {
+    position: relative;
+    background-color: #fff;
+    margin: 15% auto;
+    padding: 20px;
+    width: 400px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.close-share-modal {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    font-size: 24px;
+    cursor: pointer;
+    color: #666;
+}
+
+.share-form {
+    margin-top: 20px;
+}
+
+.share-form input[type="email"] {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.share-form button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    width: 100%;
+}
+
+.share-form button:hover {
+    background-color: #45a049;
+}

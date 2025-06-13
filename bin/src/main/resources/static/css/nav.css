@@ -1,0 +1,317 @@
+/* Nav styles */
+.navbar {
+    background: #fff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    width: 100%;
+}
+
+/* Top Navigation Styles */
+.nav-top {
+    border-bottom: 1px solid #eee;
+    padding: 10px 0;
+}
+
+.nav-wrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.logo img {
+    height: 30px;
+    object-fit: contain;
+}
+
+.search-box-large {
+    flex: 1;
+    max-width: 600px;
+    margin: 0 auto;
+    position: relative;
+}
+
+.search-box-large input {
+    width: 100%;
+    padding: 12px 40px 12px 15px;
+    border: 2px solid #0078d4;
+    border-radius: 24px;
+    font-size: 1rem;
+}
+
+.search-box-large button {
+    position: absolute;
+    right: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #0078d4;
+    cursor: pointer;
+}
+
+.nav-top-right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.weather-widget {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.theme-toggle, .signin-btn {
+    background: none;
+    border: none;
+    padding: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.theme-toggle:hover, .signin-btn:hover {
+    color: #0078d4;
+}
+
+/* Bottom Navigation Styles */
+.nav-bottom {
+    padding: 10px 0;
+}
+
+.menu-left {
+    position: relative;
+}
+
+.menu-toggle {
+    background: none;
+    border: none;
+    padding: 8px;
+    cursor: pointer;
+    font-size: 1.2rem;
+}
+
+/* Side Menu Styles */
+.side-menu {
+    position: fixed;
+    left: -300px; /* Ẩn menu bên ngoài viewport */
+    top: 0;
+    height: 100vh;
+    width: 300px;
+    background: #fff;
+    box-shadow: 2px 0 8px rgba(0,0,0,0.1);
+    transition: left 0.3s ease;
+    z-index: 1001;
+    padding-top: 60px;
+}
+
+.side-menu.active {
+    left: 0; /* Hiện menu khi active */
+}
+
+/* Overlay khi menu hiện */
+.menu-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    z-index: 1000;
+}
+
+.menu-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Close button trong side menu */
+.side-menu-close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #333;
+}
+
+.side-menu ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.side-menu li a {
+    padding: 12px 15px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    color: #333;
+}
+
+.side-menu li a:hover {
+    background: #f5f5f5;
+}
+
+.main-menu {
+    display: flex;
+    list-style: none;
+    gap: 1.5rem;
+    margin: 0;
+    padding: 0;
+    overflow-x: auto;
+}
+
+.main-menu a {
+    text-decoration: none;
+    color: #333;
+    white-space: nowrap;
+}
+
+.main-menu a:hover {
+    color: #0078d4;
+}
+
+/* Dark Theme */
+.dark-theme {
+    background: #1a1a1a;
+    color: #fff;
+}
+
+.dark-theme .navbar {
+    background: #2d2d2d;
+}
+
+.dark-theme .nav-top {
+    border-bottom-color: #404040;
+}
+
+.dark-theme .search-box-large input {
+    background: #404040;
+    border-color: #505050;
+    color: #fff;
+}
+
+.dark-theme .side-menu {
+    background: #2d2d2d;
+    color: #fff;
+}
+
+.dark-theme .side-menu-close {
+    color: #fff;
+}
+
+.dark-theme .side-menu li a {
+    color: #fff;
+}
+
+.dark-theme .side-menu li a:hover {
+    background: #404040;
+}
+
+.dark-theme .main-menu a {
+    color: #fff;
+}
+
+/* Admin Section Styles */
+.admin-section {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+}
+
+.admin-section h3 {
+    color: #333;
+    font-size: 1rem;
+    margin-bottom: 10px;
+    padding-left: 15px;
+}
+
+.admin-section ul {
+    padding-left: 0;
+}
+
+.admin-section li a {
+    padding: 8px 15px;
+    display: flex;
+    align-items: center;
+    color: #666;
+    transition: background-color 0.3s;
+}
+
+.admin-section li a:hover {
+    background-color: #f5f5f5;
+    color: #000;
+}
+
+.admin-section i {
+    margin-right: 10px;
+    width: 20px;
+    text-align: center;
+}
+
+/* Tintuc Menu Styles */
+.menu-tintuc {
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.menu-tintuc.active {
+    color: #2196F3;
+}
+
+.menu-tintuc i {
+    font-size: 14px;
+}
+
+.menu-tintuc:hover {
+    color: #1976D2;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .nav-wrapper {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .nav-menu {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .nav-right {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .search-box input {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .nav-menu {
+        gap: 1rem;
+    }
+
+    .nav-menu a {
+        font-size: 0.85rem;
+    }
+}
+
+/* Rest of your CSS */

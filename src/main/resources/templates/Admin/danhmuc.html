@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý danh mục</title>
+    <!-- CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/static/css/nav.css}">
+    <link rel="stylesheet" th:href="@{/static/css/footer.css}">
+    <link rel="stylesheet" th:href="@{/static/css/baiviet.css}">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <!-- JavaScript -->
+    <script th:src="@{/static/js/nav.js}" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script th:src="@{/static/js/baiviet.js}"></script>
+</head>
+<body>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        document.addEventListener('DOMContentLoaded', function() {
+            const message = /*[[${message}]]*/ null;
+            const messageType = /*[[${messageType}]]*/ null;
+            if (message) {
+                showToast(message, messageType);
+            }
+        });
+        /*]]>*/
+    </script>
+
+    <!-- Navigation -->
+    <div th:replace="~{Giaodien/Nav :: nav}"></div>
+    
+    <!-- Main Content -->
+    <main>
+        <div class="admin-container">
+            <div class="admin-header">
+                <h2>Quản lý danh mục</h2>
+            </div>
+
+            <!-- Search Form -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form th:action="@{/admin/danhmuc}" method="get" class="search-form">
+                        <div class="row">
+                            <div class="col">
+                                <input type="text" name="keyword" class="form-control" placeholder="Tìm theo tên danh mục...">
+                            </div>
+                            <div class="col">
+                                <select name="parentId" class="form-control">
+                                    <option value="">-- Danh mục cha --</option>
+                                    <option th:each="dm : ${danhmucs}" 
+                                            th:value="${dm.maDanhMuc}"
+                                            th:text="${dm.tenDanhMuc}"></option>
+                                </select>
+                            </div>
+                            <div class="col">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-search"></i> Tìm kiếm
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Form thêm/sửa danh mục -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form id="danhMucForm" th:action="@{/admin/danhmuc}" method="post" th:object="${danhmuc}">
+                        <input type="hidden" th:field="*{maDanhMuc}">
+                        <input type="hidden" th:field="*{ngayTao}">
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Tên danh mục</label>
+                            <input type="text" th:field="*{tenDanhMuc}" class="form-control" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Đường dẫn</label>
+                            <input type="text" th:field="*{duongDan}" class="form-control" required>
+                        </div>
+
+
+                        <div class="mb-3">
+                            <label class="form-label">Mô tả</label>
+                            <textarea th:field="*{moTa}" class="form-control" rows="3"></textarea>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <span th:text="${danhmuc.maDanhMuc == null ? 'Thêm danh mục' : 'Cập nhật'}"></span>
+                            </button>
+                            <button type="button" class="btn btn-secondary" onclick="resetForm()">Làm mới</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Danh sách danh mục -->
+            <div class="card mb-4">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Tên danh mục</th>
+                                    <th>Đường dẫn</th>
+                                    <th>Ngày tạo</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="item : ${danhmucs}">
+                                    <td th:text="${item.maDanhMuc}"></td>
+                                    <td th:text="${item.tenDanhMuc}"></td>
+                                    <td th:text="${item.duongDan}"></td>
+                                    <td th:text="${#temporals.format(item.ngayTao, 'dd-MM-yyyy HH:mm')}"></td>
+                                    <td>
+                                        <a th:href="@{/admin/danhmuc/edit/{id}(id=${item.maDanhMuc})}" 
+                                           class="btn btn-sm btn-warning">
+                                           <i class="fas fa-edit"></i>
+                                        </a>
+                                        <button type="button"
+                                                class="btn btn-sm btn-danger"
+                                                th:onclick="'confirmDelete(' + ${item.maDanhMuc} + ')'">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <div th:replace="~{Giaodien/Foter :: footer}"></div>
+
+    <script>
+        function showToast(message, type = 'success') {
+            Toastify({
+                text: message,
+                duration: 3000,
+                gravity: "top",
+                position: "right",
+                backgroundColor: type === 'success' ? "#4caf50" : "#f44336"
+            }).showToast();
+        }
+
+        function confirmDelete(id) {
+            Swal.fire({
+                title: 'Xác nhận xóa?',
+                text: "Bạn không thể hoàn tác sau khi xóa!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Xóa',
+                cancelButtonText: 'Hủy'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = `/admin/danhmuc/delete/${id}`;
+                }
+            });
+        }
+
+        function resetForm() {
+            document.getElementById('danhMucForm').reset();
+            document.querySelector('input[name="maDanhMuc"]').value = '';
+            document.querySelector('button[type="submit"] span').textContent = 'Thêm danh mục';
+        }
+    </script>
+</body>
+</html>
