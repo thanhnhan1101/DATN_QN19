@@ -4,94 +4,116 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MSN - Tin tức mới nhất</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" th:href="@{/css/nav.css}">
-    <link rel="stylesheet" th:href="@{/css/footer.css}">
+    <!-- Custom CSS -->
     <link rel="stylesheet" th:href="@{/css/style.css}">
-
 </head>
 <body>
     <!-- Navigation -->
     <div th:replace="~{Giaodien/Nav :: nav}"></div>
 
- 
-        <!-- Main Content -->
-        <div class="main-content">
+    <!-- Main Content -->
+    <div class="container py-4">
+        <div class="row g-4">
             <!-- Left Content -->
-            <div class="left-content">
+            <div class="col-lg-8">
                 <!-- Featured Articles -->
-                <div class="section">
-                    <h2 class="section-title">Bài viết nổi bật</h2>
-                    <div class="article-grid">
-                        <th:block th:each="post : ${featuredPosts}">
-                            <article class="article-item">
-                                <div class="article-image">
-                                    <a th:href="@{'/baiviet/' + ${post.duongDan}}">
-                                        <img th:src="${post.hinhAnh}" th:alt="${post.tieuDe}">
+                <section class="mb-5">
+                    <h2 class="section-title border-bottom pb-2 mb-4">Bài viết nổi bật</h2>
+                    <div class="row g-4">
+                        <th:block th:each="post, iterStat : ${featuredPosts}">
+                            <div class="col-md-6" th:classappend="${iterStat.index >= 2 ? 'd-none d-md-block' : ''}">
+                                <div class="card h-100 shadow-sm hover-effect">
+                                    <a th:href="@{'/baiviet/' + ${post.duongDan}}" class="position-relative">
+                                        <img th:src="${post.hinhAnh}" th:alt="${post.tieuDe}" class="card-img-top" style="height: 200px; object-fit: cover;">
                                     </a>
-                                </div>
-                                <h3 class="article-title">
-                                    <a th:href="@{'/baiviet/' + ${post.duongDan}}" th:text="${post.tieuDe}">Tiêu đề bài viết</a>
-                                </h3>
-                                <p class="article-excerpt" th:text="${post.tomTat}">Tóm tắt bài viết</p>
-                                <div class="article-meta">
-                                    <span th:text="${post.danhMuc.tenDanhMuc}">Danh mục</span>
-                                    <span th:text="${#temporals.format(post.ngayDang, 'dd/MM/yyyy')}">Ngày đăng</span>
-                                    <span><i class="fas fa-eye"></i> <span th:text="${post.luotXem}">0</span></span>
-                                </div>
-                            </article>
-                        </th:block>
-                    </div>
-                </div>
-
-                <!-- Latest Articles -->
-                <div class="section">
-                    <h2 class="section-title">Tin mới nhất</h2>
-                    <ul class="latest-list">
-                        <th:block th:each="post : ${latestPosts}">
-                            <li class="latest-item">
-                                <div class="latest-image">
-                                    <a th:href="@{'/baiviet/' + ${post.duongDan}}">
-                                        <img th:src="${post.hinhAnh}" th:alt="${post.tieuDe}">
-                                    </a>
-                                </div>
-                                <div class="latest-content">
-                                    <h3 class="latest-title">
-                                        <a th:href="@{'/baiviet/' + ${post.duongDan}}" th:text="${post.tieuDe}">Tiêu đề bài viết</a>
-                                    </h3>
-                                    <div class="latest-meta">
-                                        <span th:text="${post.danhMuc.tenDanhMuc}">Danh mục</span>
-                                        <span th:text="${#temporals.format(post.ngayDang, 'dd/MM/yyyy')}">Ngày đăng</span>
-                                        <span><i class="fas fa-eye"></i> <span th:text="${post.luotXem}">0</span></span>
+                                    <div class="card-body">
+                                        <h5 class="card-title">
+                                            <a th:href="@{'/baiviet/' + ${post.duongDan}}" class="text-decoration-none text-dark" th:text="${post.tieuDe}">Tiêu đề bài viết</a>
+                                        </h5>
+                                        <p class="card-text small" th:text="${post.tomTat}">Tóm tắt bài viết</p>
+                                        <div class="d-flex align-items-center text-muted small">
+                                            <span class="badge bg-primary me-2" th:text="${post.danhMuc.tenDanhMuc}">Danh mục</span>
+                                            <span class="me-2"><i class="far fa-calendar-alt me-1"></i> <span th:text="${#temporals.format(post.ngayDang, 'dd/MM/yyyy')}">Ngày đăng</span></span>
+                                            <span><i class="fas fa-eye me-1"></i> <span th:text="${post.luotXem}">0</span></span>
+                                        </div>
                                     </div>
                                 </div>
-                            </li>
+                            </div>
                         </th:block>
-                    </ul>
-                </div>
+                    </div>
+                </section>
+
+                <!-- Latest Articles -->
+                <section>
+                    <h2 class="section-title border-bottom pb-2 mb-4">Tin mới nhất</h2>
+                    <div class="list-group">
+                        <th:block th:each="post : ${latestPosts}">
+                            <a th:href="@{'/baiviet/' + ${post.duongDan}}" class="list-group-item list-group-item-action p-3 hover-effect">
+                                <div class="row g-3">
+                                    <div class="col-4 col-md-3">
+                                        <img th:src="${post.hinhAnh}" th:alt="${post.tieuDe}" class="img-fluid rounded" style="width: 100%; height: 80px; object-fit: cover;">
+                                    </div>
+                                    <div class="col-8 col-md-9">
+                                        <h5 class="mb-1" th:text="${post.tieuDe}">Tiêu đề bài viết</h5>
+                                        <p class="text-muted mb-1 small d-none d-md-block" th:text="${#strings.abbreviate(post.tomTat,100)}">Tóm tắt bài viết</p>
+                                        <div class="d-flex align-items-center text-muted small">
+                                            <span class="badge bg-light text-dark me-2" th:text="${post.danhMuc.tenDanhMuc}">Danh mục</span>
+                                            <span class="me-2"><i class="far fa-calendar-alt me-1"></i> <span th:text="${#temporals.format(post.ngayDang, 'dd/MM/yyyy')}">Ngày đăng</span></span>
+                                            <span><i class="fas fa-eye me-1"></i> <span th:text="${post.luotXem}">0</span></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </th:block>
+                    </div>
+                </section>
             </div>
 
             <!-- Right Content -->
-            <div class="right-content">
+            <div class="col-lg-4">
                 <!-- Trending Articles -->
-                <div class="section">
-                    <h2 class="section-title">Xem nhiều</h2>
-                    <ul class="trending-list">
-                        <th:block th:each="post, stat : ${trendingPosts}">
-                            <li class="trending-item">
-                                <span class="trending-number" th:text="${stat.count}">1</span>
-                                <div class="trending-content">
-                                    <h3 class="trending-title">
-                                        <a th:href="@{'/baiviet/' + ${post.duongDan}}" th:text="${post.tieuDe}">Tiêu đề bài viết</a>
-                                    </h3>
-                                    <div class="trending-meta">
-                                        <span th:text="${post.luotXem + ' lượt xem'}">0 lượt xem</span>
-                                        <span th:text="${#temporals.format(post.ngayDang, 'dd/MM/yyyy')}">Ngày đăng</span>
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="fas fa-fire me-2"></i>Xem nhiều</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <ol class="list-group list-group-flush">
+                            <th:block th:each="post, stat : ${trendingPosts}">
+                                <li class="list-group-item d-flex align-items-center py-3 px-3 hover-effect">
+                                    <span class="trending-number badge bg-primary rounded-circle me-3" th:text="${stat.count}">1</span>
+                                    <div>
+                                        <h6 class="mb-1">
+                                            <a th:href="@{'/baiviet/' + ${post.duongDan}}" class="text-decoration-none text-dark" th:text="${post.tieuDe}">Tiêu đề bài viết</a>
+                                        </h6>
+                                        <div class="d-flex align-items-center text-muted small">
+                                            <span class="me-2"><i class="fas fa-eye me-1"></i> <span th:text="${post.luotXem + ' lượt xem'}">0 lượt xem</span></span>
+                                            <span><i class="far fa-calendar-alt me-1"></i> <span th:text="${#temporals.format(post.ngayDang, 'dd/MM/yyyy')}">Ngày đăng</span></span>
+                                        </div>
                                     </div>
-                                </div>
-                            </li>
-                        </th:block>
-                    </ul>
+                                </li>
+                            </th:block>
+                        </ol>
+                    </div>
+                </div>
+                
+                <!-- Newsletter -->
+                <div class="card shadow-sm">
+                    <div class="card-header bg-secondary text-white">
+                        <h5 class="mb-0"><i class="fas fa-envelope me-2"></i>Đăng ký nhận tin</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">Nhận những tin tức mới nhất qua email của bạn.</p>
+                        <form>
+                            <div class="mb-3">
+                                <input type="email" class="form-control" placeholder="Email của bạn" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">Đăng ký</button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
@@ -100,7 +122,9 @@
     <!-- Footer -->
     <div th:replace="~{Giaodien/Foter :: footer}"></div>
 
-    <!-- JavaScript -->
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
     <script th:src="@{/js/nav.js}" defer></script>
 </body>
 </html>
