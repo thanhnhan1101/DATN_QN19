@@ -25,7 +25,7 @@ public class AuthController {
                           @RequestParam String xacNhanMatKhau,
                           RedirectAttributes ra) {
         try {
-            // Kiểm tra mật khẩu xác nhận. ĐÂY LÀ THAY ĐỔI CỦA TÔI 1 , THAY ĐÔỔI 2 
+            // Kiểm tra mật khẩu xác nhận. ĐÂY LÀ THAY ĐỔI CỦA TÔI 1 , THAY ĐÔỔI 2, THAY ĐÔ 3S
             if (!nguoiDung.getMatKhau().equals(xacNhanMatKhau)) {
                 ra.addFlashAttribute("error", "Mật khẩu xác nhận không khớp!");
                 return "redirect:/";
