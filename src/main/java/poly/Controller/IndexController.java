@@ -26,18 +26,26 @@ public class IndexController {
         // Thêm danh mục cho navigation
         model.addAttribute("danhmucs", danhMucService.getAllDanhMuc());
 
-        // Chỉ lấy các bài viết có trạng thái "Đã đăng"
-        String trangThai = "Đã đăng";
+        // Lấy danh sách bài viết đã đăng
+        List<BaiViet> allPosts = baiVietService.getLatestPublishedPosts(10); // Lấy 4 bài viết mới nhất
+        model.addAttribute("allPosts", allPosts); // Thêm dòng này
         
-        // Get main featured post
-        model.addAttribute("mainPost", baiVietService.getLatestPublishedPost());
-        
-        // Get featured posts
-        model.addAttribute("featuredPosts", baiVietService.getLatestPublishedPosts(2));
-        
-        // Get latest posts
-        model.addAttribute("latestPosts", baiVietService.getLatestPublishedPosts(5));
-        
+        if (!allPosts.isEmpty()) {
+            // Bài viết chính
+            model.addAttribute("mainPost", allPosts.get(0));
+            
+            // Bài viết phụ lớn
+            if (allPosts.size() > 1) {
+                model.addAttribute("secondPost", allPosts.get(1));
+            }
+            
+            // Hai bài viết nhỏ
+            if (allPosts.size() > 2) {
+                List<BaiViet> smallPosts = allPosts.subList(2, Math.min(4, allPosts.size()));
+                model.addAttribute("smallPosts", smallPosts);
+            }
+        }
+
         // Get top viewed posts
         model.addAttribute("topPosts", baiVietService.getMostViewedPosts(5));
         
