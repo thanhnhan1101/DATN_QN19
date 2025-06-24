@@ -1,20 +1,13 @@
 <nav th:fragment="nav" class="navbar">
-    <!-- Top Navigation Row -->
-    <div class="nav-top">
+    <!-- Top black bar -->
+    <div class="top-bar">
         <div class="nav-wrapper">
-            <a href="/" class="logo">
-                <img th:src="@{/static/images/logo.jpg}" alt="MSN Logo" width="100"> 
-            </a>
-            <div class="search-box-large">
-                <input type="search" placeholder="Tìm kiếm...">
-                <button type="button"><i class="fas fa-search"></i></button>
+            <div class="top-left">
+                <span th:text="${#dates.format(#dates.createNow(), 'EEEE, MMMM dd')}">Friday, February 05</span>
             </div>
-            <div class="nav-top-right">
-                <div class="weather-widget" id="current-weather">
-                    <i class="fas fa-cloud"></i>
-                    <span>Loading...</span>
-                </div>
-                <!-- Thay thế nút đăng nhập bằng menu user -->
+            <div class="top-right">
+               
+                <!-- Login/User Menu -->
                 <div th:if="${session.user}" class="user-menu">
                     <button class="user-button">
                         <i class="fas fa-user"></i>
@@ -34,9 +27,25 @@
         </div>
     </div>
 
-    <!-- Bottom Navigation Row -->
-    <div class="nav-bottom">
+    <!-- Main Header with Logo and Search -->
+    <div class="header-main">
         <div class="nav-wrapper">
+            <div class="logo-section">
+                <a href="/" class="main-logo">
+                    <h1>TIN<span class="highlight">TỨC</span></h1>
+                </a>
+            </div>
+            <!-- Ad Banner Space -->
+            <div class="header-banner">
+                <img src="/images/banner-ad.jpg" alt="Advertisement">
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation Bar -->
+    <div class="main-nav">
+        <div class="nav-wrapper">
+            <!-- Left Menu Toggle -->
             <div class="menu-left">
                 <button class="menu-toggle" id="menu-toggle">
                     <i class="fas fa-bars"></i>
@@ -49,16 +58,15 @@
                     <ul>
                         <li><a href="/preferences"><i class="fas fa-heart"></i> Sở thích của tôi</a></li>
                         <li><a href="/lich-su-xem"><i class="fas fa-history"></i> Lịch sử đã xem</a></li>
-                        <!-- Add Admin Section -->
                         <li class="admin-section" th:if="${session.user != null && (session.user.vaiTro == 'admin' || session.user.vaiTro == 'reporter')}">
                             <h3>Quản trị</h3>
                             <ul>
-                                <!-- Chỉ admin mới thấy quản lý danh mục và người dùng -->
                                 <li th:if="${session.user.vaiTro == 'admin'}">
                                     <a href="/admin/danhmuc"><i class="fas fa-folder"></i> Quản lý danh mục</a>
                                 </li>
                                 <li>
-                                    <a href="/admin/baiviet"><i class="fas fa-newspaper"></i>
+                                    <a href="/admin/baiviet">
+                                        <i class="fas fa-newspaper"></i>
                                         <span th:text="${session.user.vaiTro == 'admin' ? 'Quản lý bài viết' : 'Bài viết của tôi'}"></span>
                                     </a>
                                 </li>
@@ -69,25 +77,23 @@
                         </li>
                     </ul>
                 </div>
-                <!-- Menu Overlay -->
                 <div class="menu-overlay" id="menu-overlay"></div>
             </div>
+
+            <!-- Main Menu -->
             <ul class="main-menu">
-                <!-- Sửa lại menu Tin tức trỏ về trang chủ -->
-                <li>
-                    <a href="/" >
-                        Tin tức
+                <li><a href="/">Tin tức</a></li>
+                <li th:each="danhmuc : ${danhmucs}">
+                    <a th:href="@{'/danh-muc/' + ${danhmuc.duongDan}}" 
+                       th:text="${danhmuc.tenDanhMuc}">
                     </a>
                 </li>
-                <!-- Sửa đường dẫn của danh mục -->
-                <li th:each="danhmuc : ${danhmucs}">
-                    <a th:href="@{'/danh-muc/' + ${danhmuc.duongDan}}" th:text="${danhmuc.tenDanhMuc}"></a>
-                </li>
             </ul>
+            </div>
         </div>
     </div>
 
-    <!-- Auth Modal -->
+    <!-- Auth Modal (giữ nguyên phần cũ) -->
     <div id="authModal" class="auth-modal">
         <div class="auth-modal-content">
             <span class="close-modal">&times;</span>
