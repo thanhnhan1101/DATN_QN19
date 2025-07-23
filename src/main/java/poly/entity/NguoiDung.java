@@ -14,44 +14,32 @@ public class NguoiDung {
     @Column(name = "MaNguoiDung")
     private Long maNguoiDung;
 
-    @Column(name = "Email", length = 100, nullable = false, unique = true)
+    @Column(name = "Email", length = 50, nullable = false, unique = true)
     private String email;
 
-    @Column(name = "MatKhau", length = 255, nullable = false)
+    @Column(name = "MatKhau", length = 60, nullable = false)
     private String matKhau;
 
-    @Column(name = "HoTen", length = 100, columnDefinition = "NVARCHAR(100)")
+    @Column(name = "HoTen", length = 50)
     private String hoTen;
+
+    @Column(name = "GioiTinh")
+    private Boolean gioiTinh; // true: Nam, false: Nữ
 
     @Column(name = "NgaySinh")
     private LocalDate ngaySinh;
 
-    @Column(name = "GioiTinh")
-    private Boolean gioiTinh;  // true: Nam, false: Nữ
-
-    @Column(name = "SoDienThoai", length = 20)
+    @Column(name = "SoDienThoai", length = 10)
     private String soDienThoai;
 
-    @Column(name = "DiaChi", columnDefinition = "NVARCHAR(255)")
-    private String diaChi;
-
-    @Column(name = "AnhDaiDien", columnDefinition = "VARCHAR(MAX)")
-    private String anhDaiDien;
-
-    @Column(name = "VaiTro", columnDefinition = "NVARCHAR(20) DEFAULT N'user'")
+    @Column(name = "VaiTro", length = 10)
     private String vaiTro = "user"; // user, reporter, admin
 
-    @Column(name = "MaXacThuc", length = 6)
-    private String maXacThuc;
+    @Column(name = "TrangThai", length = 15)
+    private String trangThai = "Hoạt động"; // Hoạt động, Khóa
 
-    @Column(name = "NgayTao", columnDefinition = "DATETIME DEFAULT GETDATE()")
+    @Column(name = "NgayTao")
     private LocalDateTime ngayTao;
-
-    @Column(name = "LanDangNhapCuoi")
-    private LocalDateTime lanDangNhapCuoi;
-
-    @Column(name = "TrangThai", columnDefinition = "BIT DEFAULT 1")
-    private Boolean trangThai = true;
 
     @PrePersist
     protected void onCreate() {

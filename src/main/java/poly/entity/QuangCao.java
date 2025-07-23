@@ -2,7 +2,7 @@ package poly.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
@@ -12,49 +12,42 @@ public class QuangCao {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "MaQuangCao")
-    private Integer maQuangCao;
+    private Long maQuangCao;
 
-    @Column(name = "TenQuangCao", nullable = false, columnDefinition = "NVARCHAR(255)")
-    private String tenQuangCao;
+    @ManyToOne
+    @JoinColumn(name = "MaNguoiDung")
+    private NguoiDung nguoiDung;
 
-    @Column(name = "HinhAnh", length = 255)
-    private String hinhAnh;
+    @Column(name = "TieuDe", length = 255)
+    private String tieuDe;
 
-    @Column(name = "DuongDan", length = 500)
-    private String duongDan;
+    @Lob
+    @Column(name = "DuongDanAnh")
+    private String duongDanAnh;
 
-    @Column(name = "ViTri", columnDefinition = "NVARCHAR(50)")
+    @Lob
+    @Column(name = "DuongDanLienKet")
+    private String duongDanLienKet;
+
+    @Column(name = "ViTri", length = 20)
     private String viTri;
 
-    @Column(name = "KichThuoc", columnDefinition = "NVARCHAR(20)")
-    private String kichThuoc;
-
     @Column(name = "NgayBatDau")
-    private LocalDateTime ngayBatDau;
+    private LocalDate ngayBatDau;
 
     @Column(name = "NgayKetThuc")
-    private LocalDateTime ngayKetThuc;
+    private LocalDate ngayKetThuc;
 
-    @Column(name = "LuotClick", columnDefinition = "INT DEFAULT 0")
-    private Integer luotClick = 0;
+    @Column(name = "TrangThai", length = 20)
+    private String trangThai = "Chờ duyệt";
 
-    @Column(name = "DuongDanURL", length = 500)
-    private String duongDanURL;
-
-    @Column(name = "TrangThai", columnDefinition = "BIT DEFAULT 1")
-    private Boolean trangThai = true;
-
-    @Column(name = "GiaTheoNgay", columnDefinition = "DECIMAL(10,2)")
-    private BigDecimal giaTheoNgay;
-
-    @Column(name = "NhaTaiTro", columnDefinition = "NVARCHAR(255)")
-    private String nhaTaiTro;
-
-    @Column(name = "NgayTao", columnDefinition = "DATETIME DEFAULT GETDATE()")
+    @Column(name = "NgayTao")
     private LocalDateTime ngayTao;
 
     @PrePersist
     protected void onCreate() {
-        ngayTao = LocalDateTime.now();
+        if (ngayTao == null) {
+            ngayTao = LocalDateTime.now();
+        }
     }
 }
