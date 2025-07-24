@@ -135,7 +135,7 @@
                     <form th:action="@{/auth/register}" method="post">
                         <div class="form-group">
                             <i class="fas fa-user"></i>
-                            <input type="text" name="fullname" placeholder="Họ và tên" required>
+                            <input type="text" name="hoTen" placeholder="Họ và tên" required>
                         </div>
                         <div class="form-group">
                             <i class="fas fa-envelope"></i>
@@ -143,10 +143,14 @@
                         </div>
                         <div class="form-group">
                             <i class="fas fa-lock"></i>
-                            <input type="password" name="password" placeholder="Mật khẩu" required>
+                            <input type="password" name="matKhau" placeholder="Mật khẩu" required>
+                        </div>
+                        <div class="form-group">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" name="xacNhanMatKhau" placeholder="Xác nhận mật khẩu" required>
                         </div>
                         <div class="form-options">
-                            <label><input type="checkbox" name="terms"> Tôi đồng ý với các điều khoản</label>
+                            <label><input type="checkbox" name="terms" required> Tôi đồng ý với các điều khoản</label>
                         </div>
                         <button type="submit" class="auth-button">Đăng ký</button>
                     </form>

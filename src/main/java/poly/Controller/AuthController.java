@@ -49,9 +49,9 @@ public class AuthController {
 
     @PostMapping("/login")
     public String loginForm(@RequestParam String email,
-                            @RequestParam String password,
-                            HttpSession session,
-                            RedirectAttributes ra) {
+                       @RequestParam("matKhau") String password,
+                       HttpSession session,
+                       RedirectAttributes ra) {
         Optional<NguoiDung> userOpt = nguoiDungService.login(email, password);
         if (userOpt.isPresent()) {
             session.setAttribute("user", userOpt.get());
@@ -70,4 +70,4 @@ public class AuthController {
         return "redirect:/";
     }
 
-} 
+}

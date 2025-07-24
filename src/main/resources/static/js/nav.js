@@ -73,7 +73,7 @@ document.addEventListener('DOMContentLoaded', function() {
         loginForm.addEventListener('submit', function(e) {
             e.preventDefault();
             const email = this.querySelector('input[name="email"]').value;
-            const matKhau = this.querySelector('input[name="matKhau"]').value;
+            const matKhau = this.querySelector('input[name="matKhau"]').value; // Sửa selector cho khớp
             
             if (!email || !matKhau) {
                 Swal.fire({
@@ -84,11 +84,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
             
-            // Thêm loading state
-            const submitBtn = this.querySelector('button[type="submit"]');
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xử lý...';
-            
             this.submit();
         });
     }
@@ -97,10 +92,12 @@ document.addEventListener('DOMContentLoaded', function() {
         registerForm.addEventListener('submit', function(e) {
             e.preventDefault();
             const email = this.querySelector('input[name="email"]').value;
-            const hoTen = this.querySelector('input[name="hoTen"]').value;
+            // Sửa selector để khớp với name trong form HTML
+            const hoTen = this.querySelector('input[name="hoTen"]').value; // Thay vì fullname
             const matKhau = this.querySelector('input[name="matKhau"]').value;
             const xacNhanMatKhau = this.querySelector('input[name="xacNhanMatKhau"]').value;
             
+            // Thêm kiểm tra null
             if (!email || !hoTen || !matKhau || !xacNhanMatKhau) {
                 Swal.fire({
                     icon: 'error',
