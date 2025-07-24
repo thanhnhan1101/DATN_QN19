@@ -98,10 +98,19 @@
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label">Hình ảnh</label>
-                            <input type="file" name="imageFile" class="form-control" accept="image/*">
-                            <img th:if="${baiviet.hinhAnh}" th:src="${baiviet.hinhAnh}" 
-                                 class="img-preview mt-2" style="max-width: 200px;">
+                            <label class="form-label">Hình ảnh 1</label>
+                            <input type="file" name="imageFile1" class="form-control" accept="image/*">
+                            <img th:if="${baiviet.duongDanAnh1}" th:src="'data:image/jpeg;base64,' + ${baiviet.duongDanAnh1}" style="max-width: 200px;">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Hình ảnh 2</label>
+                            <input type="file" name="imageFile2" class="form-control" accept="image/*">
+                            <img th:if="${baiviet.duongDanAnh2}" th:src="'data:image/jpeg;base64,' + ${baiviet.duongDanAnh2}" style="max-width: 200px;">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Hình ảnh 3</label>
+                            <input type="file" name="imageFile3" class="form-control" accept="image/*">
+                            <img th:if="${baiviet.duongDanAnh3}" th:src="'data:image/jpeg;base64,' + ${baiviet.duongDanAnh3}" style="max-width: 200px;">
                         </div>
 
                         <div class="mb-3">
@@ -118,9 +127,15 @@
                             <label class="form-label">Trạng thái</label>
                             <select th:field="*{trangThai}" class="form-control">
                                 <option value="Nháp">Nháp</option>
-                                <option value="Đã đăng">Đã đăng</option>
-                                <option value="Ẩn">Ẩn</option>
+                                <option value="Chờ duyệt">Chờ duyệt</option>
+                                <option value="Đã xuất bản">Đã xuất bản</option>
+                                <option value="Từ chối">Từ chối</option>
                             </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Ngày xuất bản</label>
+                            <input type="datetime-local" th:field="*{ngayXuatBan}" class="form-control">
                         </div>
 
                         <div class="d-flex gap-2">
@@ -147,6 +162,7 @@
                                     <th>Trạng thái</th>
                                     <th>Lượt xem</th>
                                     <th>Ngày đăng</th>
+                                    <th>Tác giả</th>
                                     <th>Thao tác</th>
                                 </tr>
                             </thead>
@@ -154,29 +170,26 @@
                                 <tr th:each="item : ${baiViets}">
                                     <td th:text="${item.maBaiViet}"></td>
                                     <td>
-                                        <img th:if="${item.hinhAnh}" th:src="${item.hinhAnh}" 
-                                             style="max-width: 50px; height: auto;">
+                                        <img th:if="${item.duongDanAnh1}" th:src="'data:image/jpeg;base64,' + ${item.duongDanAnh1}" style="max-width: 50px; height: auto;">
                                     </td>
                                     <td th:text="${item.tieuDe}"></td>
                                     <td th:text="${item.danhMuc?.tenDanhMuc}"></td>
                                     <td>
-                                        <span th:text="${item.trangThai}"
-                                              th:class="${item.trangThai == 'Đã đăng' ? 'badge bg-success' : 'badge bg-warning'}">
-                                        </span>
+                                        <span th:text="${item.trangThai}" th:class="${item.trangThai == 'Đã đăng' ? 'badge bg-success' : 'badge bg-warning'}"></span>
                                     </td>
                                     <td th:text="${item.luotXem}"></td>
-                                    <td th:text="${#temporals.format(item.ngayDang, 'dd-MM-yyyy HH:mm')}"></td>
+                                    <td th:text="${item.ngayXuatBan != null ? #temporals.format(item.ngayXuatBan, 'dd/MM/yyyy HH:mm') : ''}"></td>
+                                    <td th:text="${item.tacGia != null ? item.tacGia.hoTen : 'Không xác định'}"></td>
                                     <td>
-                                        <a th:href="@{/admin/baiviet/edit/{id}(id=${item.maBaiViet})}" 
-                                           class="btn btn-sm btn-warning">
-                                           <i class="fas fa-edit"></i>
+                                        <a th:href="@{/admin/baiviet/edit/{id}(id=${item.maBaiViet})}" class="btn btn-sm btn-warning">
+                                            <i class="fas fa-edit"></i>
                                         </a>
                                         <a href="javascript:void(0)" 
                                            class="btn btn-sm"
                                            th:classappend="${item.trangThai == 'Ẩn' ? 'btn-success' : 'btn-danger'}"
                                            th:onclick="'toggleVisibility(' + ${item.maBaiViet} + ')'"
                                            th:title="${item.trangThai == 'Ẩn' ? 'Hiện bài viết' : 'Ẩn bài viết'}">
-                                           <i class="fas" th:classappend="${item.trangThai == 'Ẩn' ? 'fa-eye' : 'fa-eye-slash'}"></i>
+                                            <i class="fas" th:classappend="${item.trangThai == 'Ẩn' ? 'fa-eye' : 'fa-eye-slash'}"></i>
                                         </a>
                                         <button th:if="${item.trangThai == 'Chờ duyệt' and session.user.vaiTro == 'admin'}"
                                                 th:onclick="'window.location.href=\'/admin/baiviet/approve/' + ${item.maBaiViet} + '\';'">

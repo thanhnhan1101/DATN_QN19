@@ -70,7 +70,6 @@
                 <div class="card-body">
                     <form id="danhMucForm" th:action="@{/admin/danhmuc}" method="post" th:object="${danhmuc}">
                         <input type="hidden" th:field="*{maDanhMuc}">
-                        <input type="hidden" th:field="*{ngayTao}">
                         
                         <div class="mb-3">
                             <label class="form-label">Tên danh mục</label>
@@ -108,7 +107,6 @@
                                     <th>ID</th>
                                     <th>Tên danh mục</th>
                                     <th>Đường dẫn</th>
-                                    <th>Ngày tạo</th>
                                     <th>Thao tác</th>
                                 </tr>
                             </thead>
@@ -117,7 +115,6 @@
                                     <td th:text="${item.maDanhMuc}"></td>
                                     <td th:text="${item.tenDanhMuc}"></td>
                                     <td th:text="${item.duongDan}"></td>
-                                    <td th:text="${#temporals.format(item.ngayTao, 'dd-MM-yyyy HH:mm')}"></td>
                                     <td>
                                         <a th:href="@{/admin/danhmuc/edit/{id}(id=${item.maDanhMuc})}" 
                                            class="btn btn-sm btn-warning">

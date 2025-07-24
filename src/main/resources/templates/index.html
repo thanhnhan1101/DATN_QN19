@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,161 +8,21 @@
     <link rel="stylesheet" th:href="@{/css/nav.css}">
     <link rel="stylesheet" th:href="@{/css/footer.css}">
     <link rel="stylesheet" th:href="@{/css/style.css}">
-    <script th:src="@{/static/js/nav.js}" defer></script>
+    
 </head>
-
 <body>
+    <!-- Navigation -->
     <div th:replace="~{Giaodien/Nav :: nav}"></div>
 
-    <main class="container">
-        <!-- Featured Section -->
-        <section class="featured-section">
-            <!-- Main Featured Post -->
-                <article class="main-featured" th:if="${mainPost != null}">
-                <a th:href="@{'/baiviet/' + ${mainPost.duongDan}}">
-                    <div class="featured-image">
-                        <img th:src="${mainPost.hinhAnh}" th:alt="${mainPost.tieuDe}">
-                        <span class="category" th:text="${mainPost.danhMuc.tenDanhMuc}">Category</span>
-                        <div class="overlay">
-                            <h2 th:text="${mainPost.tieuDe}">Main Title</h2>
-                            <span class="date" th:text="${#temporals.format(mainPost.ngayDang, 'MMM d, yyyy')}">Date</span>
-                        </div>
-                    </div>
-                </a>
-            </article>
+ 
 
-            <!-- Side Featured Posts -->
-            <div class="side-posts">
-                <!-- Large Side Post -->
-                <article class="side-post large" th:if="${secondPost != null}">
-                    <a th:href="@{'/baiviet/' + ${secondPost.duongDan}}">
-                        <div class="featured-image">
-                            <img th:src="${secondPost.hinhAnh}" th:alt="${secondPost.tieuDe}">
-                            <div class="overlay">
-                                <h3 th:text="${secondPost.tieuDe}">Secondary Title</h3>
-                                <span class="date" th:text="${#temporals.format(secondPost.ngayDang, 'MMM d, yyyy')}">Date</span>
-                            </div>
-                        </div>
-                    </a>
-                </article>
 
-                <!-- Small Posts Container -->
-                <div class="small-posts-row" th:if="${smallPosts != null and !smallPosts.empty}">
-                    <article class="side-post small" th:each="post : ${smallPosts}">
-                        <a th:href="@{'/baiviet/' + ${post.duongDan}}">
-                            <div class="featured-image">
-                                <img th:src="${post.hinhAnh}" th:alt="${post.tieuDe}">
-                                <div class="overlay">
-                                    <h3 th:text="${post.tieuDe}">Small Post Title</h3>
-                                    <span class="date" th:text="${#temporals.format(post.ngayDang, 'MMM d, yyyy')}">Date</span>
-                                </div>
-                            </div>
-                        </a>
-                    </article>
-                </div>
-            </div>
-        </section>
-
-        <!-- Latest Articles Section -->
-        <section class="latest-articles-section">
-            <div class="latest-header" style="display: flex; align-items: flex-start; justify-content: space-between;">
-                <div style="display: flex; align-items: center;">
-                    <span class="latest-title">BÀI VIẾT MỚI NHẤT</span>
-                </div>
-                <div>
-                    <h4 style="margin: 0; font-size: 16px; font-weight: 600; color: #222;">BÀI VIẾT LƯỢT XEM NHIỀU</h4>
-                </div>
-            </div>
-            <div class="latest-articles-grid">
-                <!-- Cột trái: Danh sách bài viết -->
-                <div class="latest-main">
-                    <div class="latest-main-grid" style="gap: 20px;">
-                        <!-- Hai bản tin lớn đầu tiên -->
-                        <div class="latest-col" style="width: 50%;">
-                            <article class="latest-article big" th:if="${allPosts.size() > 0}" th:object="${allPosts[0]}">
-                                <a th:href="@{'/baiviet/' + *{duongDan}}">
-                                    <div class="latest-image" style="width:100%; min-width:unset; border-radius:6px 6px 0 0;">
-                                        <img th:src="*{hinhAnh}" th:alt="*{tieuDe}">
-                                    </div>
-                                    <div class="latest-content" style="padding:12px;">
-                                        <h3 th:text="*{tieuDe}">Tiêu đề bài viết</h3>
-                                        <div class="latest-meta">
-                                            <span th:text="*{tacGia.hoTen}">Tác giả</span> -
-                                            <span th:text="${#temporals.format(allPosts[0].ngayDang, 'MMM d, yyyy')}">Ngày đăng</span>
-                                        </div>
-                                        <p th:text="*{tomTat}">Mô tả ngắn bài viết...</p>
-                                    </div>
-                                </a>
-                            </article>
-                        </div>
-                        <div class="latest-col" style="width: 50%;">
-                            <article class="latest-article big" th:if="${allPosts.size() > 1}" th:object="${allPosts[1]}">
-                                <a th:href="@{'/baiviet/' + *{duongDan}}">
-                                    <div class="latest-image" style="width:100%; min-width:unset; border-radius:6px 6px 0 0;">
-                                        <img th:src="*{hinhAnh}" th:alt="*{tieuDe}">
-                                    </div>
-                                    <div class="latest-content" style="padding:12px;">
-                                        <h3 th:text="*{tieuDe}">Tiêu đề bài viết</h3>
-                                        <div class="latest-meta">
-                                            <span th:text="*{tacGia.hoTen}">Tác giả</span> -
-                                            <span th:text="${#temporals.format(allPosts[1].ngayDang, 'MMM d, yyyy')}">Ngày đăng</span>
-                                        </div>
-                                        <p th:text="*{tomTat}">Mô tả ngắn bài viết...</p>
-                                    </div>
-                                </a>
-                            </article>
-                        </div>
-                    </div>
-                    <!-- Danh sách các bản tin nhỏ còn lại -->
-                    <div class="latest-list" style="margin-top: 24px;">
-                        <article class="latest-article small" th:each="post,iterStat : ${allPosts}" th:if="${iterStat.index >= 2}">
-                            <a th:href="@{'/baiviet/' + ${post.duongDan}}">
-                                <div class="latest-image small">
-                                    <img th:src="${post.hinhAnh}" th:alt="${post.tieuDe}">
-                                </div>
-                                <div class="latest-content small">
-                                    <h4 th:text="${post.tieuDe}">Tiêu đề nhỏ</h4>
-                                    <div class="latest-meta">
-                                        <span th:text="${post.tacGia.hoTen}">Tác giả</span> -
-                                        <span th:text="${#temporals.format(post.ngayDang, 'MMM d, yyyy')}">Ngày đăng</span>
-                                    </div>
-                                    <p th:text="${post.tomTat}">Mô tả ngắn bài viết...</p>
-                                </div>
-                            </a>
-                        </article>
-                    </div>
-                </div>
-                <!-- Cột phải: Sidebar OUR PICKS -->
-                <aside class="latest-sidebar">
-                    <div class="sidebar-block" style="margin-top:0;">
-                        <ul class="sidebar-list">
-                            <li th:each="pick : ${topPosts}">
-                                <a th:href="@{'/baiviet/' + ${pick.duongDan}}">
-                                    <div class="sidebar-item">
-                                        <div class="sidebar-thumb" style="width:38px;height:38px;">
-                                            <img th:src="${pick.hinhAnh}" th:alt="${pick.tieuDe}">
-                                        </div>
-                                        <div>
-                                            <div class="sidebar-title" th:text="${pick.tieuDe}">Tiêu đề sidebar</div>
-                                            <span class="sidebar-date" th:text="${#temporals.format(pick.ngayDang, 'MMM d, yyyy')}">Ngày đăng</span>
-                                        </div>
-                                    </div>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="sidebar-block social-block">
-                        <a href="#" class="social-btn facebook"><i class="fab fa-facebook-f"></i> Like on Facebook <span>997</span></a>
-                        <a href="#" class="social-btn twitter"><i class="fab fa-twitter"></i> Follow on Twitter <span>65.6K</span></a>
-                        <a href="#" class="social-btn google"><i class="fab fa-google"></i> Follow on Google <span>1.2K</span></a>
-                        <a href="#" class="social-btn instagram"><i class="fab fa-instagram"></i> Follow on Instagram <span>11K</span></a>
-                    </div>
-                </aside>
-            </div>
-        </section>
-    </main>
-
+    
+    <!-- Footer -->
     <div th:replace="~{Giaodien/Foter :: footer}"></div>
-</body>
 
+    <!-- JavaScript -->
+    <script th:src="@{/js/nav.js}" ></script>
+    
+</body>
 </html>

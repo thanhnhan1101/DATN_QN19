@@ -12,27 +12,26 @@ public class BinhLuan {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "MaBinhLuan")
     private Long maBinhLuan;
-    
-    @ManyToOne
-    @JoinColumn(name = "MaNguoiDung")
-    private NguoiDung nguoiDung;
-    
+
     @ManyToOne
     @JoinColumn(name = "MaBaiViet")
     private BaiViet baiViet;
-    
-    @Column(name = "NoiDung", columnDefinition = "NVARCHAR(MAX)")
-    private String noiDung;
-    
+
     @ManyToOne
-    @JoinColumn(name = "MaBinhLuanCha", foreignKey = @ForeignKey(name = "FK_BinhLuan_Cha"))
-    private BinhLuan binhLuanCha;
-    
-    @Column(name = "NgayBinhLuan", columnDefinition = "DATETIME DEFAULT GETDATE()")
-    private LocalDateTime ngayBinhLuan;
+    @JoinColumn(name = "MaNguoiDung")
+    private NguoiDung nguoiDung;
+
+    @Column(name = "NoiDung", nullable = false, length = 100)
+    private String noiDung;
+
+    @Column(name = "TrangThai", length = 15)
+    private String trangThai = "Chờ duyệt";
+
+    @Column(name = "NgayTao")
+    private LocalDateTime ngayTao;
 
     @PrePersist
     protected void onCreate() {
-        ngayBinhLuan = LocalDateTime.now();
+        ngayTao = LocalDateTime.now();
     }
 }

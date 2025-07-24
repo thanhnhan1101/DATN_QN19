@@ -73,9 +73,9 @@ document.addEventListener('DOMContentLoaded', function() {
         loginForm.addEventListener('submit', function(e) {
             e.preventDefault();
             const email = this.querySelector('input[name="email"]').value;
-            const password = this.querySelector('input[name="password"]').value;
+            const matKhau = this.querySelector('input[name="matKhau"]').value;
             
-            if (!email || !password) {
+            if (!email || !matKhau) {
                 Swal.fire({
                     icon: 'error',
                     title: 'Lỗi',
@@ -83,6 +83,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
                 return;
             }
+            
+            // Thêm loading state
+            const submitBtn = this.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xử lý...';
             
             this.submit();
         });
@@ -172,5 +177,23 @@ document.addEventListener('DOMContentLoaded', function() {
         if(authModal) {
             authModal.style.display = 'none';
         }
+    }
+
+    // User Menu Dropdown
+    const userButton = document.getElementById('userMenuButton');
+    const userDropdown = document.getElementById('userDropdown');
+
+    if (userButton && userDropdown) {
+        userButton.addEventListener('click', function(e) {
+            e.stopPropagation(); // Ngăn sự kiện click lan ra document
+            userDropdown.classList.toggle('show');
+        });
+
+        // Đóng dropdown khi click ra ngoài
+        document.addEventListener('click', function(e) {
+            if (!userButton.contains(e.target) && !userDropdown.contains(e.target)) {
+                userDropdown.classList.remove('show');
+            }
+        });
     }
 });
