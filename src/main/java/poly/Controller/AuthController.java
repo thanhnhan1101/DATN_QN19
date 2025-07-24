@@ -48,11 +48,11 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public String login(@RequestParam("email") String email, 
-                       @RequestParam("matKhau") String matKhau,
-                       HttpSession session,
-                       RedirectAttributes ra) {
-        Optional<NguoiDung> userOpt = nguoiDungService.login(email, matKhau);
+    public String loginForm(@RequestParam String email,
+                            @RequestParam String password,
+                            HttpSession session,
+                            RedirectAttributes ra) {
+        Optional<NguoiDung> userOpt = nguoiDungService.login(email, password);
         if (userOpt.isPresent()) {
             session.setAttribute("user", userOpt.get());
             ra.addFlashAttribute("message", "Đăng nhập thành công!");
@@ -70,4 +70,4 @@ public class AuthController {
         return "redirect:/";
     }
 
-}
+} 
