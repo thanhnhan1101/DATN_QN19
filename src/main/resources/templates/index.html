@@ -8,21 +8,82 @@
     <link rel="stylesheet" th:href="@{/css/nav.css}">
     <link rel="stylesheet" th:href="@{/css/footer.css}">
     <link rel="stylesheet" th:href="@{/css/style.css}">
-    
 </head>
 <body>
     <!-- Navigation -->
     <div th:replace="~{Giaodien/Nav :: nav}"></div>
 
- 
+    <!-- Main Content -->
+    <main class="container">
+        <!-- Bài viết nổi bật -->
+        <section class="featured-posts">
+            <div th:if="${hasArticles}" class="posts-grid">
+                <!-- Bài viết nổi bật chính (cột trái) -->
+                <div th:if="${baiViets != null and not #lists.isEmpty(baiViets)}" 
+                     th:with="mainPost=${baiViets[0]}" class="main-post">
+                    <div class="post-image">
+                        <img th:if="${mainPost.duongDanAnh1}"
+                             th:src="'data:image/jpeg;base64,' + ${mainPost.duongDanAnh1}"
+                             alt="Hình ảnh bài viết">
+                    </div>
+                    <div class="post-content">
+                        <h3 class="post-title" th:text="${mainPost.tieuDe}">Tiêu đề bài viết</h3>
+                        <div class="post-meta">
+                            <span class="post-date" th:text="${#temporals.format(mainPost.ngayXuatBan, 'dd/MM/yyyy')}">Ngày đăng</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 3 bài viết phụ (cột phải) -->
+                <div class="secondary-posts">
+                    <!-- Bài viết lớn ở trên -->
+                    <div th:if="${baiViets != null and #lists.size(baiViets) > 1}" 
+                         th:with="secondPost=${baiViets[1]}" 
+                         class="post-card">
+                        <div class="post-image">
+                            <img th:if="${secondPost.duongDanAnh1}"
+                                 th:src="'data:image/jpeg;base64,' + ${secondPost.duongDanAnh1}"
+                                 alt="Hình ảnh bài viết">
+                        </div>
+                        <div class="post-content">
+                            <h3 class="post-title" th:text="${secondPost.tieuDe}">Tiêu đề bài viết</h3>
+                            <div class="post-meta">
+                                <span class="post-date" th:text="${#temporals.format(secondPost.ngayXuatBan, 'dd/MM/yyyy')}">Ngày đăng</span>
+                            </div>
+                        </div>
+                    </div>
 
+                    <!-- 2 bài viết nhỏ ở dưới -->
+                    <div class="bottom-posts">
+                        <div th:each="baiViet, iterStat : ${baiViets}" 
+                             th:if="${iterStat.index > 1 && iterStat.index <= 3}" 
+                             class="post-card">
+                            <div class="post-image">
+                                <img th:if="${baiViet.duongDanAnh1}"
+                                     th:src="'data:image/jpeg;base64,' + ${baiViet.duongDanAnh1}"
+                                     alt="Hình ảnh bài viết">
+                            </div>
+                            <div class="post-content">
+                                <h3 class="post-title" th:text="${baiViet.tieuDe}">Tiêu đề bài viết</h3>
+                                <div class="post-meta">
+                                    <span class="post-date" th:text="${#temporals.format(baiViet.ngayXuatBan, 'dd/MM/yyyy')}">Ngày đăng</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-    
+            <div th:unless="${hasArticles}" class="no-posts">
+                <p>Chưa có bài viết nào được xuất bản.</p>
+            </div>
+        </section>
+    </main>
+
     <!-- Footer -->
     <div th:replace="~{Giaodien/Foter :: footer}"></div>
 
     <!-- JavaScript -->
-    <script th:src="@{/js/nav.js}" ></script>
-    
+    <script th:src="@{/js/nav.js}"></script>
 </body>
 </html>

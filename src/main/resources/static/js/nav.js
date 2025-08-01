@@ -97,7 +97,7 @@ document.addEventListener('DOMContentLoaded', function() {
         registerForm.addEventListener('submit', function(e) {
             e.preventDefault();
             const email = this.querySelector('input[name="email"]').value;
-            const hoTen = this.querySelector('input[name="hoTen"]').value;
+            const hoTen = this.querySelector('input[name="hoTen"]').value; // Đã đúng với name trong form
             const matKhau = this.querySelector('input[name="matKhau"]').value;
             const xacNhanMatKhau = this.querySelector('input[name="xacNhanMatKhau"]').value;
             
@@ -118,6 +118,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
                 return;
             }
+            
+            // Thêm loading state
+            const submitBtn = this.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xử lý...';
             
             this.submit();
         });
