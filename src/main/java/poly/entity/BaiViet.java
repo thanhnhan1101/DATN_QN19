@@ -1,6 +1,7 @@
 package poly.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 import java.time.LocalDateTime;
 
@@ -39,8 +40,10 @@ public class BaiViet {
     @JoinColumn(name = "MaTacGia", foreignKey = @ForeignKey(name = "FK_BaiViet_TacGia"))
     private NguoiDung tacGia;
 
-    @Column(name = "TrangThai", columnDefinition = "NVARCHAR(15) DEFAULT N'Nháp'")
-    private String trangThai = "Nháp";
+    @Column(name = "TrangThai")
+    @Pattern(regexp = "^(Nháp|Chờ duyệt|Đã đăng|Ẩn|Từ chối)$", 
+             message = "Trạng thái không hợp lệ")
+    private String trangThai;
 
     @Column(name = "NgayXuatBan")
     private LocalDateTime ngayXuatBan;

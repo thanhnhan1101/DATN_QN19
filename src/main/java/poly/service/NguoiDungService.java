@@ -81,4 +81,9 @@ public class NguoiDungService {
             throw new IOException("Error processing image: " + e.getMessage());
         }
     }
+
+    // Thêm phương thức đếm tổng số người dùng
+    public long countAll() {
+        return nguoiDungRepository.count();
+    }
 }

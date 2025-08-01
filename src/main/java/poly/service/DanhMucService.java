@@ -30,4 +30,9 @@ public class DanhMucService {
     public DanhMuc findByDuongDan(String duongDan) {
         return danhMucRepository.findByDuongDan(duongDan);
     }
+
+    // Thêm phương thức đếm tổng số danh mục
+    public long countAll() {
+        return danhMucRepository.count();
+    }
 }

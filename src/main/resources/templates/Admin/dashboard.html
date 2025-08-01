@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản trị hệ thống</title>
+    <!-- CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/static/css/nav.css}">
+    <link rel="stylesheet" th:href="@{/static/css/footer.css}">
+    <link rel="stylesheet" th:href="@{/static/css/admin.css}">
+</head>
+<body>
+    <!-- Navigation -->
+    <div th:replace="~{Giaodien/Nav :: nav}"></div>
+
+    <main class="admin-dashboard">
+        <div class="dashboard-container">
+            <h1 class="dashboard-title">Quản trị hệ thống</h1>
+            
+            <div class="dashboard-stats">
+                <div class="stat-card">
+                    <i class="fas fa-newspaper"></i>
+                    <h3>Bài viết</h3>
+                    <p th:text="${totalBaiViet}">0</p>
+                    <a href="/admin/baiviet" class="stat-link">Quản lý bài viết</a>
+                </div>
+
+                <div class="stat-card">
+                    <i class="fas fa-list"></i>
+                    <h3>Danh mục</h3>
+                    <p th:text="${totalDanhMuc}">0</p>
+                    <a href="/admin/danhmuc" class="stat-link">Quản lý danh mục</a>
+                </div>
+
+                <div class="stat-card">
+                    <i class="fas fa-users"></i>
+                    <h3>Người dùng</h3>
+                    <p th:text="${totalNguoiDung}">0</p>
+                    <a href="/admin/nguoidung" class="stat-link">Quản lý người dùng</a>
+                </div>
+            </div>
+
+            <div class="quick-actions">
+                <h2>Thao tác nhanh</h2>
+                <div class="action-buttons">
+                    <a href="/admin/baiviet" class="action-btn">
+                        <i class="fas fa-plus"></i>
+                        Thêm bài viết mới
+                    </a>
+                    <a href="/admin/danhmuc" class="action-btn">
+                        <i class="fas fa-folder-plus"></i>
+                        Thêm danh mục
+                    </a>
+                    <a href="/admin/nguoidung" class="action-btn">
+                        <i class="fas fa-user-plus"></i>
+                        Thêm người dùng
+                    </a>
+                </div>
+            </div>
+
+            <div class="recent-activity">
+                <h2>Hoạt động gần đây</h2>
+                <div class="activity-list">
+                    <!-- Danh sách bài viết chờ duyệt -->
+                    <div class="activity-section">
+                        <h3>Bài viết chờ duyệt</h3>
+                        <div class="pending-posts" th:if="${pendingPosts != null && !pendingPosts.empty}">
+                            <div th:each="post : ${pendingPosts}" class="pending-post-item">
+                                <span th:text="${post.tieuDe}">Tiêu đề bài viết</span>
+                                <div class="post-actions">
+                                    <a th:href="@{'/admin/baiviet/edit/' + ${post.maBaiViet}}" class="btn-view">
+                                        <i class="fas fa-eye"></i> Xem
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <p th:if="${pendingPosts == null || pendingPosts.empty}" class="no-items">
+                            Không có bài viết nào chờ duyệt
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <div th:replace="~{Giaodien/Foter :: footer}"></div>
+</body>
+</html>

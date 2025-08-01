@@ -8,21 +8,80 @@
     <link rel="stylesheet" th:href="@{/css/nav.css}">
     <link rel="stylesheet" th:href="@{/css/footer.css}">
     <link rel="stylesheet" th:href="@{/css/style.css}">
-    
 </head>
 <body>
     <!-- Navigation -->
     <div th:replace="~{Giaodien/Nav :: nav}"></div>
 
- 
+    <!-- Main Content -->
+    <main class="container">
+        <!-- Bài viết nổi bật -->
+        <section class="featured-posts">
+            <h2 class="section-title">Bài viết nổi bật</h2>
+            <div class="posts-grid">
+                <!-- Bài viết nổi bật chính -->
+                <div th:with="mainPost=${baiViets[0]}" class="main-post">
+                    <div class="post-image">
+                        <img th:if="${mainPost.duongDanAnh1}"
+                             th:src="'data:image/jpeg;base64,' + ${mainPost.duongDanAnh1}"
+                             alt="Hình ảnh bài viết">
+                    </div>
+                    <div class="post-content">
+                        <h3 class="post-title" th:text="${mainPost.tieuDe}">Tiêu đề bài viết</h3>
+                        <p class="post-excerpt" th:text="${mainPost.tomTat}">Tóm tắt bài viết</p>
+                        <div class="post-meta">
+                            <span class="post-date" th:text="${#temporals.format(mainPost.ngayXuatBan, 'dd/MM/yyyy')}">Ngày đăng</span>
+                            <span class="post-category" th:text="${mainPost.danhMuc?.tenDanhMuc}">Danh mục</span>
+                        </div>
+                        <a th:href="@{'/bai-viet/' + ${mainPost.maBaiViet}}" class="read-more">Đọc thêm</a>
+                    </div>
+                </div>
+                
+                <!-- Các bài viết phụ bên phải -->
+                <div class="secondary-posts">
+                    <!-- Bài viết lớn ở trên -->
+                    <div th:with="secondPost=${baiViets[1]}" class="post-card">
+                        <div class="post-image">
+                            <img th:if="${secondPost.duongDanAnh1}"
+                                 th:src="'data:image/jpeg;base64,' + ${secondPost.duongDanAnh1}"
+                                 alt="Hình ảnh bài viết">
+                        </div>
+                        <div class="post-content">
+                            <h3 class="post-title" th:text="${secondPost.tieuDe}">Tiêu đề bài viết</h3>
+                            <div class="post-meta">
+                                <span class="post-date" th:text="${#temporals.format(secondPost.ngayXuatBan, 'dd/MM/yyyy')}">Ngày đăng</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Container cho 2 bài viết nhỏ -->
+                    <div class="small-posts-container">
+                        <!-- Hai bài viết nhỏ -->
+                        <div th:each="baiViet, iterStat : ${baiViets}" 
+                             th:if="${iterStat.index > 1 && iterStat.index <= 3}" 
+                             class="post-card">
+                            <div class="post-image">
+                                <img th:if="${baiViet.duongDanAnh1}"
+                                     th:src="'data:image/jpeg;base64,' + ${baiViet.duongDanAnh1}"
+                                     alt="Hình ảnh bài viết">
+                            </div>
+                            <div class="post-content">
+                                <h3 class="post-title" th:text="${baiViet.tieuDe}">Tiêu đề bài viết</h3>
+                                <div class="post-meta">
+                                    <span class="post-date" th:text="${#temporals.format(baiViet.ngayXuatBan, 'dd/MM/yyyy')}">Ngày đăng</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
 
-
-    
     <!-- Footer -->
     <div th:replace="~{Giaodien/Foter :: footer}"></div>
 
     <!-- JavaScript -->
-    <script th:src="@{/js/nav.js}" ></script>
-    
+    <script th:src="@{/js/nav.js}"></script>
 </body>
 </html>

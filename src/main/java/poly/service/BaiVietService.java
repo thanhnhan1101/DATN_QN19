@@ -2,9 +2,9 @@ package poly.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import poly.entity.BaiViet;
 import poly.repository.BaiVietRepository;
-
 import java.util.List;
 import java.util.Optional;
 
@@ -62,5 +62,34 @@ public class BaiVietService {
         }
     }
 
+    // Thêm phương thức đếm tổng số bài viết
+    public long countAll() {
+        return baiVietRepository.count();
+    }
+
+    // Thêm phương thức lấy danh sách bài viết chờ duyệt
+    public List<BaiViet> findPendingPosts() {
+        return baiVietRepository.findByTrangThai("Chờ duyệt");
+    }
+
     // TODO: Xem lịch sử chỉnh sửa (cần thêm bảng lịch sử)
+
+    @Transactional
+    public void toggleVisibility(Long id) {
+        Optional<BaiViet> opt = baiVietRepository.findById(id);
+        if (opt.isPresent()) {
+            BaiViet baiViet = opt.get();
+            // Chỉ cho phép chuyển đổi giữa "Đã đăng" và "Ẩn"
+            if ("Đã đăng".equals(baiViet.getTrangThai())) {
+                baiViet.setTrangThai("Ẩn");
+            } else if ("Ẩn".equals(baiViet.getTrangThai())) {
+                baiViet.setTrangThai("Đã đăng");
+            }
+            baiVietRepository.save(baiViet);
+        }
+    }
+
+    public List<BaiViet> getPublishedPosts() {
+        return baiVietRepository.findByTrangThai("Đã đăng");
+    }
 }

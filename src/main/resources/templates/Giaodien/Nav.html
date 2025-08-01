@@ -2,7 +2,7 @@
     <div class="container-mona">
         <div class="nav-mona-top">
             <div class="logo-mona">
-                <img src="/images/logo.jpg" alt="Logo" style="height:54px;">
+                <img src="/images/logo.png" alt="Logo" style="height:54px;">
             </div>
             <div class="nav-mona-right">
                 <form class="search-box-mona" th:action="@{/tim-kiem}" method="get">
@@ -72,22 +72,7 @@
         <!-- Navigation Bar -->
         <div class="nav-mona-sub">
             <div class="nav-wrapper">
-                <!-- Left Menu Toggle -->
-                <div class="menu-left">
-                    <button class="menu-toggle" id="menu-toggle">
-                        <i class="fas fa-bars"></i>
-                    </button>
-                    <!-- Side Menu -->
-                    <div class="side-menu" id="side-menu">
-                        <button class="side-menu-close" id="side-menu-close">
-                            <i class="fas fa-times"></i>
-                        </button>
-                        <ul>
-                            <li><a href="/preferences"><i class="fas fa-heart"></i> Sở thích của tôi</a></li>
-                        </ul>
-                    </div>
-                    <div class="menu-overlay" id="menu-overlay"></div>
-                </div>
+              
 
                 <!-- Main Menu -->
                 <ul class="main-menu">
@@ -135,7 +120,7 @@
                     <form th:action="@{/auth/register}" method="post">
                         <div class="form-group">
                             <i class="fas fa-user"></i>
-                            <input type="text" name="hoTen" placeholder="Họ và tên" required>
+                            <input type="text" name="fullname" placeholder="Họ và tên" required>
                         </div>
                         <div class="form-group">
                             <i class="fas fa-envelope"></i>
@@ -143,14 +128,10 @@
                         </div>
                         <div class="form-group">
                             <i class="fas fa-lock"></i>
-                            <input type="password" name="matKhau" placeholder="Mật khẩu" required>
-                        </div>
-                        <div class="form-group">
-                            <i class="fas fa-lock"></i>
-                            <input type="password" name="xacNhanMatKhau" placeholder="Xác nhận mật khẩu" required>
+                            <input type="password" name="password" placeholder="Mật khẩu" required>
                         </div>
                         <div class="form-options">
-                            <label><input type="checkbox" name="terms" required> Tôi đồng ý với các điều khoản</label>
+                            <label><input type="checkbox" name="terms"> Tôi đồng ý với các điều khoản</label>
                         </div>
                         <button type="submit" class="auth-button">Đăng ký</button>
                     </form>

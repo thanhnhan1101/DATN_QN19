@@ -5,182 +5,173 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quản lý người dùng</title>
     <!-- CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" th:href="@{/static/css/nav.css}">
-    <link rel="stylesheet" th:href="@{/static/css/footer.css}">
-    <link rel="stylesheet" th:href="@{/static/css/nguoidung.css}">
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
-    <!-- JavaScript -->
-    <script th:src="@{/static/js/nav.js}" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
-    <script th:src="@{/static/js/baiviet.js}"></script>
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+    <link rel="stylesheet" th:href="@{/css/nav.css}">
 </head>
 <body>
-    <script th:inline="javascript">
-        /*<![CDATA[*/
-        document.addEventListener('DOMContentLoaded', function() {
-            const message = /*[[${message}]]*/ null;
-            const messageType = /*[[${messageType}]]*/ null;
-            if (message) {
-                showToast(message, messageType);
-            }
-        });
-        /*]]>*/
-    </script>
-
-    <!-- Navigation -->
     <div th:replace="~{Giaodien/Nav :: nav}"></div>
-    
-    <!-- Main Content -->
-    <main>
-        <div class="admin-container">
-            <div class="admin-header">
-                <h2>Quản lý người dùng</h2>
-            </div>
-            
-            <!-- Form thêm/sửa người dùng -->
-            <div class="card mb-4">
-                <div class="card-body">
-                    <form id="nguoiDungForm" th:action="@{/admin/nguoidung}" method="post" 
-                          th:object="${nguoiDung}" enctype="multipart/form-data">
-                        <input type="hidden" th:field="*{maNguoiDung}">
-                        <input type="hidden" th:field="*{ngayTao}">
-                        
-                        <div class="mb-3">
-                            <label class="form-label">Email</label>
-                            <input type="email" th:field="*{email}" class="form-control" required>
-                        </div>
+    <div class="admin-wrapper">
+        <!-- Page Content -->
+        <div id="content">
+         
+            <!-- Main Content -->
+            <div class="container-fluid p-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Quản lý người dùng</h5>
+                    </div>
+                    <div class="card-body">
+                        <!-- Search Form -->
+                        <form th:action="@{/admin/nguoidung}" method="get" class="mb-4">
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <input type="text" name="keyword" class="form-control" 
+                                           placeholder="Tìm theo tên hoặc email...">
+                                </div>
+                                <div class="col-md-3">
+                                    <select name="vaiTro" class="form-control">
+                                        <option value="">-- Vai trò --</option>
+                                        <option value="user">Người dùng</option>
+                                        <option value="reporter">Phóng viên</option>
+                                        <option value="admin">Quản trị viên</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <select name="trangThai" class="form-control">
+                                        <option value="">-- Trạng thái --</option>
+                                        <option value="Hoạt động">Hoạt động</option>
+                                        <option value="Khóa">Khóa</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <button type="submit" class="btn btn-primary w-100">
+                                        <i class="fas fa-search"></i> Tìm kiếm
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
 
-                        <div class="mb-3">
-                            <label class="form-label">Mật khẩu</label>
-                            <input type="password" th:field="*{matKhau}" class="form-control"
-                                   th:required="${nguoiDung.maNguoiDung == null}"
-                                   th:placeholder="${nguoiDung.maNguoiDung != null ? 'Để trống nếu không đổi mật khẩu' : 'Nhập mật khẩu'}">
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Họ tên</label>
-                            <input type="text" th:field="*{hoTen}" class="form-control" required>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Ngày sinh</label>
-                            <input type="date" th:field="*{ngaySinh}" class="form-control">
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Giới tính</label>
-                            <select th:field="*{gioiTinh}" class="form-control">
-                                <option value="true">Nam</option>
-                                <option value="false">Nữ</option>
-                            </select>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Số điện thoại</label>
-                            <input type="tel" th:field="*{soDienThoai}" class="form-control">
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Địa chỉ</label>
-                            <textarea th:field="*{diaChi}" class="form-control" rows="3"></textarea>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Ảnh đại diện</label>
-                            <input type="file" name="avatarFile" class="form-control" accept="image/*">
-                            <img th:if="${nguoiDung.anhDaiDien}" th:src="${nguoiDung.anhDaiDien}" 
-                                 class="img-preview mt-2" style="max-width: 100px;">
-                        </div>
-
-                        <select th:field="*{vaiTro}" class="form-control">
-                            <option value="user">Người dùng</option>
-                            <option value="reporter">Phóng viên</option>
-                            <option value="admin">Quản trị viên</option>
-                        </select>
-
-                        <div class="mb-3">
-                            <label class="form-label">Trạng thái</label>
-                            <select th:field="*{trangThai}" class="form-control">
-                                <option value="true">Hoạt động</option>
-                                <option value="false">Khóa</option>
-                            </select>
-                        </div>
-
-                        <div class="d-flex gap-2">
-                            <button type="submit" class="btn btn-primary">
-                                <span th:text="${nguoiDung.maNguoiDung == null ? 'Thêm mới' : 'Cập nhật'}"></span>
-                            </button>
-                            <button type="button" class="btn btn-secondary" onclick="resetForm()">Làm mới</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-            
-            <!-- Danh sách người dùng -->
-            <div class="card mb-4">
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Ảnh</th>
-                                    <th>Email</th>
-                                    <th>Họ tên</th>
-                                    <th>Số điện thoại</th>
-                                    <th>Vai trò</th>
-                                    <th>Trạng thái</th>
-                                    <th>Thao tác</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr th:each="item : ${nguoiDungs}">
-                                    <td th:text="${item.maNguoiDung}"></td>
-                                    <td>
-                                        <img th:if="${item.anhDaiDien}" th:src="${item.anhDaiDien}" 
-                                             class="rounded-circle" style="width: 40px; height: 40px; object-fit: cover;">
-                                    </td>
-                                    <td th:text="${item.email}"></td>
-                                    <td th:text="${item.hoTen}"></td>
-                                    <td th:text="${item.soDienThoai}"></td>
-                                    <td>
-                                        <span th:switch="${item.vaiTro}">
-                                            <span th:case="'admin'" class="badge bg-primary">Quản trị viên</span>
-                                            <span th:case="'reporter'" class="badge bg-info">Phóng viên</span>
-                                            <span th:case="'user'" class="badge bg-secondary">Người dùng</span>
+                        <!-- User Form -->
+                        <form id="nguoiDungForm" th:action="@{/admin/nguoidung}" method="post" 
+                              th:object="${nguoiDung}" class="mb-4">
+                            <input type="hidden" th:field="*{maNguoiDung}">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Email</label>
+                                    <input type="email" th:field="*{email}" class="form-control" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Mật khẩu</label>
+                                    <input type="password" th:field="*{matKhau}" class="form-control"
+                                           th:required="${nguoiDung.maNguoiDung == null}">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Họ tên</label>
+                                    <input type="text" th:field="*{hoTen}" class="form-control" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Ngày sinh</label>
+                                    <input type="date" th:field="*{ngaySinh}" class="form-control">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Giới tính</label>
+                                    <select th:field="*{gioiTinh}" class="form-control">
+                                        <option value="true">Nam</option>
+                                        <option value="false">Nữ</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Số điện thoại</label>
+                                    <input type="tel" th:field="*{soDienThoai}" class="form-control">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Vai trò</label>
+                                    <select th:field="*{vaiTro}" class="form-control">
+                                        <option value="user">Người dùng</option>
+                                        <option value="reporter">Phóng viên</option>
+                                        <option value="admin">Quản trị viên</option>
+                                    </select>
+                                </div>
+                                <div class="col-12">
+                                    <button type="submit" class="btn btn-primary me-2">
+                                        <i class="fas fa-save"></i>
+                                        <span th:text="${nguoiDung.maNguoiDung == null ? 'Thêm mới' : 'Cập nhật'}">
                                         </span>
-                                    </td>
-                                    <td>
-                                        <span th:text="${item.trangThai ? 'Hoạt động' : 'Khóa'}"
-                                              th:class="${item.trangThai ? 'badge bg-success' : 'badge bg-danger'}">
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <a th:href="@{/admin/nguoidung/edit/{id}(id=${item.maNguoiDung})}" 
-                                           class="btn btn-sm btn-warning">
-                                           <i class="fas fa-edit"></i>
-                                        </a>
-                                        <button type="button"
-                                                class="btn btn-sm btn-danger"
-                                                th:onclick="'confirmDelete(' + ${item.maNguoiDung} + ')'">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                                    </button>
+                                    <button type="button" class="btn btn-secondary" onclick="resetForm()">
+                                        <i class="fas fa-redo"></i> Làm mới
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+
+                        <!-- Users Table -->
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Email</th>
+                                        <th>Họ tên</th>
+                                        <th>Số điện thoại</th>
+                                        <th>Vai trò</th>
+                                        <th>Trạng thái</th>
+                                        <th>Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="item : ${nguoiDungs}">
+                                        <td th:text="${item.maNguoiDung}"></td>
+                                        <td th:text="${item.email}"></td>
+                                        <td th:text="${item.hoTen}"></td>
+                                        <td th:text="${item.soDienThoai}"></td>
+                                        <td>
+                                            <span th:switch="${item.vaiTro}">
+                                                <span th:case="'admin'" class="badge bg-danger">Admin</span>
+                                                <span th:case="'reporter'" class="badge bg-warning">Reporter</span>
+                                                <span th:case="'user'" class="badge bg-info">User</span>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span th:class="${item.trangThai == 'Hoạt động' ? 'badge bg-success' : 'badge bg-danger'}"
+                                                  th:text="${item.trangThai}">
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <a th:href="@{/admin/nguoidung/edit/{id}(id=${item.maNguoiDung})}" 
+                                               class="btn btn-sm btn-warning">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <button type="button" class="btn btn-sm btn-danger"
+                                                    th:onclick="'deleteUser(' + ${item.maNguoiDung} + ')'">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </main>
+    </div>
 
-    <!-- Footer -->
-    <div th:replace="~{Giaodien/Foter :: footer}"></div>
-
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    
     <script>
+        // Toggle sidebar
+        document.getElementById('sidebarCollapse').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.toggle('active');
+        });
+
+        // Show toast message
         function showToast(message, type = 'success') {
             Toastify({
                 text: message,
@@ -191,7 +182,8 @@
             }).showToast();
         }
 
-        function confirmDelete(id) {
+        // Delete confirmation
+        function deleteUser(id) {
             Swal.fire({
                 title: 'Xác nhận xóa?',
                 text: "Bạn không thể hoàn tác sau khi xóa!",
@@ -208,13 +200,21 @@
             });
         }
 
+        // Reset form
         function resetForm() {
             document.getElementById('nguoiDungForm').reset();
             document.querySelector('input[name="maNguoiDung"]').value = '';
             document.querySelector('button[type="submit"] span').textContent = 'Thêm mới';
-            const imgPreview = document.querySelector('.img-preview');
-            if (imgPreview) imgPreview.remove();
         }
+
+        // Show toast message if exists
+        document.addEventListener('DOMContentLoaded', function() {
+            const message = /*[[${message}]]*/ null;
+            const messageType = /*[[${messageType}]]*/ null;
+            if (message) {
+                showToast(message, messageType);
+            }
+        });
     </script>
 </body>
 </html>

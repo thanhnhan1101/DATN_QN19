@@ -37,13 +37,15 @@ public class NguoiDungController {
         return "Admin/nguoidung";
     }
 
-    @PostMapping("")
+    @PostMapping("")  // Changed from @PostMapping("/save")
     public String save(@ModelAttribute NguoiDung nguoiDung, RedirectAttributes ra) {
         try {
             nguoiDungService.save(nguoiDung);
             ra.addFlashAttribute("message", "Lưu người dùng thành công!");
+            ra.addFlashAttribute("messageType", "success");
         } catch (Exception e) {
-            ra.addFlashAttribute("error", "Lỗi: " + e.getMessage());
+            ra.addFlashAttribute("message", "Lỗi: " + e.getMessage());
+            ra.addFlashAttribute("messageType", "error");
         }
         return "redirect:/admin/nguoidung";
     }

@@ -125,10 +125,11 @@
 
                         <div class="mb-3">
                             <label class="form-label">Trạng thái</label>
-                            <select th:field="*{trangThai}" class="form-control">
+                            <select th:field="*{trangThai}" class="form-control" required>
                                 <option value="Nháp">Nháp</option>
                                 <option value="Chờ duyệt">Chờ duyệt</option>
-                                <option value="Đã xuất bản">Đã xuất bản</option>
+                                <option value="Đã đăng">Đã đăng</option>
+                                <option value="Ẩn">Ẩn</option>
                                 <option value="Từ chối">Từ chối</option>
                             </select>
                         </div>
@@ -184,12 +185,12 @@
                                         <a th:href="@{/admin/baiviet/edit/{id}(id=${item.maBaiViet})}" class="btn btn-sm btn-warning">
                                             <i class="fas fa-edit"></i>
                                         </a>
-                                        <a href="javascript:void(0)" 
+                                        <a th:href="@{/admin/baiviet/toggle/{id}(id=${item.maBaiViet})}" 
                                            class="btn btn-sm"
-                                           th:classappend="${item.trangThai == 'Ẩn' ? 'btn-success' : 'btn-danger'}"
-                                           th:onclick="'toggleVisibility(' + ${item.maBaiViet} + ')'"
-                                           th:title="${item.trangThai == 'Ẩn' ? 'Hiện bài viết' : 'Ẩn bài viết'}">
-                                            <i class="fas" th:classappend="${item.trangThai == 'Ẩn' ? 'fa-eye' : 'fa-eye-slash'}"></i>
+                                           th:if="${item.trangThai == 'Đã đăng' || item.trangThai == 'Ẩn'}"
+                                           th:classappend="${item.trangThai == 'Đã đăng' ? 'btn-danger' : 'btn-success'}"
+                                           onclick="return confirm('Bạn có chắc muốn thay đổi trạng thái của bài viết này?')">
+                                            <i class="fas" th:classappend="${item.trangThai == 'Đã đăng' ? 'fa-eye-slash' : 'fa-eye'}"></i>
                                         </a>
                                         <button th:if="${item.trangThai == 'Chờ duyệt' and session.user.vaiTro == 'admin'}"
                                                 th:onclick="'window.location.href=\'/admin/baiviet/approve/' + ${item.maBaiViet} + '\';'">

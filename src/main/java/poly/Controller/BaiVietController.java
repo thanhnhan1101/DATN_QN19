@@ -13,6 +13,7 @@ import poly.service.DanhMucService;
 
 import java.util.Base64;
 import java.util.List;
+import java.time.LocalDateTime;
 
 @Controller
 @RequestMapping("/admin/baiviet")
@@ -45,28 +46,32 @@ public class BaiVietController {
                        @RequestParam("imageFile2") MultipartFile imageFile2,
                        @RequestParam("imageFile3") MultipartFile imageFile3,
                        HttpSession session) {
-        // Nếu là cập nhật, lấy bài viết cũ để giữ lại ảnh
-        if (baiViet.getMaBaiViet() != null) {
-            BaiViet old = baiVietService.findById(baiViet.getMaBaiViet()).orElse(null);
-            if (old != null) {
-                if (imageFile1.isEmpty()) baiViet.setDuongDanAnh1(old.getDuongDanAnh1());
-                if (imageFile2.isEmpty()) baiViet.setDuongDanAnh2(old.getDuongDanAnh2());
-                if (imageFile3.isEmpty()) baiViet.setDuongDanAnh3(old.getDuongDanAnh3());
-            }
-        }
-
         try {
+            // Kiểm tra và gán trạng thái mặc định nếu chưa có
+            if (baiViet.getTrangThai() == null || baiViet.getTrangThai().isEmpty()) {
+                baiViet.setTrangThai("Nháp"); // Hoặc giá trị mặc định phù hợp
+            }
+
+            // Xử lý ngày tạo/cập nhật
+            if (baiViet.getMaBaiViet() == null) {
+                baiViet.setNgayTao(LocalDateTime.now());
+            }
+            baiViet.setNgayCapNhat(LocalDateTime.now());
+
+            // Xử lý lượt xem
+            if (baiViet.getLuotXem() == null) {
+                baiViet.setLuotXem(0);
+            }
+
+            // Xử lý ảnh như cũ
             if (!imageFile1.isEmpty()) {
-                String base64 = Base64.getEncoder().encodeToString(imageFile1.getBytes());
-                baiViet.setDuongDanAnh1(base64);
+                baiViet.setDuongDanAnh1(Base64.getEncoder().encodeToString(imageFile1.getBytes()));
             }
             if (!imageFile2.isEmpty()) {
-                String base64 = Base64.getEncoder().encodeToString(imageFile2.getBytes());
-                baiViet.setDuongDanAnh2(base64);
+                baiViet.setDuongDanAnh2(Base64.getEncoder().encodeToString(imageFile2.getBytes()));
             }
             if (!imageFile3.isEmpty()) {
-                String base64 = Base64.getEncoder().encodeToString(imageFile3.getBytes());
-                baiViet.setDuongDanAnh3(base64);
+                baiViet.setDuongDanAnh3(Base64.getEncoder().encodeToString(imageFile3.getBytes()));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -77,7 +82,7 @@ public class BaiVietController {
         baiViet.setTacGia(nguoiDung);
 
         baiVietService.save(baiViet);
-        return "redirect:/admin/baiviet";
+        return "redirect:/admin/baiviet?message=Lưu bài viết thành công";
     }
 
     @GetMapping("/edit/{id}")
@@ -117,4 +122,10 @@ public class BaiVietController {
     }
 
     // Lịch sử chỉnh sửa: cần thêm bảng/logic lưu lịch sử nếu muốn
+
+    @GetMapping("/toggle/{id}")
+    public String toggleVisibility(@PathVariable Long id) {
+        baiVietService.toggleVisibility(id);
+        return "redirect:/admin/baiviet";
+    }
 }
