@@ -1,0 +1,104 @@
+/* Sidebar styles */
+.sidebar {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 250px;
+    padding: 20px;
+    background-color: #343a40;
+    z-index: 100;
+}
+
+.sidebar .nav-link {
+    font-weight: 500;
+    color: #fff;
+    padding: 10px 15px;
+    border-radius: 4px;
+}
+
+.sidebar .nav-link.active {
+    background-color: rgba(255,255,255,.1);
+}
+
+.sidebar .nav-link:hover {
+    background-color: rgba(255,255,255,.1);
+}
+
+.sidebar .nav-link i {
+    margin-right: 10px;
+}
+
+.sidebar-sticky {
+    position: relative;
+    top: 0;
+    height: calc(100vh - 48px);
+    padding-top: .5rem;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+/* Main content adjustment */
+.main-content {
+    margin-left: 250px;
+    padding: 20px;
+}
+
+/* Card stats */
+.border-left-primary {
+    border-left: .25rem solid #4e73df!important;
+}
+
+.border-left-success {
+    border-left: .25rem solid #1cc88a!important;
+}
+
+.border-left-info {
+    border-left: .25rem solid #36b9cc!important;
+}
+
+.border-left-warning {
+    border-left: .25rem solid #f6c23e!important;
+}
+
+.text-gray-300 {
+    color: #dddfeb!important;
+}
+
+.text-gray-800 {
+    color: #5a5c69!important;
+}
+/* Posts management styles */
+.table img {
+    border-radius: 4px;
+    object-fit: cover;
+}
+
+.badge {
+    padding: 0.5em 0.75em;
+    font-weight: 500;
+}
+
+.card-header {
+    background-color: #f8f9fa;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.search-box {
+    max-width: 300px;
+}
+
+/* Form styles */
+.form-label {
+    font-weight: 500;
+}
+
+textarea {
+    resize: vertical;
+}
+
+.preview-image {
+    max-width: 100px;
+    margin-top: 10px;
+    border-radius: 4px;
+}

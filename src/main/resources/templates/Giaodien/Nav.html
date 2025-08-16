@@ -59,6 +59,12 @@
                                 <i class="fas fa-cogs"></i> Quản trị hệ thống
                             </a>
                         </div>
+                        <!-- Reporter Section -->
+                        <div class="reporter-section" th:if="${session.user.vaiTro == 'reporter'}">
+                            <a href="/reporter/dashboard" class="reporter-link">
+                                <i class="fas fa-newspaper"></i> Quản lý bài viết
+                            </a>
+                        </div>
                         <a href="/auth/logout"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a>
                     </div>
                 </div>

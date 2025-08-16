@@ -13,11 +13,11 @@ import java.util.Optional;
 
 @Service
 public class NguoiDungService {
-
     @Autowired
     private NguoiDungRepository nguoiDungRepository;
-
-    private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    
+    @Autowired
+    private BCryptPasswordEncoder passwordEncoder;
 
     public List<NguoiDung> findAll() {
         return nguoiDungRepository.findAll();
@@ -49,12 +49,9 @@ public class NguoiDungService {
         return nguoiDungRepository.findByEmail(email);
     }
 
-    public Optional<NguoiDung> login(String email, String password) {
-        Optional<NguoiDung> userOpt = nguoiDungRepository.findByEmail(email);
-        if (userOpt.isPresent() && passwordEncoder.matches(password, userOpt.get().getMatKhau())) {
-            return userOpt;
-        }
-        return Optional.empty();
+    public Optional<NguoiDung> login(String email, String matKhau) {
+        return findByEmail(email)
+            .filter(user -> passwordEncoder.matches(matKhau, user.getMatKhau()));
     }
 
     public String compressAndEncodeImage(MultipartFile file) throws IOException {
@@ -80,5 +77,9 @@ public class NguoiDungService {
         } catch (IOException e) {
             throw new IOException("Error processing image: " + e.getMessage());
         }
+    }
+
+    public List<NguoiDung> findByVaiTro(String vaiTro) {
+        return nguoiDungRepository.findByVaiTro(vaiTro);
     }
 }

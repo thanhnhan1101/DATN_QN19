@@ -5,14 +5,19 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 import jakarta.servlet.http.HttpSession;
 import poly.entity.BaiViet;
 import poly.entity.NguoiDung;
 import poly.service.BaiVietService;
 import poly.service.DanhMucService;
 
+import java.time.LocalDateTime;
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/admin/baiviet")
@@ -21,100 +26,211 @@ public class BaiVietController {
     @Autowired
     private BaiVietService baiVietService;
 
-    @Autowired
+    @Autowired 
     private DanhMucService danhMucService;
 
     @GetMapping
-    public String list(@RequestParam(required = false) String keyword,
-                       @RequestParam(required = false) String trangThai,
-                       @RequestParam(required = false) Integer maDanhMuc,
-                       Model model) {
-        List<BaiViet> baiViets = baiVietService.getAll(); // hoặc search nếu có filter
+    public String list(@RequestParam(required = false) Long edit, Model model) {
+        if (edit != null) {
+            // Load bài viết cần edit
+            BaiViet editPost = baiVietService.findById(edit).orElse(new BaiViet());
+            model.addAttribute("baiviet", editPost);
+        } else {
+            // Form thêm mới
+            model.addAttribute("baiviet", new BaiViet());
+        }
+        
+        // Add other required attributes
+        List<BaiViet> baiViets = baiVietService.getAll();
         model.addAttribute("baiViets", baiViets);
-
-        // Truyền thêm các biến khác nếu cần
-        model.addAttribute("baiviet", new BaiViet());
         model.addAttribute("danhmucs", danhMucService.getAllDanhMuc());
+        model.addAttribute("totalPosts", baiVietService.count());
+        model.addAttribute("pendingPosts", baiVietService.countByTrangThai("Chờ duyệt"));
 
         return "Admin/baiviet";
     }
 
-    @PostMapping
+    @PostMapping("/save")
     public String save(@ModelAttribute BaiViet baiViet,
-                       @RequestParam("imageFile1") MultipartFile imageFile1,
-                       @RequestParam("imageFile2") MultipartFile imageFile2,
-                       @RequestParam("imageFile3") MultipartFile imageFile3,
-                       HttpSession session) {
-        // Nếu là cập nhật, lấy bài viết cũ để giữ lại ảnh
-        if (baiViet.getMaBaiViet() != null) {
-            BaiViet old = baiVietService.findById(baiViet.getMaBaiViet()).orElse(null);
-            if (old != null) {
-                if (imageFile1.isEmpty()) baiViet.setDuongDanAnh1(old.getDuongDanAnh1());
-                if (imageFile2.isEmpty()) baiViet.setDuongDanAnh2(old.getDuongDanAnh2());
-                if (imageFile3.isEmpty()) baiViet.setDuongDanAnh3(old.getDuongDanAnh3());
-            }
-        }
-
+                      @RequestParam("imageFile1") MultipartFile imageFile1,
+                      @RequestParam(value = "imageFile2", required = false) MultipartFile imageFile2,
+                      @RequestParam(value = "imageFile3", required = false) MultipartFile imageFile3,
+                      HttpSession session,
+                      RedirectAttributes ra) {
         try {
+            // Set author
+            NguoiDung nguoiDung = (NguoiDung) session.getAttribute("user");
+            baiViet.setTacGia(nguoiDung);
+
+            // Handle main image (required)
             if (!imageFile1.isEmpty()) {
-                String base64 = Base64.getEncoder().encodeToString(imageFile1.getBytes());
-                baiViet.setDuongDanAnh1(base64);
+                baiViet.setDuongDanAnh1(Base64.getEncoder().encodeToString(imageFile1.getBytes()));
+            } else if (baiViet.getMaBaiViet() == null) {
+                ra.addFlashAttribute("message", "Vui lòng chọn ảnh chính");
+                ra.addFlashAttribute("messageType", "danger");
+                return "redirect:/admin/baiviet";
             }
-            if (!imageFile2.isEmpty()) {
-                String base64 = Base64.getEncoder().encodeToString(imageFile2.getBytes());
-                baiViet.setDuongDanAnh2(base64);
+
+            // Handle optional images
+            if (imageFile2 != null && !imageFile2.isEmpty()) {
+                baiViet.setDuongDanAnh2(Base64.getEncoder().encodeToString(imageFile2.getBytes()));
             }
-            if (!imageFile3.isEmpty()) {
-                String base64 = Base64.getEncoder().encodeToString(imageFile3.getBytes());
-                baiViet.setDuongDanAnh3(base64);
+            if (imageFile3 != null && !imageFile3.isEmpty()) {
+                baiViet.setDuongDanAnh3(Base64.getEncoder().encodeToString(imageFile3.getBytes()));
             }
+
+            // Set dates
+            if (baiViet.getMaBaiViet() == null) {
+                baiViet.setNgayTao(LocalDateTime.now());
+            }
+            baiViet.setNgayCapNhat(LocalDateTime.now());
+
+            // Set publish date if status is "Đã xuất bản"
+            if ("Đã xuất bản".equals(baiViet.getTrangThai())) {
+                baiViet.setNgayXuatBan(LocalDateTime.now());
+            }
+
+            // Save
+            baiVietService.save(baiViet);
+
+            ra.addFlashAttribute("message", "Lưu bài viết thành công!");
+            ra.addFlashAttribute("messageType", "success");
+
         } catch (Exception e) {
-            e.printStackTrace();
+            ra.addFlashAttribute("message", "Lỗi: " + e.getMessage());
+            ra.addFlashAttribute("messageType", "danger");
         }
 
-        // Lấy người dùng từ session
-        NguoiDung nguoiDung = (NguoiDung) session.getAttribute("user");
-        baiViet.setTacGia(nguoiDung);
-
-        baiVietService.save(baiViet);
         return "redirect:/admin/baiviet";
     }
 
-    @GetMapping("/edit/{id}")
-    public String edit(@PathVariable Long id, Model model) {
-        BaiViet baiViet = baiVietService.findById(id).orElse(null);
-        model.addAttribute("baiviet", baiViet != null ? baiViet : new BaiViet());
-        model.addAttribute("baiViets", baiVietService.getAll());
-        model.addAttribute("danhmucs", danhMucService.getAllDanhMuc());
-        return "Admin/baiviet";
-    }
+   
 
     @GetMapping("/delete/{id}")
-    public String delete(@PathVariable Long id) {
-        baiVietService.deleteById(id);
-        return "redirect:/admin/baiviet";
-    }
-
-    // Duyệt bài viết
-    @GetMapping("/approve/{id}")
-    public String approve(@PathVariable Long id) {
-        BaiViet baiViet = baiVietService.findById(id).orElse(null);
-        if (baiViet != null) {
-            baiViet.setTrangThai("Đã đăng");
-            baiVietService.save(baiViet);
+    public String delete(@PathVariable Long id, RedirectAttributes ra) {
+        try {
+            baiVietService.deleteById(id);
+            ra.addFlashAttribute("message", "Xóa bài viết thành công!");
+            ra.addFlashAttribute("messageType", "success");
+        } catch (Exception e) {
+            ra.addFlashAttribute("message", "Lỗi: " + e.getMessage());
+            ra.addFlashAttribute("messageType", "danger");
         }
         return "redirect:/admin/baiviet";
     }
 
-    @GetMapping("/reject/{id}")
-    public String reject(@PathVariable Long id) {
+    @PostMapping("/approve")
+    @ResponseBody
+    public Map<String, Object> approve(@RequestParam Long id) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            BaiViet baiViet = baiVietService.findById(id).orElse(null);
+            if (baiViet != null) {
+                baiViet.setTrangThai("Đã xuất bản");
+                baiViet.setNgayXuatBan(LocalDateTime.now());
+                baiVietService.save(baiViet);
+                response.put("success", true);
+            } else {
+                response.put("success", false);
+                response.put("message", "Không tìm thấy bài viết!");
+            }
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", e.getMessage());
+        }
+        return response;
+    }
+
+    @GetMapping("/stats")
+    @ResponseBody
+    public Map<String, Long> getStats() {
+        Map<String, Long> stats = new HashMap<>();
+        stats.put("total", baiVietService.count());
+        stats.put("pending", baiVietService.countByTrangThai("Chờ duyệt"));
+        return stats;
+    }
+
+    @GetMapping("/showReject/{id}")
+    public String showRejectForm(@PathVariable Long id, Model model) {
         BaiViet baiViet = baiVietService.findById(id).orElse(null);
-        if (baiViet != null) {
-            baiViet.setTrangThai("Từ chối");
-            baiVietService.save(baiViet);
+        if (baiViet == null) {
+            return "redirect:/admin/baiviet";
+        }
+        model.addAttribute("baiViet", baiViet);
+        return "Admin/baiviet/reject";
+    }
+
+    @PostMapping("/reject")
+    public String reject(@RequestParam Long id, @RequestParam String lyDo, RedirectAttributes ra) {
+        try {
+            BaiViet baiViet = baiVietService.findById(id).orElse(null);
+            if (baiViet != null) {
+                baiViet.setTrangThai("Từ chối");
+                baiViet.setLyDoTuChoi(lyDo);
+                baiVietService.save(baiViet);
+                ra.addFlashAttribute("message", "Đã từ chối bài viết!");
+                ra.addFlashAttribute("messageType", "success");
+            }
+        } catch (Exception e) {
+            ra.addFlashAttribute("message", "Lỗi: " + e.getMessage());
+            ra.addFlashAttribute("messageType", "danger");
         }
         return "redirect:/admin/baiviet";
     }
 
-    // Lịch sử chỉnh sửa: cần thêm bảng/logic lưu lịch sử nếu muốn
+    @GetMapping("/view/{id}")
+    public String view(@PathVariable Long id, Model model) {
+        try {
+            BaiViet baiViet = baiVietService.findById(id).orElse(null);
+            if (baiViet == null) {
+                return "redirect:/admin/baiviet";
+            }
+            model.addAttribute("baiViet", baiViet);
+            return "Admin/baiviet-detail";
+        } catch (Exception e) {
+            return "redirect:/admin/baiviet";
+        }
+    }
+
+    @GetMapping("/getData/{id}")
+    public String getData(@PathVariable Long id, Model model) {
+        BaiViet baiViet = baiVietService.findById(id).orElse(new BaiViet());
+        model.addAttribute("baiviet", baiViet);
+        model.addAttribute("danhmucs", danhMucService.getAllDanhMuc());
+        return "Admin/fragments/posts :: #editForm";
+    }
+
+    @GetMapping("/reset")
+    public String reset(Model model) {
+        // Tạo form mới
+        model.addAttribute("baiviet", new BaiViet());
+        model.addAttribute("danhmucs", danhMucService.getAllDanhMuc());
+        return "Admin/fragments/posts :: #editForm";
+    }
+
+    @PostMapping("/toggle-visibility/{id}")
+    public String toggleVisibility(@PathVariable Long id, RedirectAttributes ra) {
+        try {
+            BaiViet baiViet = baiVietService.findById(id).orElse(null);
+            if (baiViet != null) {
+                // Nếu đang ẩn thì chuyển về trạng thái "Đã xuất bản", ngược lại thì ẩn
+                String newStatus = baiViet.getTrangThai().equals("Đã ẩn") ? "Đã xuất bản" : "Đã ẩn";
+                baiViet.setTrangThai(newStatus);
+                baiVietService.save(baiViet);
+                ra.addFlashAttribute("message", 
+                    newStatus.equals("Đã ẩn") ? "Đã ẩn bài viết!" : "Đã hiện bài viết!");
+                ra.addFlashAttribute("messageType", "success");
+            }
+        } catch (Exception e) {
+            ra.addFlashAttribute("message", "Lỗi: " + e.getMessage());
+            ra.addFlashAttribute("messageType", "danger");
+        }
+        return "redirect:/admin/baiviet";
+    }
+
+    @GetMapping("/detail/{id}")
+    @ResponseBody
+    public BaiViet getDetail(@PathVariable Long id) {
+        return baiVietService.findById(id).orElse(null);
+    }
 }

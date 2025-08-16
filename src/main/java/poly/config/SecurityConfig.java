@@ -7,13 +7,14 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.config.http.SessionCreationPolicy;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-
+    
     @Bean
-    public PasswordEncoder passwordEncoder() {
+    public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
@@ -24,8 +25,18 @@ public class SecurityConfig {
                 .requestMatchers("/admin/**").permitAll()  // Cho phép truy cập tất cả đường dẫn /admin/**
                 .anyRequest().permitAll()
             )
-            .csrf(csrf -> csrf.disable());  // Tắt CSRF để test
-        
+            .csrf(csrf -> csrf.disable())  // Tắt CSRF để test
+            .rememberMe(remember -> remember
+                .rememberMeCookieName("rememberMe")
+                .key("uniqueAndSecret")  // Change this to a unique secret key
+                .tokenValiditySeconds(1800) // 30 minutes in seconds
+            )
+            .sessionManagement(session -> session
+                .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                .maximumSessions(1)
+                .expiredUrl("/login?expired")
+            );
+            
         return http.build();
     }
 }

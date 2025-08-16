@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{Admin/layout}">
+
+<div layout:fragment="content">
+    <div class="container-fluid">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/admin/dashboard">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="/admin/baiviet">Quản lý bài viết</a></li>
+                <li class="breadcrumb-item active">Chi tiết bài viết</li>
+            </ol>
+        </nav>
+
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Chi tiết bài viết</h5>
+                <div th:if="${baiViet.trangThai == 'Chờ duyệt'}">
+                    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#approveModal">
+                        <i class="fas fa-check"></i> Duyệt bài
+                    </button>
+                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#rejectModal">
+                        <i class="fas fa-times"></i> Từ chối
+                    </button>
+                </div>
+            </div>
+            
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <!-- Nội dung bài viết -->
+                        <h3 th:text="${baiViet.tieuDe}" class="mb-3"></h3>
+                        <div class="mb-4">
+                            <span class="badge bg-primary" th:text="${baiViet.danhMuc.tenDanhMuc}"></span>
+                            <span class="text-muted ms-3">
+                                <i class="far fa-user"></i> 
+                                <span th:text="${baiViet.tacGia.hoTen}"></span>
+                            </span>
+                            <span class="text-muted ms-3">
+                                <i class="far fa-clock"></i>
+                                <span th:text="${#temporals.format(baiViet.ngayTao, 'dd/MM/yyyy HH:mm')}"></span>
+                            </span>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <img th:if="${baiViet.duongDanAnh1}" 
+                                 th:src="'data:image/jpeg;base64,' + ${baiViet.duongDanAnh1}"
+                                 class="img-fluid rounded mb-3">
+                            <div th:utext="${baiViet.noiDung}" class="ck-content"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <!-- Thông tin bài viết -->
+                        <div class="card">
+                            <div class="card-body">
+                                <h6 class="card-title">Thông tin bài viết</h6>
+                                <ul class="list-unstyled">
+                                    <li class="mb-2">
+                                        Trạng thái: 
+                                        <span th:class="'badge ' + ${baiViet.trangThai == 'Đã xuất bản' ? 'bg-success' : 
+                                        (baiViet.trangThai == 'Chờ duyệt' ? 'bg-warning' : 'bg-danger')}"
+                                              th:text="${baiViet.trangThai}">
+                                        </span>
+                                    </li>
+                                    <li class="mb-2" th:if="${baiViet.ngayXuatBan}">
+                                        Ngày xuất bản: 
+                                        <span th:text="${#temporals.format(baiViet.ngayXuatBan, 'dd/MM/yyyy HH:mm')}"></span>
+                                    </li>
+                                    <li class="mb-2" th:if="${baiViet.lyDoTuChoi}">
+                                        Lý do từ chối:
+                                        <p class="text-danger mt-1" th:text="${baiViet.lyDoTuChoi}"></p>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal xác nhận duyệt -->
+    <div class="modal fade" id="approveModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Xác nhận duyệt bài</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form th:action="@{/admin/baiviet/approve}" method="post">
+                    <div class="modal-body">
+                        <input type="hidden" name="id" th:value="${baiViet.maBaiViet}">
+                        <p>Bạn có chắc chắn muốn duyệt bài viết này?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn btn-success">Xác nhận duyệt</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal từ chối -->
+    <div class="modal fade" id="rejectModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Từ chối bài viết</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form th:action="@{/admin/baiviet/reject}" method="post">
+                    <div class="modal-body">
+                        <input type="hidden" name="id" th:value="${baiViet.maBaiViet}">
+                        <div class="mb-3">
+                            <label class="form-label">Lý do từ chối <span class="text-danger">*</span></label>
+                            <textarea class="form-control" name="lyDo" rows="3" required
+                                placeholder="Nhập lý do từ chối và hướng dẫn chỉnh sửa..."></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn btn-danger">Xác nhận từ chối</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+</html>

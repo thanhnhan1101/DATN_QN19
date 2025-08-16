@@ -30,4 +30,12 @@ public class DanhMucService {
     public DanhMuc findByDuongDan(String duongDan) {
         return danhMucRepository.findByDuongDan(duongDan);
     }
+
+    public List<DanhMuc> findAll() {
+        return danhMucRepository.findAll();
+    }
+    
+    public long count() {
+        return danhMucRepository.count();
+    }
 }

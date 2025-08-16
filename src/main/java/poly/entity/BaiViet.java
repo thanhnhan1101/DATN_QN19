@@ -22,14 +22,23 @@ public class BaiViet {
     @Column(name = "NoiDung", nullable = false, columnDefinition = "NVARCHAR(MAX)")
     private String noiDung;
 
-    @Column(name = "DuongDanAnh1", columnDefinition = "NVARCHAR(MAX)")
+    @Column(name = "DuongDanAnh1", nullable = false, columnDefinition = "NVARCHAR(MAX)")
     private String duongDanAnh1;
+
+    @Column(name = "NoiDungAnh1", nullable = false, columnDefinition = "NVARCHAR(500)")
+    private String noiDungAnh1;
 
     @Column(name = "DuongDanAnh2", columnDefinition = "NVARCHAR(MAX)")
     private String duongDanAnh2;
 
+    @Column(name = "NoiDungAnh2", columnDefinition = "NVARCHAR(500)")
+    private String noiDungAnh2;
+
     @Column(name = "DuongDanAnh3", columnDefinition = "NVARCHAR(MAX)")
     private String duongDanAnh3;
+
+    @Column(name = "NoiDungAnh3", columnDefinition = "NVARCHAR(500)")
+    private String noiDungAnh3;
 
     @ManyToOne
     @JoinColumn(name = "MaDanhMuc", foreignKey = @ForeignKey(name = "FK_BaiViet_DanhMuc"))
@@ -39,7 +48,7 @@ public class BaiViet {
     @JoinColumn(name = "MaTacGia", foreignKey = @ForeignKey(name = "FK_BaiViet_TacGia"))
     private NguoiDung tacGia;
 
-    @Column(name = "TrangThai", columnDefinition = "NVARCHAR(15) DEFAULT N'Nháp'")
+    @Column(name = "TrangThai", columnDefinition = "NVARCHAR(15) DEFAULT N'Nháp' CHECK (TrangThai IN (N'Nháp', N'Chờ duyệt', N'Đã xuất bản', N'Từ chối', N'Đã ẩn'))")
     private String trangThai = "Nháp";
 
     @Column(name = "NgayXuatBan")
@@ -54,6 +63,9 @@ public class BaiViet {
     @Column(name = "NgayCapNhat", columnDefinition = "DATETIME DEFAULT GETDATE()")
     private LocalDateTime ngayCapNhat;
 
+    @Column(name = "LyDoTuChoi", columnDefinition = "NVARCHAR(500)")
+    private String lyDoTuChoi;
+
     @PrePersist
     protected void onCreate() {
         ngayTao = LocalDateTime.now();
@@ -63,5 +75,14 @@ public class BaiViet {
     @PreUpdate
     protected void onUpdate() {
         ngayCapNhat = LocalDateTime.now();
+    }
+
+    // Getter and Setter for lyDoTuChoi
+    public String getLyDoTuChoi() {
+        return lyDoTuChoi;
+    }
+
+    public void setLyDoTuChoi(String lyDoTuChoi) {
+        this.lyDoTuChoi = lyDoTuChoi;
     }
 }

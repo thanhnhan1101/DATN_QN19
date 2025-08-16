@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <div th:replace="admin/fragments/header :: header"></div>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div th:replace="admin/fragments/sidebar :: sidebar"></div>
+
+    <!-- Main content -->
+    <main class="main-content">
+        <div class="container-fluid">
+            <!-- Add home button -->
+            <div class="mb-3">
+                <a href="/" class="btn btn-primary">
+                    <i class="fas fa-home"></i> Trang chủ
+                </a>
+            </div>
+
+            <!-- Tab content -->
+            <div class="tab-content">
+                <!-- Overview tab -->
+                <div th:replace="admin/fragments/overview :: overview"></div>
+                
+                <!-- Posts tab --> 
+                <div th:replace="admin/fragments/posts :: posts"></div>
+                
+                <!-- Categories tab -->
+                <div th:replace="admin/fragments/categories :: categories"></div>
+                
+                <!-- Users tab -->
+                <div th:replace="admin/fragments/users :: users"></div>
+                
+                <!-- Ads tab -->
+                <div th:replace="admin/fragments/ads :: ads"></div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <div th:replace="admin/fragments/header :: scripts"></div>
+    <script th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', function() {
+            // Lấy active tab từ model
+            const activeTab = /*[[${activeTab}]]*/ null;
+            if (activeTab) {
+                // Kích hoạt tab tương ứng
+                const tab = document.querySelector(`#${activeTab}`);
+                if (tab) {
+                    const bsTab = new bootstrap.Tab(tab);
+                    bsTab.show();
+                }
+            }
+            
+            // Xử lý hash URL
+            if (window.location.hash) {
+                const hash = window.location.hash.substring(1);
+                const tab = document.querySelector(`#${hash}`);
+                if (tab) {
+                    const bsTab = new bootstrap.Tab(tab);
+                    bsTab.show();
+                }
+            }
+        });
+    </script>
+</body>
+</html>

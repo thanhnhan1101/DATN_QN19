@@ -94,7 +94,7 @@ CREATE TABLE QuangCao (
     NgayBatDau DATE,
     NgayKetThuc DATE,
     TrangThai NVARCHAR(20) DEFAULT N'Chờ duyệt'
-        CHECK (TrangThai IN (N'Chờ duyệt', N'Đã duyệt', N'Từ chối')),
+        CHECK (TrangThai IN (N'Nháp', N'Chờ duyệt', N'Đã xuất bản', N'Từ chối', N'Đã ẩn'))
     NgayTao DATETIME DEFAULT GETDATE(),
     FOREIGN KEY (MaNguoiDung) REFERENCES NguoiDung(MaNguoiDung)
 );
@@ -143,4 +143,19 @@ CREATE TABLE LichSuTuongTac (
     FOREIGN KEY (MaNguoiDung) REFERENCES NguoiDung(MaNguoiDung),
     FOREIGN KEY (MaBaiViet) REFERENCES BaiViet(MaBaiViet)
 );
+
+-------------
+-- ADD Thêm mới ngày 06/08
+ALTER TABLE BaiViet
+ADD NoiDungAnh1 NVARCHAR(500) NOT NULL DEFAULT N'',
+    NoiDungAnh2 NVARCHAR(500),
+    NoiDungAnh3 NVARCHAR(500);
+
+-- Make DuongDanAnh1 required
+ALTER TABLE BaiViet
+ALTER COLUMN DuongDanAnh1 NVARCHAR(MAX) NOT NULL;
+
+ALTER TABLE BaiViet
+ADD LyDoTuChoi NVARCHAR(500);
+
 

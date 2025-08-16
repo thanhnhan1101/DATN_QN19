@@ -1,18 +1,16 @@
 package poly.Controller;
 
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import poly.entity.NguoiDung;
 import poly.service.NguoiDungService;
 import java.util.Optional;
-import java.util.HashMap;
-import java.util.Map;
-
 @Controller
 @RequestMapping("/auth")
 public class AuthController {
@@ -48,26 +46,54 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public String login(@RequestParam("email") String email, 
-                       @RequestParam("matKhau") String matKhau,
+    public String login(@RequestParam String email, 
+                       @RequestParam String matKhau,
+                       @RequestParam(defaultValue = "false") boolean rememberMe,
+                       HttpServletResponse response,
                        HttpSession session,
                        RedirectAttributes ra) {
-        Optional<NguoiDung> userOpt = nguoiDungService.login(email, matKhau);
-        if (userOpt.isPresent()) {
-            session.setAttribute("user", userOpt.get());
-            ra.addFlashAttribute("message", "Đăng nhập thành công!");
-            return "redirect:/";
-        } else {
+        try {
+            Optional<NguoiDung> userOpt = nguoiDungService.login(email, matKhau);
+            if (userOpt.isPresent()) {
+                NguoiDung user = userOpt.get();
+                session.setAttribute("user", user);
+                
+                if (rememberMe) {
+                    Cookie cookie = new Cookie("rememberMe", user.getEmail());
+                    cookie.setMaxAge(1800);
+                    cookie.setPath("/");
+                    cookie.setHttpOnly(true);
+                    response.addCookie(cookie);
+                }
+                
+                return "redirect:/";
+            }
             ra.addFlashAttribute("error", "Email hoặc mật khẩu không đúng!");
-            return "redirect:/";
+        } catch (Exception e) {
+            ra.addFlashAttribute("error", e.getMessage());
         }
-    }
-
-    @GetMapping("/logout")
-    public String logout(HttpSession session, RedirectAttributes ra) {
-        session.removeAttribute("user");
-        ra.addFlashAttribute("message", "Đăng xuất thành công!");
         return "redirect:/";
     }
 
+    @GetMapping("/logout")
+    public String logout(HttpServletRequest request, 
+                        HttpServletResponse response,
+                        HttpSession session) {
+        session.invalidate();
+        
+        // Delete remember-me cookie
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("rememberMe".equals(cookie.getName())) {
+                    cookie.setMaxAge(0);
+                    cookie.setPath("/");
+                    response.addCookie(cookie);
+                    break;
+                }
+            }
+        }
+        
+        return "redirect:/";
+    }
 }

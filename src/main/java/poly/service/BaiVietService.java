@@ -1,8 +1,11 @@
 package poly.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import poly.entity.BaiViet;
+import poly.entity.NguoiDung;
 import poly.repository.BaiVietRepository;
 
 import java.util.List;
@@ -62,5 +65,37 @@ public class BaiVietService {
         }
     }
 
+    // Đếm tổng số bài viết của reporter
+    public long countByTacGia(NguoiDung tacGia) {
+        return baiVietRepository.countByTacGia(tacGia);
+    }
+
+    // Đếm số bài viết theo trạng thái của reporter
+    public long countByTacGiaAndTrangThai(NguoiDung tacGia, String trangThai) {
+        return baiVietRepository.countByTacGiaAndTrangThai(tacGia, trangThai);
+    }
+
+    // Tính tổng lượt xem của tất cả bài viết của reporter
+    public long sumLuotXemByTacGia(NguoiDung tacGia) {
+        return baiVietRepository.sumLuotXemByTacGia(tacGia);
+    }
+
+    // Lấy danh sách bài viết có phân trang của reporter
+    public Page<BaiViet> findByTacGia(NguoiDung tacGia, Pageable pageable) {
+        return baiVietRepository.findByTacGia(tacGia, pageable);
+    }
+
+    // Đếm số bài viết theo trạng thái
+    public long countByTrangThai(String trangThai) {
+        return baiVietRepository.countByTrangThai(trangThai);
+    }
+
+    public long count() {
+        return baiVietRepository.count();
+    }
     // TODO: Xem lịch sử chỉnh sửa (cần thêm bảng lịch sử)
+
+    public List<BaiViet> getBaiVietPublic() {
+        return baiVietRepository.findPublicPosts();
+    }
 }

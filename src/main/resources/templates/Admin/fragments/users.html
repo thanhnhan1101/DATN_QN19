@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<div th:fragment="users" class="tab-pane fade" id="users" role="tabpanel">
+    <div class="container-fluid">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Thêm/Sửa người dùng</h5>
+            </div>
+            <div class="card-body">
+                <form id="userForm" th:action="@{/admin/nguoidung}" method="post" th:object="${nguoiDung}">
+                    <input type="hidden" th:field="*{maNguoiDung}">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Email</label>
+                                <input type="email" class="form-control" th:field="*{email}" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Mật khẩu</label>
+                                <input type="password" class="form-control" th:field="*{matKhau}"
+                                    th:required="${nguoiDung.maNguoiDung == null}">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Họ tên</label>
+                                <input type="text" class="form-control" th:field="*{hoTen}" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Giới tính</label>
+                                <select class="form-control" th:field="*{gioiTinh}">
+                                    <option th:value="true">Nam</option>
+                                    <option th:value="false">Nữ</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Ngày sinh</label>
+                                <input type="date" class="form-control" th:field="*{ngaySinh}">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Số điện thoại</label>
+                                <input type="tel" class="form-control" th:field="*{soDienThoai}">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Vai trò</label>
+                                <select class="form-control" th:field="*{vaiTro}">
+                                    <option value="user">Người dùng</option>
+                                    <option value="reporter">Phóng viên</option>
+                                    <option value="admin">Quản trị viên</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Trạng thái</label>
+                                <select class="form-control" th:field="*{trangThai}">
+                                    <option value="Hoạt động">Hoạt động</option>
+                                    <option value="Khóa">Khóa</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-end">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i>
+                            <span th:text="${nguoiDung.maNguoiDung == null ? 'Thêm mới' : 'Cập nhật'}"></span>
+                        </button>
+                        <a th:href="@{/admin/nguoidung}" class="btn btn-secondary">
+                            <i class="fas fa-redo"></i> Làm mới
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Danh sách người dùng</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Email</th>
+                                <th>Họ tên</th>
+                                <th>Số điện thoại</th>
+                                <th>Vai trò</th>
+                                <th>Trạng thái</th>
+                                <th>Ngày tạo</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="user : ${nguoiDungs}">
+                                <td th:text="${user.maNguoiDung}"></td>
+                                <td th:text="${user.email}"></td>
+                                <td th:text="${user.hoTen}"></td>
+                                <td th:text="${user.soDienThoai}"></td>
+                                <td>
+                                    <span class="badge" 
+                                          th:classappend="${user.vaiTro == 'admin' ? 'bg-danger' : 
+                                          (user.vaiTro == 'reporter' ? 'bg-warning' : 'bg-info')}"
+                                          th:text="${user.vaiTro == 'admin' ? 'Quản trị viên' : 
+                                          (user.vaiTro == 'reporter' ? 'Phóng viên' : 'Người dùng')}">
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge" 
+                                          th:classappend="${user.trangThai == 'Hoạt động' ? 'bg-success' : 'bg-danger'}"
+                                          th:text="${user.trangThai}">
+                                    </span>
+                                </td>
+                                <td th:text="${#temporals.format(user.ngayTao, 'dd/MM/yyyy HH:mm')}"></td>
+                                <td>
+                                    <div class="btn-group">
+                                        <a th:href="@{/admin/nguoidung/edit/{id}(id=${user.maNguoiDung})}" 
+                                           class="btn btn-sm btn-warning">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a th:href="@{/admin/nguoidung/delete/{id}(id=${user.maNguoiDung})}"
+                                           class="btn btn-sm btn-danger"
+                                           onclick="return confirm('Bạn có chắc muốn xóa người dùng này?')">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</html>
