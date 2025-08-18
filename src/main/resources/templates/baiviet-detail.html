@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${baiViet.tieuDe + ' - MSN'}">Chi tiết bài viết - MSN</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/nav.css}">
+    <link rel="stylesheet" th:href="@{/css/footer.css}">
+    <link rel="stylesheet" th:href="@{/css/baiviet-detail.css}">
+</head>
+<body>
+    <!-- Navigation -->
+    <div th:replace="~{Giaodien/Nav :: nav}"></div>
+
+    <!-- Main Content -->
+    <main class="container">
+        <div class="article-container">
+            <!-- Breadcrumb -->
+            <nav class="breadcrumb">
+                <a href="/">Trang chủ</a>
+                <span class="separator">/</span>
+                <a th:if="${baiViet.danhMuc}" th:href="@{/danh-muc/{duongDan}(duongDan=${baiViet.danhMuc.duongDan})}" 
+                   th:text="${baiViet.danhMuc.tenDanhMuc}">Danh mục</a>
+                <span class="separator">/</span>
+                <span class="current" th:text="${baiViet.tieuDe}">Tiêu đề bài viết</span>
+            </nav>
+
+            <!-- Article Header -->
+            <header class="article-header">
+                <h1 class="article-title" th:text="${baiViet.tieuDe}">Tiêu đề bài viết</h1>
+                
+                <div class="article-meta">
+                    <div class="meta-item">
+                        <i class="fas fa-user"></i>
+                        <span th:text="${baiViet.tacGia.hoTen}">Tác giả</span>
+                    </div>
+                    <div class="meta-item">
+                        <i class="fas fa-calendar"></i>
+                        <span th:text="${#temporals.format(baiViet.ngayXuatBan, 'dd/MM/yyyy HH:mm')}">Ngày đăng</span>
+                    </div>
+                                         <div class="meta-item">
+                         <i class="fas fa-eye"></i>
+                         <span th:text="${baiViet.luotXem}">0</span> lượt xem
+                     </div>
+                     <div class="meta-item">
+                         <button class="like-button" th:attr="data-bai-viet-id=${baiViet.maBaiViet}" 
+                                 th:class="${isLiked ? 'like-button liked' : 'like-button'}">
+                             <i class="fas fa-heart"></i>
+                             <span class="like-count" th:text="${likeCount}">0</span>
+                         </button>
+                     </div>
+                    <div class="meta-item" th:if="${baiViet.danhMuc}">
+                        <i class="fas fa-tag"></i>
+                        <span th:text="${baiViet.danhMuc.tenDanhMuc}">Danh mục</span>
+                    </div>
+                </div>
+
+                <div class="article-summary" th:if="${baiViet.tomTat != null and baiViet.tomTat != ''}">
+                    <p th:text="${baiViet.tomTat}">Tóm tắt bài viết</p>
+                </div>
+            </header>
+
+            <!-- Article Content -->
+            <article class="article-content">
+                <!-- Main Image -->
+                <div class="main-image" th:if="${baiViet.duongDanAnh1 != null and baiViet.duongDanAnh1 != ''}">
+                    <img th:data-src="${baiViet.duongDanAnh1}"
+                         th:alt="${baiViet.noiDungAnh1 != null ? baiViet.noiDungAnh1 : 'Hình ảnh bài viết'}"
+                         class="featured-image">
+                    <p class="image-caption" th:if="${baiViet.noiDungAnh1 != null and baiViet.noiDungAnh1 != ''}" th:text="${baiViet.noiDungAnh1}">Mô tả ảnh</p>
+                </div>
+
+                <!-- Article Text -->
+                <div class="article-text" th:utext="${baiViet.noiDung}">
+                    Nội dung bài viết
+                </div>
+
+                <!-- Additional Images -->
+                <div class="additional-images" th:if="${(baiViet.duongDanAnh2 != null and baiViet.duongDanAnh2 != '') or (baiViet.duongDanAnh3 != null and baiViet.duongDanAnh3 != '')}">
+                    <div class="image-gallery">
+                        <div class="gallery-item" th:if="${baiViet.duongDanAnh2 != null and baiViet.duongDanAnh2 != ''}">
+                            <img th:data-src="${baiViet.duongDanAnh2}"
+                                 th:alt="${baiViet.noiDungAnh2 != null ? baiViet.noiDungAnh2 : 'Hình ảnh bài viết'}"
+                                 class="gallery-image">
+                            <p class="image-caption" th:if="${baiViet.noiDungAnh2 != null and baiViet.noiDungAnh2 != ''}" th:text="${baiViet.noiDungAnh2}">Mô tả ảnh</p>
+                        </div>
+                        <div class="gallery-item" th:if="${baiViet.duongDanAnh3 != null and baiViet.duongDanAnh3 != ''}">
+                            <img th:data-src="${baiViet.duongDanAnh3}"
+                                 th:alt="${baiViet.noiDungAnh3 != null ? baiViet.noiDungAnh3 : 'Hình ảnh bài viết'}"
+                                 class="gallery-image">
+                            <p class="image-caption" th:if="${baiViet.noiDungAnh3 != null and baiViet.noiDungAnh3 != ''}" th:text="${baiViet.noiDungAnh3}">Mô tả ảnh</p>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Article Footer -->
+            <footer class="article-footer">
+                <div class="article-tags" th:if="${baiViet.danhMuc}">
+                    <span class="tag-label">Danh mục:</span>
+                    <a th:href="@{/danh-muc/{duongDan}(duongDan=${baiViet.danhMuc.duongDan})}" 
+                       class="tag" th:text="${baiViet.danhMuc.tenDanhMuc}">Danh mục</a>
+                </div>
+                
+                <div class="share-buttons">
+                    <span class="share-label">Chia sẻ:</span>
+                    <a href="#" class="share-btn facebook" onclick="shareOnFacebook()">
+                        <i class="fab fa-facebook"></i>
+                    </a>
+                    <a href="#" class="share-btn twitter" onclick="shareOnTwitter()">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    <a href="#" class="share-btn linkedin" onclick="shareOnLinkedIn()">
+                        <i class="fab fa-linkedin"></i>
+                    </a>
+                </div>
+            </footer>
+        </div>
+
+        <!-- Related Articles -->
+        <aside class="related-articles" th:if="${not #lists.isEmpty(relatedPosts)}">
+            <h3 class="related-title">Bài viết liên quan</h3>
+            <div class="related-grid">
+                <div th:each="relatedPost : ${relatedPosts}" class="related-card">
+                    <div class="related-image">
+                        <img th:if="${relatedPost.duongDanAnh1 != null and relatedPost.duongDanAnh1 != ''}"
+                             th:data-src="${relatedPost.duongDanAnh1}"
+                             alt="Hình ảnh bài viết liên quan">
+                    </div>
+                    <div class="related-content">
+                        <h4 class="related-title">
+                            <a th:href="@{/bai-viet/{id}(id=${relatedPost.maBaiViet})}" 
+                               th:text="${relatedPost.tieuDe}">Tiêu đề bài viết liên quan</a>
+                        </h4>
+                        <div class="related-meta">
+                            <span class="related-date" th:text="${#temporals.format(relatedPost.ngayXuatBan, 'dd/MM/yyyy')}">Ngày đăng</span>
+                            <span class="related-views" th:text="${relatedPost.luotXem + ' lượt xem'}">0 lượt xem</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </main>
+
+    <!-- Footer -->
+    <div th:replace="~{Giaodien/Foter :: footer}"></div>
+
+    <!-- JavaScript -->
+    <script th:src="@{/js/nav.js}"></script>
+    <script th:src="@{/js/baiviet-detail.js}"></script>
+</body>
+</html>
