@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${danhMuc.tenDanhMuc + ' - MSN'}">Danh mục - MSN</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/nav.css}">
+    <link rel="stylesheet" th:href="@{/css/footer.css}">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <!-- Navigation -->
+    <div th:replace="~{Giaodien/Nav :: nav}"></div>
+
+    <!-- Main Content -->
+    <main class="container">
+        <!-- Breadcrumb -->
+        <nav class="breadcrumb">
+            <a href="/">Trang chủ</a>
+            <span class="separator">/</span>
+            <span class="current" th:text="${danhMuc.tenDanhMuc}">Danh mục</span>
+        </nav>
+
+        <!-- Category Header -->
+        <header class="category-header">
+            <h1 class="category-title" th:text="${danhMuc.tenDanhMuc}">Tên danh mục</h1>
+            <p class="category-description" th:if="${danhMuc.moTa != null and danhMuc.moTa != ''}" th:text="${danhMuc.moTa}">Mô tả danh mục</p>
+            <div class="category-stats">
+                <span class="article-count" th:text="${#lists.size(baiViets) + ' bài viết'}">0 bài viết</span>
+            </div>
+        </header>
+
+        <!-- Articles Grid -->
+        <section class="articles-section">
+            <div th:if="${hasArticles}" class="articles-grid">
+                <div th:each="baiViet : ${baiViets}" class="article-card">
+                    <a th:href="@{/bai-viet/{id}(id=${baiViet.maBaiViet})}" class="article-link">
+                        <div class="article-image">
+                            <img th:if="${baiViet.duongDanAnh1 != null and baiViet.duongDanAnh1 != ''}"
+                                 th:data-src="${baiViet.duongDanAnh1}"
+                                 alt="Hình ảnh bài viết">
+                        </div>
+                        <div class="article-content">
+                            <h3 class="article-title" th:text="${baiViet.tieuDe}">Tiêu đề bài viết</h3>
+                            <div class="article-summary" th:if="${baiViet.tomTat != null and baiViet.tomTat != ''}">
+                                <p th:text="${baiViet.tomTat}">Tóm tắt bài viết</p>
+                            </div>
+                            <div class="article-meta">
+                                <div class="meta-item" th:if="${baiViet.tacGia != null}">
+                                    <i class="fas fa-user"></i>
+                                    <span th:text="${baiViet.tacGia.hoTen}">Tác giả</span>
+                                </div>
+                                <div class="meta-item" th:if="${baiViet.ngayXuatBan != null}">
+                                    <i class="fas fa-calendar"></i>
+                                    <span th:text="${#temporals.format(baiViet.ngayXuatBan, 'dd/MM/yyyy')}">Ngày đăng</span>
+                                </div>
+                                <div class="meta-item" th:if="${baiViet.luotXem != null}">
+                                    <i class="fas fa-eye"></i>
+                                    <span th:text="${baiViet.luotXem}">0</span> lượt xem
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <div th:unless="${hasArticles}" class="no-articles">
+                <div class="no-articles-content">
+                    <i class="fas fa-newspaper"></i>
+                    <h3>Chưa có bài viết nào trong danh mục này</h3>
+                    <p>Hãy quay lại sau để xem các bài viết mới nhất!</p>
+                    <a href="/" class="btn-back">Quay về trang chủ</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <div th:replace="~{Giaodien/Foter :: footer}"></div>
+
+    <!-- JavaScript -->
+    <script th:src="@{/js/nav.js}"></script>
+    <script>
+        // Convert base64 data to image src
+        function convertBase64ToImage() {
+            const images = document.querySelectorAll('img[data-src]');
+            images.forEach(img => {
+                const base64Data = img.getAttribute('data-src');
+                if (base64Data && base64Data.trim() !== '') {
+                    img.src = 'data:image/jpeg;base64,' + base64Data;
+                }
+            });
+        }
+        
+        // Run when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            convertBase64ToImage();
+        });
+    </script>
+</body>
+</html>
