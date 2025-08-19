@@ -37,6 +37,11 @@ public class NguoiDungController {
         return "Admin/nguoidung";
     }
 
+    @GetMapping("/reset")
+    public String reset() {
+        return "redirect:/admin/nguoidung";
+    }
+
     @PostMapping("")
     public String save(@ModelAttribute NguoiDung nguoiDung, RedirectAttributes ra) {
         try {

@@ -98,4 +98,14 @@ public class BaiVietService {
     public List<BaiViet> getBaiVietPublic() {
         return baiVietRepository.findPublicPosts();
     }
+
+    // Get monthly statistics for author
+    public List<Object[]> getMonthlyStatsByAuthor(Long maNguoiDung) {
+        return baiVietRepository.getMonthlyStatsByAuthor(maNguoiDung);
+    }
+
+    // Get category statistics for author
+    public List<Object[]> getCategoryStatsByAuthor(Long maNguoiDung) {
+        return baiVietRepository.getCategoryStatsByAuthor(maNguoiDung);
+    }
 }

@@ -1,23 +1,255 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" 
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{Admin/layout}">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 
-<div layout:fragment="content">
-    <div class="container-fluid">
-        <!-- Show messages -->
-        <div th:if="${message}" class="alert alert-success alert-dismissible fade show" role="alert">
-            <span th:text="${message}"></span>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý người dùng - Admin Dashboard</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .sidebar {
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 100;
+            padding: 48px 0 0;
+            box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
+            background-color: #343a40;
+            width: 250px;
+        }
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+        }
+        .nav-link {
+            color: #fff;
+            padding: 1rem;
+        }
+        .nav-link:hover {
+            color: #fff;
+            background-color: rgba(255,255,255,.1);
+        }
+        .nav-link.active {
+            background-color: rgba(255,255,255,.2);
+        }
+        .card {
+            margin-bottom: 1.5rem;
+            box-shadow: 0 .15rem 1.75rem 0 rgba(58,59,69,.15);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Sidebar -->
+    <nav class="col-md-3 col-lg-2 d-md-block sidebar">
+        <div class="sidebar-sticky">
+            <div class="text-center mb-4">
+                <h5 class="text-white mt-2">Bảng điều khiển quản trị</h5>
+            </div>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link" href="/admin/dashboard">
+                        <i class="fas fa-tachometer-alt me-2"></i>
+                        Tổng quan
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/admin/baiviet">
+                        <i class="fas fa-newspaper me-2"></i>
+                        Quản lý bài viết
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/admin/danhmuc">
+                        <i class="fas fa-folder me-2"></i>
+                        Quản lý danh mục
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="/admin/nguoidung">
+                        <i class="fas fa-users me-2"></i>
+                        Quản lý người dùng
+                    </a>
+                </li>
+            </ul>
         </div>
-        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
-            <span th:text="${error}"></span>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </nav>
+
+    <!-- Main content -->
+    <main class="main-content">
+        <!-- Top navbar -->
+        <nav class="navbar navbar-light bg-light mb-4 shadow-sm">
+            <div class="container-fluid">
+                <span class="navbar-brand mb-0 h1">Quản lý người dùng</span>
+                <div class="d-flex">
+                    <div class="dropdown">
+                        <button class="btn btn-link dropdown-toggle text-dark" type="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-user-circle"></i>
+                            <span th:text="${session.admin != null} ? ${session.admin.hoTen} : 'Admin'">Admin</span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="/admin/profile"><i class="fas fa-user me-2"></i>Hồ sơ</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="/logout"><i class="fas fa-sign-out-alt me-2"></i>Đăng xuất</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- User Form Card -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Thêm/Sửa người dùng</h6>
+            </div>
+            <div class="card-body">
+                <!-- Add success/error messages -->
+                <div th:if="${message}" class="alert alert-success alert-dismissible fade show" role="alert">
+                    <span th:text="${message}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <span th:text="${error}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+
+                <form id="userForm" th:action="@{/admin/nguoidung}" method="post" th:object="${nguoiDung}">
+                    <input type="hidden" th:field="*{maNguoiDung}">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Email <span class="text-danger">*</span></label>
+                                <input type="email" class="form-control" th:field="*{email}" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Mật khẩu</label>
+                                <input type="password" class="form-control" th:field="*{matKhau}"
+                                    th:required="${nguoiDung.maNguoiDung == null}">
+                                <small class="text-muted" th:if="${nguoiDung.maNguoiDung != null}">
+                                    Để trống nếu không muốn thay đổi mật khẩu
+                                </small>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Họ tên <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" th:field="*{hoTen}" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Giới tính</label>
+                                <select class="form-control" th:field="*{gioiTinh}">
+                                    <option th:value="true">Nam</option>
+                                    <option th:value="false">Nữ</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Ngày sinh</label>
+                                <input type="date" class="form-control" th:field="*{ngaySinh}">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Số điện thoại</label>
+                                <input type="tel" class="form-control" th:field="*{soDienThoai}">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Vai trò <span class="text-danger">*</span></label>
+                                <select class="form-control" th:field="*{vaiTro}" required>
+                                    <option value="user">Người dùng</option>
+                                    <option value="reporter">Phóng viên</option>
+                                    <option value="admin">Quản trị viên</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Trạng thái</label>
+                                <select class="form-control" th:field="*{trangThai}">
+                                    <option value="Hoạt động">Hoạt động</option>
+                                    <option value="Khóa">Khóa</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-end">
+                        <a th:href="@{/admin/nguoidung/reset}" class="btn btn-secondary">
+                            <i class="fas fa-redo"></i> Làm mới
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i>
+                            <span th:text="${nguoiDung.maNguoiDung == null ? 'Thêm mới' : 'Cập nhật'}"></span>
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
 
-        <!-- Include users fragment -->
-        <div th:replace="Admin/fragments/users :: users"></div>
-    </div>
-</div>
+        <!-- Users List Card -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Danh sách người dùng</h6>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Email</th>
+                                <th>Họ tên</th>
+                                <th>Số điện thoại</th>
+                                <th>Vai trò</th>
+                                <th>Trạng thái</th>
+                                <th>Ngày tạo</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="user : ${nguoiDungs}">
+                                <td th:text="${user.maNguoiDung}"></td>
+                                <td th:text="${user.email}"></td>
+                                <td th:text="${user.hoTen}"></td>
+                                <td th:text="${user.soDienThoai}"></td>
+                                <td>
+                                    <span class="badge" 
+                                          th:classappend="${user.vaiTro == 'admin' ? 'bg-danger' : 
+                                          (user.vaiTro == 'reporter' ? 'bg-warning' : 'bg-info')}"
+                                          th:text="${user.vaiTro == 'admin' ? 'Quản trị viên' : 
+                                          (user.vaiTro == 'reporter' ? 'Phóng viên' : 'Người dùng')}">
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge" 
+                                          th:classappend="${user.trangThai == 'Hoạt động' ? 'bg-success' : 'bg-danger'}"
+                                          th:text="${user.trangThai}">
+                                    </span>
+                                </td>
+                                <td th:text="${#temporals.format(user.ngayTao, 'dd/MM/yyyy HH:mm')}"></td>
+                                <td>
+                                    <a th:href="@{'/admin/nguoidung/edit/' + ${user.maNguoiDung}}" 
+                                       class="btn btn-warning btn-sm">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a th:href="@{'/admin/nguoidung/delete/' + ${user.maNguoiDung}}"
+                                       class="btn btn-danger btn-sm"
+                                       onclick="return confirm('Bạn có chắc muốn xóa người dùng này?')">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
 
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+</body>
 </html>

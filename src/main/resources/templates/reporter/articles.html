@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài viết của tôi - Reporter Dashboard</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- SweetAlert2 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <style>
+        /* Copy the same styles from dashboard.html */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 100;
+            padding: 48px 0 0;
+            box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
+            background-color: #343a40;
+        }
+
+        .sidebar-sticky {
+            position: relative;
+            top: 0;
+            height: calc(100vh - 48px);
+            padding-top: .5rem;
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+
+        .nav-link {
+            color: #fff;
+            padding: 1rem;
+        }
+
+        .nav-link:hover {
+            color: #fff;
+            background-color: rgba(255, 255, 255, .1);
+        }
+
+        .nav-link.active {
+            background-color: rgba(255, 255, 255, .2);
+        }
+
+        .main-content {
+            margin-left: 240px;
+            padding: 20px;
+        }
+
+        .card {
+            margin-bottom: 1.5rem;
+            box-shadow: 0 .15rem 1.75rem 0 rgba(58,59,69,.15);
+        }
+
+        .card-header {
+            background-color: #f8f9fc;
+            border-bottom: 1px solid #e3e6f0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <nav class="col-md-3 col-lg-2 d-md-block sidebar">
+        <div class="sidebar-sticky">
+            <div class="text-center mb-4">
+                <h5 class="text-white mt-2">Quản lý bài viết</h5>
+            </div>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link" href="/reporter/dashboard">
+                        <i class="fas fa-tachometer-alt me-2"></i>
+                        Tổng quan
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="/reporter/articles">
+                        <i class="fas fa-newspaper me-2"></i>
+                        Bài viết của tôi
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main content -->
+    <main class="main-content">
+        <!-- Top navbar -->
+        <nav class="navbar navbar-light bg-light mb-4 shadow-sm">
+            <div class="container-fluid">
+                <span class="navbar-brand mb-0 h1">Bài viết của tôi</span>
+                <div class="d-flex">
+                    <!-- User dropdown -->
+                    <div class="dropdown">
+                        <button class="btn btn-link dropdown-toggle text-dark" type="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-user-circle"></i>
+                            <span th:text="${session.user != null} ? ${session.user.hoTen} : 'Reporter'">Reporter</span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="/profile"><i class="fas fa-user me-2"></i>Hồ sơ</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="/logout"><i class="fas fa-sign-out-alt me-2"></i>Đăng xuất</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Content -->
+        <div class="container-fluid">
+            <!-- Article Form Card -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Thêm/Sửa bài viết</h6>
+                </div>
+                <div class="card-body">
+                    <form id="baiVietForm" th:action="@{/reporter/baiviet/save}" method="post" 
+                          th:object="${baiviet}" enctype="multipart/form-data">
+                        <!-- Hidden input -->
+                        <input type="hidden" th:field="*{maBaiViet}">
+
+                        <!-- Title -->
+                        <div class="mb-3">
+                            <label class="form-label">Tiêu đề</label>
+                            <input type="text" th:field="*{tieuDe}" class="form-control" required>
+                        </div>
+
+                        <!-- Summary -->
+                        <div class="mb-3">
+                            <label class="form-label">Tóm tắt</label>
+                            <textarea th:field="*{tomTat}" class="form-control" rows="3"></textarea>
+                        </div>
+
+                        <!-- Content -->
+                        <div class="mb-3">
+                            <label class="form-label">Nội dung</label>
+                            <textarea th:field="*{noiDung}" class="form-control" rows="10" required></textarea>
+                        </div>
+
+                        <!-- Main Image -->
+                        <div class="mb-4">
+                            <label class="form-label">Ảnh chính và nội dung <span class="text-danger">*</span></label>
+                            <div class="card">
+                                <div class="card-body">
+                                    <input type="file" name="imageFile1" class="form-control mb-2" accept="image/*" 
+                                           th:required="${baiviet.duongDanAnh1 == null}">
+                                    <textarea class="form-control" th:field="*{noiDungAnh1}" 
+                                             rows="2" placeholder="Nhập nội dung mô tả cho ảnh chính" required></textarea>
+                                    <div class="mt-2" th:if="${baiviet.duongDanAnh1}">
+                                        <img th:src="'data:image/jpeg;base64,' + ${baiviet.duongDanAnh1}"
+                                             class="img-thumbnail" style="max-width: 200px;">
+                                        <p class="mt-1" th:text="${baiviet.noiDungAnh1}"></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Secondary Image 1 -->
+                        <div class="mb-4">
+                            <label class="form-label">Ảnh phụ 1 và nội dung (tùy chọn)</label>
+                            <div class="card">
+                                <div class="card-body">
+                                    <input type="file" name="imageFile2" class="form-control mb-2" accept="image/*">
+                                    <textarea class="form-control" th:field="*{noiDungAnh2}" 
+                                             rows="2" placeholder="Nhập nội dung mô tả cho ảnh phụ 1"></textarea>
+                                    <div class="mt-2" th:if="${baiviet.duongDanAnh2}">
+                                        <img th:src="'data:image/jpeg;base64,' + ${baiviet.duongDanAnh2}"
+                                             class="img-thumbnail" style="max-width: 200px;">
+                                        <p class="mt-1" th:text="${baiviet.noiDungAnh2}"></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Secondary Image 2 -->
+                        <div class="mb-4">
+                            <label class="form-label">Ảnh phụ 2 và nội dung (tùy chọn)</label>
+                            <div class="card">
+                                <div class="card-body">
+                                    <input type="file" name="imageFile3" class="form-control mb-2" accept="image/*">
+                                    <textarea class="form-control" th:field="*{noiDungAnh3}" 
+                                             rows="2" placeholder="Nhập nội dung mô tả cho ảnh phụ 2"></textarea>
+                                    <div class="mt-2" th:if="${baiviet.duongDanAnh3}">
+                                        <img th:src="'data:image/jpeg;base64,' + ${baiviet.duongDanAnh3}"
+                                             class="img-thumbnail" style="max-width: 200px;">
+                                        <p class="mt-1" th:text="${baiviet.noiDungAnh3}"></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Category Selection -->
+                        <div class="mb-3">
+                            <label class="form-label">Danh mục</label>
+                            <select th:field="*{danhMuc.maDanhMuc}" class="form-control" required>
+                                <option value="">-- Chọn danh mục --</option>
+                                <option th:each="dm : ${danhmucs}" 
+                                        th:value="${dm.maDanhMuc}"
+                                        th:text="${dm.tenDanhMuc}"></option>
+                            </select>
+                        </div>
+
+                        <!-- Form Buttons -->
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <span th:text="${baiviet.maBaiViet == null ? 'Thêm bài viết' : 'Cập nhật'}"></span>
+                            </button>
+                            <button type="button" class="btn btn-secondary" onclick="resetBaiVietForm()">Reset</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Articles Table Card -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Danh sách bài viết</h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Hình ảnh</th>
+                                    <th>Tiêu đề</th>
+                                    <th>Danh mục</th>
+                                    <th>Trạng thái</th>
+                                    <th>Lượt xem</th>
+                                    <th>Ngày tạo</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="bv : ${baiViets}">
+                                    <td th:text="${bv.maBaiViet}"></td>
+                                    <td>
+                                        <img th:if="${bv.duongDanAnh1}" 
+                                             th:src="'data:image/jpeg;base64,' + ${bv.duongDanAnh1}"
+                                             style="max-width: 50px; height: auto;">
+                                    </td>
+                                    <td th:text="${bv.tieuDe}"></td>
+                                    <td th:text="${bv.danhMuc?.tenDanhMuc}"></td>
+                                    <td>
+                                        <span th:text="${bv.trangThai}"
+                                              th:class="${bv.trangThai == 'Đã xuất bản' ? 'badge bg-success' : 
+                                                          (bv.trangThai == 'Chờ duyệt' ? 'badge bg-warning' : 
+                                                          (bv.trangThai == 'Từ chối' ? 'badge bg-danger' : 'badge bg-secondary'))}">
+                                        </span>
+                                    </td>
+                                    <td th:text="${bv.luotXem}"></td>
+                                    <td th:text="${#temporals.format(bv.ngayTao, 'dd/MM/yyyy HH:mm')}"></td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <button type="button" class="btn btn-sm btn-warning"
+                                                    th:onclick="'loadBaiViet(' + ${bv.maBaiViet} + ')'">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-danger"
+                                                    th:onclick="'confirmDelete(' + ${bv.maBaiViet} + ')'">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                            <button th:if="${bv.trangThai == 'Nháp'}" type="button"
+                                                    class="btn btn-sm btn-success"
+                                                    th:onclick="'submitArticle(' + ${bv.maBaiViet} + ')'">
+                                                <i class="fas fa-paper-plane"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+   
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
+    <script>
+        function showToast(message, type = 'success') {
+            Toastify({
+                text: message,
+                duration: 3000,
+                gravity: "top",
+                position: "right",
+                backgroundColor: type === 'success' ? "#4caf50" : "#f44336"
+            }).showToast();
+        }
+
+        function confirmDelete(id) {
+            Swal.fire({
+                title: 'Xác nhận xóa?',
+                text: "Bạn không thể hoàn tác sau khi xóa!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Xóa',
+                cancelButtonText: 'Hủy'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch(`/reporter/baiviet/delete/${id}`, { method: 'POST' })
+                        .then(response => {
+                            if (response.ok) {
+                                showToast('Xóa bài viết thành công');
+                                setTimeout(() => window.location.reload(), 1000);
+                            }
+                        });
+                }
+            });
+        }
+
+        function submitArticle(id) {
+            Swal.fire({
+                title: 'Gửi bài viết?',
+                text: "Bài viết sẽ được gửi để duyệt!",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Gửi',
+                cancelButtonText: 'Hủy'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch(`/reporter/baiviet/submit/${id}`, { method: 'POST' })
+                        .then(response => {
+                            if (response.ok) {
+                                showToast('Gửi bài viết thành công');
+                                setTimeout(() => window.location.reload(), 1000);
+                            }
+                        });
+                }
+            });
+        }
+
+        function resetBaiVietForm() {
+            document.getElementById('baiVietForm').reset();
+            const maBaiVietInput = document.querySelector('#baiVietForm input[name="maBaiViet"]');
+            if (maBaiVietInput) maBaiVietInput.value = '';
+            const submitBtn = document.querySelector('#baiVietForm button[type="submit"] span');
+            if (submitBtn) submitBtn.textContent = 'Thêm bài viết';
+            // Xóa preview ảnh
+            const previews = document.querySelectorAll('#baiVietForm img');
+            previews.forEach(preview => preview.remove());
+        }
+
+        function loadBaiViet(id) {
+            fetch(`/reporter/baiviet/${id}`)
+                .then(response => response.json())
+                .then(data => {
+                    // Điền dữ liệu vào form
+                    document.querySelector('input[name="maBaiViet"]').value = data.maBaiViet;
+                    document.querySelector('input[name="tieuDe"]').value = data.tieuDe;
+                    document.querySelector('textarea[name="tomTat"]').value = data.tomTat;
+                    document.querySelector('textarea[name="noiDung"]').value = data.noiDung;
+                    document.querySelector('select[name="danhMuc.maDanhMuc"]').value = data.danhMuc.maDanhMuc;
+                    // Cập nhật nút submit
+                    document.querySelector('#baiVietForm button[type="submit"] span').textContent = 'Cập nhật';
+                });
+        }
+    </script>
+</body>
+</html>

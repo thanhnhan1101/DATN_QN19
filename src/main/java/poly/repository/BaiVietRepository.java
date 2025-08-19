@@ -31,5 +31,15 @@ public interface BaiVietRepository extends JpaRepository<BaiViet, Long> {
     @Query("SELECT b FROM BaiViet b LEFT JOIN FETCH b.tacGia LEFT JOIN FETCH b.danhMuc")
     List<BaiViet> findAllWithTacGiaAndDanhMuc();
 
-    
+    @Query("SELECT FUNCTION('DATE_FORMAT', b.ngayTao, '%m/%Y') as month, COUNT(b) " +
+           "FROM BaiViet b WHERE b.tacGia.maNguoiDung = :maNguoiDung " +
+           "GROUP BY FUNCTION('DATE_FORMAT', b.ngayTao, '%m/%Y') " +
+           "ORDER BY month")
+    List<Object[]> getMonthlyStatsByAuthor(@Param("maNguoiDung") Long maNguoiDung);
+
+    @Query("SELECT d.tenDanhMuc, COUNT(b) " +
+           "FROM BaiViet b JOIN b.danhMuc d " +
+           "WHERE b.tacGia.maNguoiDung = :maNguoiDung " +
+           "GROUP BY d.tenDanhMuc")
+    List<Object[]> getCategoryStatsByAuthor(@Param("maNguoiDung") Long maNguoiDung);
 }

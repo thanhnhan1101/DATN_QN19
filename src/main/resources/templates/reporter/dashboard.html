@@ -64,13 +64,13 @@
             </div>
             <ul class="nav flex-column">
                 <li class="nav-item">
-                    <a class="nav-link active" href="#overview">
+                    <a class="nav-link active" href="/reporter/dashboard">
                         <i class="fas fa-tachometer-alt me-2"></i>
                         Tổng quan
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#articles">
+                    <a class="nav-link" href="/reporter/articles">
                         <i class="fas fa-newspaper me-2"></i>
                         Bài viết của tôi
                     </a>
@@ -158,154 +158,26 @@
                 </div>
             </div>
 
-            <!-- Article Management -->
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h6 class="m-0 font-weight-bold">Quản lý bài viết</h6>
+            <!-- Add charts section -->
+            <div class="row">
+                <div class="col-xl-8 col-lg-7">
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary">Thống kê bài viết theo tháng</h6>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="myArticlesChart"></canvas>
+                        </div>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <!-- Form thêm/sửa bài viết -->
-                    <form id="baiVietForm" th:action="@{/reporter/baiviet/save}" method="post" 
-                          th:object="${baiviet}" enctype="multipart/form-data">
-                        <input type="hidden" th:field="*{maBaiViet}">
-
-                        <div class="mb-3">
-                            <label class="form-label">Tiêu đề</label>
-                            <input type="text" th:field="*{tieuDe}" class="form-control" required>
+                <div class="col-xl-4 col-lg-5">
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary">Thống kê theo danh mục</h6>
                         </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Tóm tắt</label>
-                            <textarea th:field="*{tomTat}" class="form-control" rows="3"></textarea>
+                        <div class="card-body">
+                            <canvas id="categoriesChart"></canvas>
                         </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Nội dung</label>
-                            <textarea th:field="*{noiDung}" class="form-control" rows="10" required></textarea>
-                        </div>
-
-                        <!-- Replace the existing image input sections with this -->
-                        <div class="mb-4">
-                            <label class="form-label">Ảnh chính và nội dung <span class="text-danger">*</span></label>
-                            <div class="card">
-                                <div class="card-body">
-                                    <input type="file" name="imageFile1" class="form-control mb-2" accept="image/*" 
-                                           th:required="${baiviet.duongDanAnh1 == null}">
-                                    <textarea class="form-control" th:field="*{noiDungAnh1}" 
-                                             rows="2" placeholder="Nhập nội dung mô tả cho ảnh chính" required></textarea>
-                                    <div class="mt-2" th:if="${baiviet.duongDanAnh1}">
-                                        <img th:src="'data:image/jpeg;base64,' + ${baiviet.duongDanAnh1}"
-                                             class="img-thumbnail" style="max-width: 200px;">
-                                        <p class="mt-1" th:text="${baiviet.noiDungAnh1}"></p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="mb-4">
-                            <label class="form-label">Ảnh phụ 1 và nội dung (tùy chọn)</label>
-                            <div class="card">
-                                <div class="card-body">
-                                    <input type="file" name="imageFile2" class="form-control mb-2" accept="image/*">
-                                    <textarea class="form-control" th:field="*{noiDungAnh2}" 
-                                             rows="2" placeholder="Nhập nội dung mô tả cho ảnh phụ 1"></textarea>
-                                    <div class="mt-2" th:if="${baiviet.duongDanAnh2}">
-                                        <img th:src="'data:image/jpeg;base64,' + ${baiviet.duongDanAnh2}"
-                                             class="img-thumbnail" style="max-width: 200px;">
-                                        <p class="mt-1" th:text="${baiviet.noiDungAnh2}"></p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="mb-4">
-                            <label class="form-label">Ảnh phụ 2 và nội dung (tùy chọn)</label>
-                            <div class="card">
-                                <div class="card-body">
-                                    <input type="file" name="imageFile3" class="form-control mb-2" accept="image/*">
-                                    <textarea class="form-control" th:field="*{noiDungAnh3}" 
-                                             rows="2" placeholder="Nhập nội dung mô tả cho ảnh phụ 2"></textarea>
-                                    <div class="mt-2" th:if="${baiviet.duongDanAnh3}">
-                                        <img th:src="'data:image/jpeg;base64,' + ${baiviet.duongDanAnh3}"
-                                             class="img-thumbnail" style="max-width: 200px;">
-                                        <p class="mt-1" th:text="${baiviet.noiDungAnh3}"></p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Danh mục</label>
-                            <select th:field="*{danhMuc.maDanhMuc}" class="form-control" required>
-                                <option value="">-- Chọn danh mục --</option>
-                                <option th:each="dm : ${danhmucs}" 
-                                        th:value="${dm.maDanhMuc}"
-                                        th:text="${dm.tenDanhMuc}"></option>
-                            </select>
-                        </div>
-
-                        <div class="d-flex gap-2">
-                            <button type="submit" class="btn btn-primary">
-                                <span th:text="${baiviet.maBaiViet == null ? 'Thêm bài viết' : 'Cập nhật'}"></span>
-                            </button>
-                            <button type="button" class="btn btn-secondary" onclick="resetBaiVietForm()">Reset</button>
-                        </div>
-                    </form>
-
-                    <!-- Danh sách bài viết -->
-                    <div class="table-responsive mt-4">
-                        <table class="table table-bordered">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Hình ảnh</th>
-                                    <th>Tiêu đề</th>
-                                    <th>Danh mục</th>
-                                    <th>Trạng thái</th>
-                                    <th>Lượt xem</th>
-                                    <th>Ngày tạo</th>
-                                    <th>Thao tác</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr th:each="bv : ${baiViets}">
-                                    <td th:text="${bv.maBaiViet}"></td>
-                                    <td>
-                                        <img th:if="${bv.duongDanAnh1}" 
-                                             th:src="'data:image/jpeg;base64,' + ${bv.duongDanAnh1}"
-                                             style="max-width: 50px; height: auto;">
-                                    </td>
-                                    <td th:text="${bv.tieuDe}"></td>
-                                    <td th:text="${bv.danhMuc?.tenDanhMuc}"></td>
-                                    <td>
-                                        <span th:text="${bv.trangThai}"
-                                              th:class="${bv.trangThai == 'Đã xuất bản' ? 'badge bg-success' : 
-                                                        (bv.trangThai == 'Chờ duyệt' ? 'badge bg-warning' : 
-                                                        (bv.trangThai == 'Từ chối' ? 'badge bg-danger' : 'badge bg-secondary'))}">
-                                        </span>
-                                    </td>
-                                    <td th:text="${bv.luotXem}"></td>
-                                    <td th:text="${#temporals.format(bv.ngayTao, 'dd/MM/yyyy HH:mm')}"></td>
-                                    <td>
-                                        <div class="btn-group">
-                                            <button type="button" class="btn btn-sm btn-warning"
-                                                    th:onclick="'loadBaiViet(' + ${bv.maBaiViet} + ')'">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
-                                            <button type="button" class="btn btn-sm btn-danger"
-                                                    th:onclick="'confirmDelete(' + ${bv.maBaiViet} + ')'">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                            <button th:if="${bv.trangThai == 'Nháp'}" type="button"
-                                                    class="btn btn-sm btn-success"
-                                                    th:onclick="'submitArticle(' + ${bv.maBaiViet} + ')'">
-                                                <i class="fas fa-paper-plane"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
                     </div>
                 </div>
             </div>
