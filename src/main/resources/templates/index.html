@@ -8,6 +8,22 @@
     <link rel="stylesheet" th:href="@{/css/nav.css}">
     <link rel="stylesheet" th:href="@{/css/footer.css}">
     <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <style>
+        .colored-toast {
+            border-radius: 8px !important;
+            padding: 15px 25px !important;
+        }
+        .colored-toast.success {
+            background: linear-gradient(to right, #00b09b, #96c93d) !important;
+        }
+        .colored-toast.error {
+            background: linear-gradient(to right, #ff5f6d, #ffc371) !important;
+        }
+        .colored-toast.info {
+            background: linear-gradient(to right, #2193b0, #6dd5ed) !important;
+        }
+    </style>
 </head>
 <body>
     <!-- Navigation -->
@@ -91,6 +107,45 @@
 
     <!-- JavaScript -->
     <script th:src="@{/js/nav.js}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', function() {
+            const message = /*[[${message}]]*/ null;
+            const error = /*[[${error}]]*/ null;
+            
+            function showToast(message, type = 'success') {
+                Toastify({
+                    text: message,
+                    duration: 3000,
+                    gravity: "top",
+                    position: "right",
+                    className: `colored-toast ${type}`,
+                    stopOnFocus: true,
+                    close: true,
+                    style: {
+                        background: "none",
+                        boxShadow: "0 3px 6px -1px rgba(0, 0, 0, 0.12), 0 10px 36px -4px rgba(77, 96, 232, 0.3)"
+                    }
+                }).showToast();
+            }
+            
+            if (message) {
+                if (message.includes("Đăng ký thành công")) {
+                    showToast("✅ " + message);
+                    // Show login prompt after successful registration
+                    setTimeout(() => {
+                        showToast("👋 Bạn có muốn đăng nhập ngay?", "info");
+                    }, 1000);
+                } else {
+                    showToast("✅ " + message);
+                }
+            }
+            
+            if (error) {
+                showToast("❌ " + error, "error");
+            }
+        });
+    </script>
     <script>
         // Convert base64 data to image src
         function convertBase64ToImage() {
