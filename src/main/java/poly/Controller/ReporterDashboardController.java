@@ -17,7 +17,6 @@ import org.springframework.data.domain.Sort;
 @Controller
 @RequestMapping("/reporter")
 public class ReporterDashboardController {
-
     @Autowired
     private BaiVietService baiVietService;
     

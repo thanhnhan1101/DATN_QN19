@@ -23,24 +23,21 @@ public class AuthController {
                           @RequestParam String xacNhanMatKhau,
                           RedirectAttributes ra) {
         try {
-            // Kiểm tra mật khẩu xác nhận. ĐÂY LÀ THAY ĐỔI CỦA TÔI 1 , THAY ĐÔỔI 2, THAY ĐÔ 3S, THAY ĐỔI 4
             if (!nguoiDung.getMatKhau().equals(xacNhanMatKhau)) {
                 ra.addFlashAttribute("error", "Mật khẩu xác nhận không khớp!");
                 return "redirect:/";
             }
 
-            // Kiểm tra email đã tồn tại
             if (nguoiDungService.findByEmail(nguoiDung.getEmail()).isPresent()) {
-                ra.addFlashAttribute("error", "Email đã tồn tại!");
+                ra.addFlashAttribute("error", "Email này đã được sử dụng!");
                 return "redirect:/";
             }
 
-            // Lưu người dùng mới
             nguoiDungService.save(nguoiDung);
-            ra.addFlashAttribute("message", "Đăng ký thành công! Vui lòng đăng nhập.");
+            ra.addFlashAttribute("message", "Đăng ký thành công! Mời bạn đăng nhập.");
             return "redirect:/";
         } catch (Exception e) {
-            ra.addFlashAttribute("error", "Lỗi đăng ký: " + e.getMessage());
+            ra.addFlashAttribute("error", "Có lỗi xảy ra: " + e.getMessage());
             return "redirect:/";
         }
     }
@@ -66,11 +63,12 @@ public class AuthController {
                     response.addCookie(cookie);
                 }
                 
+                ra.addFlashAttribute("message", "Xin chào " + user.getHoTen() + "! Chúc bạn một ngày tốt lành 🌟");
                 return "redirect:/";
             }
-            ra.addFlashAttribute("error", "Email hoặc mật khẩu không đúng!");
+            ra.addFlashAttribute("error", "Email hoặc mật khẩu không chính xác!");
         } catch (Exception e) {
-            ra.addFlashAttribute("error", e.getMessage());
+            ra.addFlashAttribute("error", "Có lỗi xảy ra: " + e.getMessage());
         }
         return "redirect:/";
     }

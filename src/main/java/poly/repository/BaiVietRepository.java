@@ -30,4 +30,6 @@ public interface BaiVietRepository extends JpaRepository<BaiViet, Long> {
     List<BaiViet> findByTacGiaMaNguoiDung(Long tacGiaId);
     @Query("SELECT b FROM BaiViet b LEFT JOIN FETCH b.tacGia LEFT JOIN FETCH b.danhMuc")
     List<BaiViet> findAllWithTacGiaAndDanhMuc();
+
+    
 }
