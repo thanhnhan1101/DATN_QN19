@@ -8,22 +8,6 @@
     <link rel="stylesheet" th:href="@{/css/nav.css}">
     <link rel="stylesheet" th:href="@{/css/footer.css}">
     <link rel="stylesheet" th:href="@{/css/style.css}">
-    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
-    <style>
-        .colored-toast {
-            border-radius: 8px !important;
-            padding: 15px 25px !important;
-        }
-        .colored-toast.success {
-            background: linear-gradient(to right, #00b09b, #96c93d) !important;
-        }
-        .colored-toast.error {
-            background: linear-gradient(to right, #ff5f6d, #ffc371) !important;
-        }
-        .colored-toast.info {
-            background: linear-gradient(to right, #2193b0, #6dd5ed) !important;
-        }
-    </style>
 </head>
 <body>
     <!-- Navigation -->
@@ -37,17 +21,19 @@
                 <!-- Bài viết nổi bật chính (cột trái) -->
                 <div th:if="${baiViets != null and not #lists.isEmpty(baiViets)}" 
                      th:with="mainPost=${baiViets[0]}" class="main-post">
-                    <div class="post-image">
-                        <img th:if="${mainPost.duongDanAnh1}"
-                             th:src="'data:image/jpeg;base64,' + ${mainPost.duongDanAnh1}"
-                             alt="Hình ảnh bài viết">
-                    </div>
-                    <div class="post-content">
-                        <h3 class="post-title" th:text="${mainPost.tieuDe}">Tiêu đề bài viết</h3>
-                        <div class="post-meta">
-                            <span class="post-date" th:text="${#temporals.format(mainPost.ngayXuatBan, 'dd/MM/yyyy')}">Ngày đăng</span>
+                    <a th:href="@{/bai-viet/{id}(id=${mainPost.maBaiViet})}" class="post-link">
+                        <div class="post-image">
+                            <img th:if="${mainPost.duongDanAnh1 != null and mainPost.duongDanAnh1 != ''}"
+                                 th:data-src="${mainPost.duongDanAnh1}"
+                                 alt="Hình ảnh bài viết">
                         </div>
-                    </div>
+                        <div class="post-content">
+                            <h3 class="post-title" th:text="${mainPost.tieuDe}">Tiêu đề bài viết</h3>
+                            <div class="post-meta">
+                                <span class="post-date" th:text="${#temporals.format(mainPost.ngayXuatBan, 'dd/MM/yyyy')}">Ngày đăng</span>
+                            </div>
+                        </div>
+                    </a>
                 </div>
                 
                 <!-- 3 bài viết phụ (cột phải) -->
@@ -56,17 +42,19 @@
                     <div th:if="${baiViets != null and #lists.size(baiViets) > 1}" 
                          th:with="secondPost=${baiViets[1]}" 
                          class="post-card">
-                        <div class="post-image">
-                            <img th:if="${secondPost.duongDanAnh1}"
-                                 th:src="'data:image/jpeg;base64,' + ${secondPost.duongDanAnh1}"
-                                 alt="Hình ảnh bài viết">
-                        </div>
-                        <div class="post-content">
-                            <h3 class="post-title" th:text="${secondPost.tieuDe}">Tiêu đề bài viết</h3>
-                            <div class="post-meta">
-                                <span class="post-date" th:text="${#temporals.format(secondPost.ngayXuatBan, 'dd/MM/yyyy')}">Ngày đăng</span>
+                        <a th:href="@{/bai-viet/{id}(id=${secondPost.maBaiViet})}" class="post-link">
+                            <div class="post-image">
+                                <img th:if="${secondPost.duongDanAnh1 != null and secondPost.duongDanAnh1 != ''}"
+                                     th:data-src="${secondPost.duongDanAnh1}"
+                                     alt="Hình ảnh bài viết">
                             </div>
-                        </div>
+                            <div class="post-content">
+                                <h3 class="post-title" th:text="${secondPost.tieuDe}">Tiêu đề bài viết</h3>
+                                <div class="post-meta">
+                                    <span class="post-date" th:text="${#temporals.format(secondPost.ngayXuatBan, 'dd/MM/yyyy')}">Ngày đăng</span>
+                                </div>
+                            </div>
+                        </a>
                     </div>
 
                     <!-- 2 bài viết nhỏ ở dưới -->
@@ -74,17 +62,19 @@
                         <div th:each="baiViet, iterStat : ${baiViets}" 
                              th:if="${iterStat.index > 1 && iterStat.index <= 3}" 
                              class="post-card">
-                            <div class="post-image">
-                                <img th:if="${baiViet.duongDanAnh1}"
-                                     th:src="'data:image/jpeg;base64,' + ${baiViet.duongDanAnh1}"
-                                     alt="Hình ảnh bài viết">
-                            </div>
-                            <div class="post-content">
-                                <h3 class="post-title" th:text="${baiViet.tieuDe}">Tiêu đề bài viết</h3>
-                                <div class="post-meta">
-                                    <span class="post-date" th:text="${#temporals.format(baiViet.ngayXuatBan, 'dd/MM/yyyy')}">Ngày đăng</span>
+                            <a th:href="@{/bai-viet/{id}(id=${baiViet.maBaiViet})}" class="post-link">
+                                <div class="post-image">
+                                    <img th:if="${baiViet.duongDanAnh1 != null and baiViet.duongDanAnh1 != ''}"
+                                         th:data-src="${baiViet.duongDanAnh1}"
+                                         alt="Hình ảnh bài viết">
                                 </div>
-                            </div>
+                                <div class="post-content">
+                                    <h3 class="post-title" th:text="${baiViet.tieuDe}">Tiêu đề bài viết</h3>
+                                    <div class="post-meta">
+                                        <span class="post-date" th:text="${#temporals.format(baiViet.ngayXuatBan, 'dd/MM/yyyy')}">Ngày đăng</span>
+                                    </div>
+                                </div>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -101,43 +91,21 @@
 
     <!-- JavaScript -->
     <script th:src="@{/js/nav.js}"></script>
-    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
-    <script th:inline="javascript">
-        document.addEventListener('DOMContentLoaded', function() {
-            const message = /*[[${message}]]*/ null;
-            const error = /*[[${error}]]*/ null;
-            
-            function showToast(message, type = 'success') {
-                Toastify({
-                    text: message,
-                    duration: 3000,
-                    gravity: "top",
-                    position: "right",
-                    className: `colored-toast ${type}`,
-                    stopOnFocus: true,
-                    close: true,
-                    style: {
-                        background: "none",
-                        boxShadow: "0 3px 6px -1px rgba(0, 0, 0, 0.12), 0 10px 36px -4px rgba(77, 96, 232, 0.3)"
-                    }
-                }).showToast();
-            }
-            
-            if (message) {
-                if (message.includes("Đăng ký thành công")) {
-                    showToast("✅ " + message);
-                    // Show login prompt after successful registration
-                    setTimeout(() => {
-                        showToast("👋 Bạn có muốn đăng nhập ngay?", "info");
-                    }, 1000);
-                } else {
-                    showToast("✅ " + message);
+    <script>
+        // Convert base64 data to image src
+        function convertBase64ToImage() {
+            const images = document.querySelectorAll('img[data-src]');
+            images.forEach(img => {
+                const base64Data = img.getAttribute('data-src');
+                if (base64Data && base64Data.trim() !== '') {
+                    img.src = 'data:image/jpeg;base64,' + base64Data;
                 }
-            }
-            
-            if (error) {
-                showToast("❌ " + error, "error");
-            }
+            });
+        }
+        
+        // Run when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            convertBase64ToImage();
         });
     </script>
 </body>
