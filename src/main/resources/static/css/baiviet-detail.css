@@ -345,6 +345,84 @@
     color: #666;
 }
 
+/* Comment Styles */
+.comments-section {
+    margin-top: 30px;
+    padding-top: 15px;
+    border-top: 1px solid var(--border-color);
+    max-width: 90%; /* Thu nhỏ chiều rộng */
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.comments-section h3 {
+    font-size: 18px;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.comment-form textarea {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    resize: vertical;
+    max-height: 100px;
+    font-size: 14px;
+}
+
+.comment-form button {
+    padding: 6px 15px;
+    font-size: 14px;
+    margin-top: 8px;
+}
+
+.comments-list {
+    margin-top: 20px;
+}
+
+.comment-item {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 8px;
+    background: #f8f9fa;
+    border-radius: 4px;
+}
+
+.comment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.comment-author {
+    font-size: 14px;
+    font-weight: 600;
+    color: #444;
+}
+
+.comment-date {
+    font-size: 12px;
+    color: #666;
+}
+
+.comment-content {
+    font-size: 14px;
+    line-height: 1.4;
+    color: #333;
+    padding: 5px 0;
+}
+
+.login-prompt {
+    text-align: center;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 4px;
+    font-size: 14px;
+    margin: 10px 0;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .article-container {

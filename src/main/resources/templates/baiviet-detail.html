@@ -8,6 +8,8 @@
     <link rel="stylesheet" th:href="@{/css/nav.css}">
     <link rel="stylesheet" th:href="@{/css/footer.css}">
     <link rel="stylesheet" th:href="@{/css/baiviet-detail.css}">
+    <!-- Thêm vào phần head -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
     <!-- Navigation -->
@@ -16,15 +18,7 @@
     <!-- Main Content -->
     <main class="container">
         <div class="article-container">
-            <!-- Breadcrumb -->
-            <nav class="breadcrumb">
-                <a href="/">Trang chủ</a>
-                <span class="separator">/</span>
-                <a th:if="${baiViet.danhMuc}" th:href="@{/danh-muc/{duongDan}(duongDan=${baiViet.danhMuc.duongDan})}" 
-                   th:text="${baiViet.danhMuc.tenDanhMuc}">Danh mục</a>
-                <span class="separator">/</span>
-                <span class="current" th:text="${baiViet.tieuDe}">Tiêu đề bài viết</span>
-            </nav>
+          
 
             <!-- Article Header -->
             <header class="article-header">
@@ -97,28 +91,6 @@
                     </div>
                 </div>
             </article>
-
-            <!-- Article Footer -->
-            <footer class="article-footer">
-                <div class="article-tags" th:if="${baiViet.danhMuc}">
-                    <span class="tag-label">Danh mục:</span>
-                    <a th:href="@{/danh-muc/{duongDan}(duongDan=${baiViet.danhMuc.duongDan})}" 
-                       class="tag" th:text="${baiViet.danhMuc.tenDanhMuc}">Danh mục</a>
-                </div>
-                
-                <div class="share-buttons">
-                    <span class="share-label">Chia sẻ:</span>
-                    <a href="#" class="share-btn facebook" onclick="shareOnFacebook()">
-                        <i class="fab fa-facebook"></i>
-                    </a>
-                    <a href="#" class="share-btn twitter" onclick="shareOnTwitter()">
-                        <i class="fab fa-twitter"></i>
-                    </a>
-                    <a href="#" class="share-btn linkedin" onclick="shareOnLinkedIn()">
-                        <i class="fab fa-linkedin"></i>
-                    </a>
-                </div>
-            </footer>
         </div>
 
         <!-- Related Articles -->
@@ -144,6 +116,46 @@
                 </div>
             </div>
         </aside>
+
+        <!-- Comments Section -->
+        <div class="comments-section">
+            <h3>Bình luận</h3>
+            
+            <!-- Comment Form -->
+            <div class="comment-form" th:if="${session.user}">
+                <form id="commentForm">
+                    <textarea 
+                        name="noiDung" 
+                        placeholder="Nhập bình luận của bạn..." 
+                        required
+                        maxlength="100"
+                        rows="3"
+                        class="form-control"></textarea>
+                    <button type="submit" class="btn btn-primary mt-2">
+                        Gửi bình luận
+                    </button>
+                </form>
+            </div>
+            <div class="login-prompt" th:unless="${session.user}">
+                <p>Vui lòng <a th:href="@{/dang-nhap}">đăng nhập</a> để bình luận.</p>
+            </div>
+
+            <!-- Comments List -->
+            <div class="comments-list" th:if="${not #lists.isEmpty(comments)}">
+                <div th:each="comment : ${comments}" class="comment-item">
+                    <div class="comment-header">
+                        <span class="comment-author" th:text="${comment.nguoiDung.hoTen}">Người dùng</span>
+                        <span class="comment-date" 
+                              th:text="${#temporals.format(comment.ngayTao, 'dd/MM/yyyy HH:mm')}">
+                            Thời gian
+                        </span>
+                    </div>
+                    <div class="comment-content" th:text="${comment.noiDung}">
+                        Nội dung bình luận
+                    </div>
+                </div>
+            </div>
+        </div>
     </main>
 
     <!-- Footer -->

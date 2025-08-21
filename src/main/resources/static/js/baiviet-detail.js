@@ -327,3 +327,97 @@ function showToast(message, type) {
         timer: 3000
     });
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    const commentForm = document.getElementById('commentForm');
+    if (commentForm) {
+        commentForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const textarea = this.querySelector('textarea');
+            const maBaiViet = window.location.pathname.split('/').pop();
+            
+            if (!textarea.value.trim()) {
+                Swal.fire({
+                    icon: 'error',
+                    text: 'Vui lòng nhập nội dung bình luận',
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000
+                });
+                return;
+            }
+            
+            fetch('/api/binhluan/add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `maBaiViet=${maBaiViet}&noiDung=${encodeURIComponent(textarea.value)}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Thêm bình luận mới vào danh sách
+                    addNewComment(data.comment);
+                    // Reset form
+                    textarea.value = '';
+                    
+                    Swal.fire({
+                        icon: 'success',
+                        text: data.message,
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 3000
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        text: data.message,
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 3000
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    text: 'Đã xảy ra lỗi khi gửi bình luận',
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000
+                });
+            });
+        });
+    }
+});
+
+function addNewComment(comment) {
+    const commentsList = document.querySelector('.comments-list');
+    if (!commentsList) {
+        location.reload(); // Reload nếu không tìm thấy danh sách bình luận
+        return;
+    }
+
+    const commentHtml = `
+        <div class="comment-item">
+            <div class="comment-header">
+                <span class="comment-author">${comment.nguoiDung.hoTen}</span>
+                <span class="comment-date">Vừa xong</span>
+            </div>
+            <div class="comment-content">${comment.noiDung}</div>
+        </div>
+    `;
+    
+    if (!commentsList.querySelector('.comment-item')) {
+        commentsList.innerHTML = commentHtml;
+    } else {
+        commentsList.insertAdjacentHTML('afterbegin', commentHtml);
+    }
+}

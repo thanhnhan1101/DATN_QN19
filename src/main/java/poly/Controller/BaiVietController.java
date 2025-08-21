@@ -12,6 +12,7 @@ import poly.entity.BaiViet;
 import poly.entity.NguoiDung;
 import poly.service.BaiVietService;
 import poly.service.DanhMucService;
+import poly.service.ThongBaoService;
 import poly.service.YeuThichService;
 
 import java.time.LocalDateTime;
@@ -32,6 +33,9 @@ public class BaiVietController {
 
     @Autowired
     private YeuThichService yeuThichService;
+
+    @Autowired
+    private ThongBaoService thongBaoService;
 
     @GetMapping
     public String list(@RequestParam(required = false) Long edit, Model model) {
@@ -123,9 +127,9 @@ public class BaiVietController {
         return "redirect:/admin/baiviet";
     }
 
-    @PostMapping("/approve")
+    @PostMapping("/approve/{id}")
     @ResponseBody
-    public Map<String, Object> approve(@RequestParam Long id) {
+    public Map<String, Object> approveBaiViet(@PathVariable Long id) {
         Map<String, Object> response = new HashMap<>();
         try {
             BaiViet baiViet = baiVietService.findById(id).orElse(null);
@@ -133,14 +137,23 @@ public class BaiVietController {
                 baiViet.setTrangThai("Đã xuất bản");
                 baiViet.setNgayXuatBan(LocalDateTime.now());
                 baiVietService.save(baiViet);
+                
+                // Gửi thông báo cho tác giả
+                thongBaoService.taoThongBao(
+                    "Bài viết đã được duyệt",
+                    "Bài viết \"" + baiViet.getTieuDe() + "\" của bạn đã được duyệt và xuất bản",
+                    baiViet.getTacGia()
+                );
+
                 response.put("success", true);
+                response.put("message", "Bài viết đã được duyệt và xuất bản!");
             } else {
                 response.put("success", false);
                 response.put("message", "Không tìm thấy bài viết!");
             }
         } catch (Exception e) {
             response.put("success", false);
-            response.put("message", e.getMessage());
+            response.put("message", "Lỗi khi duyệt bài viết: " + e.getMessage());
         }
         return response;
     }
@@ -164,22 +177,35 @@ public class BaiVietController {
         return "Admin/baiviet/reject";
     }
 
-    @PostMapping("/reject")
-    public String reject(@RequestParam Long id, @RequestParam String lyDo, RedirectAttributes ra) {
+    @PostMapping("/reject/{id}")
+    @ResponseBody
+    public Map<String, Object> rejectBaiViet(@PathVariable Long id, @RequestParam String lyDo) {
+        Map<String, Object> response = new HashMap<>();
         try {
             BaiViet baiViet = baiVietService.findById(id).orElse(null);
             if (baiViet != null) {
                 baiViet.setTrangThai("Từ chối");
                 baiViet.setLyDoTuChoi(lyDo);
                 baiVietService.save(baiViet);
-                ra.addFlashAttribute("message", "Đã từ chối bài viết!");
-                ra.addFlashAttribute("messageType", "success");
+
+                // Gửi thông báo cho tác giả
+                thongBaoService.taoThongBao(
+                    "Bài viết bị từ chối",
+                    "Bài viết \"" + baiViet.getTieuDe() + "\" của bạn đã bị từ chối. Lý do: " + lyDo,
+                    baiViet.getTacGia()
+                );
+
+                response.put("success", true);
+                response.put("message", "Đã từ chối bài viết!");
+            } else {
+                response.put("success", false);
+                response.put("message", "Không tìm thấy bài viết!");
             }
         } catch (Exception e) {
-            ra.addFlashAttribute("message", "Lỗi: " + e.getMessage());
-            ra.addFlashAttribute("messageType", "danger");
+            response.put("success", false);
+            response.put("message", "Lỗi khi từ chối bài viết: " + e.getMessage());
         }
-        return "redirect:/admin/baiviet";
+        return response;
     }
 
     @GetMapping("/view/{id}")
