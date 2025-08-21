@@ -27,7 +27,7 @@ public class YeuThich {
     @Column(name = "TrangThai", columnDefinition = "NVARCHAR(20) DEFAULT N'Đã thích'")
     private String trangThai = "Đã thích";
 
-    @Column(name = "NgayTao", columnDefinition = "DATETIME DEFAULT GETDATE()")
+    @Column(name = "NgayTao")
     private LocalDateTime ngayTao;
 
     @Column(name = "NgayCapNhat", columnDefinition = "DATETIME DEFAULT GETDATE()")

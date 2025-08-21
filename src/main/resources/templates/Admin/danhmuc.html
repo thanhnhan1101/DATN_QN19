@@ -75,6 +75,12 @@
                         Quản lý người dùng
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/admin/quangcao">
+                        <i class="fas fa-ad me-2"></i>
+                        Quản lý quảng cáo
+                    </a>
+                </li>
             </ul>
         </div>
     </nav>
@@ -243,6 +249,21 @@
             document.querySelector('form').reset();
             document.querySelector('[name="maDanhMuc"]').value = '';
         }
+
+        // Thêm hàm tự động tạo đường dẫn
+        document.querySelector('[name="tenDanhMuc"]').addEventListener('input', function(e) {
+            let slug = e.target.value
+                .toLowerCase()
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .replace(/[đĐ]/g, 'd')
+                .replace(/[^a-z0-9\s]/g, '')
+                .replace(/\s+/g, '-')
+                .replace(/-+/g, '-')
+                .replace(/^-|-$/g, '');
+            
+            document.querySelector('[name="duongDan"]').value = slug;
+        });
     </script>
 </body>
 </html>

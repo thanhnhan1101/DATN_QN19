@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.ui.Model;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/admin/danhmuc")
@@ -32,9 +33,53 @@ public class DanhMucController {
         return "Admin/danhmuc";
     }
 
+    @PostMapping("/save")
+    public String save(@ModelAttribute DanhMuc danhMuc, RedirectAttributes ra) {
+        try {
+            boolean isEdit = danhMuc.getMaDanhMuc() != null;
+            danhMucService.save(danhMuc);
+            ra.addFlashAttribute("message", isEdit ? "Cập nhật danh mục thành công!" : "Thêm danh mục thành công!");
+            ra.addFlashAttribute("messageType", "success");
+        } catch (Exception e) {
+            ra.addFlashAttribute("message", "Có lỗi xảy ra: " + e.getMessage());
+            ra.addFlashAttribute("messageType", "error");
+        }
+        return "redirect:/admin/danhmuc";
+    }
+
+    @GetMapping("/edit/{id}")
+    public String edit(@PathVariable Integer id, Model model) {
+        try {
+            DanhMuc danhMuc = danhMucService.findById(id);
+            if (danhMuc == null) {
+                return "redirect:/admin/danhmuc";
+            }
+            
+            model.addAttribute("danhmuc", danhMuc);
+            model.addAttribute("danhmucs", danhMucService.getAllDanhMuc());
+            
+            return "Admin/danhmuc";
+        } catch (Exception e) {
+            return "redirect:/admin/danhmuc";
+        }
+    }
+
+    @GetMapping("/delete/{id}")
+    public String delete(@PathVariable Integer id, RedirectAttributes ra) {
+        try {
+            danhMucService.deleteById(id);
+            ra.addFlashAttribute("message", "Xóa danh mục thành công!");
+            ra.addFlashAttribute("messageType", "success");
+        } catch (Exception e) {
+            ra.addFlashAttribute("message", "Có lỗi xảy ra: " + e.getMessage());
+            ra.addFlashAttribute("messageType", "error");
+        }
+        return "redirect:/admin/danhmuc";
+    }
+
     @PostMapping("/api/save")
     @ResponseBody
-    public Map<String, Object> save(@ModelAttribute DanhMuc danhMuc, Model model) {
+    public Map<String, Object> saveApi(@ModelAttribute DanhMuc danhMuc, Model model) {
         Map<String, Object> response = new HashMap<>();
         try {
             // Validate dữ liệu
@@ -66,7 +111,7 @@ public class DanhMucController {
 
     @DeleteMapping("/api/delete/{id}")
     @ResponseBody
-    public Map<String, Object> delete(@PathVariable Integer id) {
+    public Map<String, Object> deleteApi(@PathVariable Integer id) {
         Map<String, Object> response = new HashMap<>();
         try {
             danhMucService.deleteById(id);

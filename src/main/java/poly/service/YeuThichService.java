@@ -11,40 +11,71 @@ import poly.repository.BaiVietRepository;
 
 import java.util.List;
 import java.util.Optional;
+import java.time.LocalDateTime;
 
 @Service
 public class YeuThichService {
-    
+
     @Autowired
     private YeuThichRepository yeuThichRepository;
-    
+
     @Autowired
     private NguoiDungRepository nguoiDungRepository;
-    
+
     @Autowired
     private BaiVietRepository baiVietRepository;
-    
-    // Thích bài viết
-    public boolean likeBaiViet(Long nguoiDungId, Long baiVietId) {
+
+    // Thích hoặc bỏ thích bài viết
+    public boolean toggleLike(Long userId, Long baiVietId) {
         try {
-            Optional<NguoiDung> nguoiDungOpt = nguoiDungRepository.findById(nguoiDungId);
+            YeuThich yeuThich = yeuThichRepository.findByNguoiDungMaNguoiDungAndBaiVietMaBaiViet(userId, baiVietId);
+
+            if (yeuThich != null) {
+                // Nếu đã yêu thích thì xóa
+                yeuThichRepository.delete(yeuThich);
+                return false;
+            }
+
+            // Lấy đối tượng NguoiDung và BaiViet từ database
+            Optional<NguoiDung> nguoiDungOpt = nguoiDungRepository.findById(userId);
             Optional<BaiViet> baiVietOpt = baiVietRepository.findById(baiVietId);
-            
+
             if (nguoiDungOpt.isPresent() && baiVietOpt.isPresent()) {
-                NguoiDung nguoiDung = nguoiDungOpt.get();
-                BaiViet baiViet = baiVietOpt.get();
+                YeuThich newYeuThich = new YeuThich();
+                newYeuThich.setNguoiDung(nguoiDungOpt.get());
+                newYeuThich.setBaiViet(baiVietOpt.get());
                 
-                // Kiểm tra đã thích chưa
-                if (yeuThichRepository.existsByNguoiDungAndBaiViet(nguoiDung, baiViet)) {
-                    return false; // Đã thích rồi
-                }
+                // Set the current date/time using the correct field name
+                newYeuThich.setNgayTao(LocalDateTime.now()); // Changed from setNgayYeuThich to setNgayTao
                 
-                // Tạo yêu thích mới
+                yeuThichRepository.save(newYeuThich);
+                return true;
+            }
+            return false;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    // Thêm phương thức like bài viết
+    public boolean likeBaiViet(Long userId, Long baiVietId) {
+        try {
+            // Kiểm tra xem đã like chưa
+            YeuThich existing = yeuThichRepository.findByNguoiDungMaNguoiDungAndBaiVietMaBaiViet(userId, baiVietId);
+            if (existing != null) {
+                return false; // Đã like rồi
+            }
+
+            // Lấy đối tượng NguoiDung và BaiViet
+            Optional<NguoiDung> nguoiDungOpt = nguoiDungRepository.findById(userId);
+            Optional<BaiViet> baiVietOpt = baiVietRepository.findById(baiVietId);
+
+            if (nguoiDungOpt.isPresent() && baiVietOpt.isPresent()) {
                 YeuThich yeuThich = new YeuThich();
-                yeuThich.setNguoiDung(nguoiDung);
-                yeuThich.setBaiViet(baiViet);
-                yeuThich.setTrangThai("Đã thích");
-                
+                yeuThich.setNguoiDung(nguoiDungOpt.get());
+                yeuThich.setBaiViet(baiVietOpt.get());
+                yeuThich.setNgayTao(LocalDateTime.now());
                 yeuThichRepository.save(yeuThich);
                 return true;
             }
@@ -54,18 +85,13 @@ public class YeuThichService {
             return false;
         }
     }
-    
-    // Bỏ thích bài viết
-    public boolean unlikeBaiViet(Long nguoiDungId, Long baiVietId) {
+
+    // Thêm phương thức unlike bài viết
+    public boolean unlikeBaiViet(Long userId, Long baiVietId) {
         try {
-            Optional<NguoiDung> nguoiDungOpt = nguoiDungRepository.findById(nguoiDungId);
-            Optional<BaiViet> baiVietOpt = baiVietRepository.findById(baiVietId);
-            
-            if (nguoiDungOpt.isPresent() && baiVietOpt.isPresent()) {
-                NguoiDung nguoiDung = nguoiDungOpt.get();
-                BaiViet baiViet = baiVietOpt.get();
-                
-                yeuThichRepository.deleteByNguoiDungAndBaiViet(nguoiDung, baiViet);
+            YeuThich yeuThich = yeuThichRepository.findByNguoiDungMaNguoiDungAndBaiVietMaBaiViet(userId, baiVietId);
+            if (yeuThich != null) {
+                yeuThichRepository.delete(yeuThich);
                 return true;
             }
             return false;
@@ -74,37 +100,17 @@ public class YeuThichService {
             return false;
         }
     }
-    
-    // Kiểm tra người dùng đã thích bài viết chưa
-    public boolean isLiked(Long nguoiDungId, Long baiVietId) {
-        try {
-            Optional<NguoiDung> nguoiDungOpt = nguoiDungRepository.findById(nguoiDungId);
-            Optional<BaiViet> baiVietOpt = baiVietRepository.findById(baiVietId);
-            
-            if (nguoiDungOpt.isPresent() && baiVietOpt.isPresent()) {
-                return yeuThichRepository.existsByNguoiDungAndBaiViet(nguoiDungOpt.get(), baiVietOpt.get());
-            }
-            return false;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-    
+
     // Đếm số lượt thích của bài viết
     public long countLikesByBaiViet(Long baiVietId) {
-        try {
-            Optional<BaiViet> baiVietOpt = baiVietRepository.findById(baiVietId);
-            if (baiVietOpt.isPresent()) {
-                return yeuThichRepository.countByBaiViet(baiVietOpt.get());
-            }
-            return 0;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return 0;
-        }
+        return yeuThichRepository.countByBaiVietMaBaiViet(baiVietId);
     }
-    
+
+    // Kiểm tra người dùng đã thích bài viết chưa
+    public boolean isLiked(Long userId, Long baiVietId) {
+        return yeuThichRepository.findByNguoiDungMaNguoiDungAndBaiVietMaBaiViet(userId, baiVietId) != null;
+    }
+
     // Lấy danh sách bài viết yêu thích của người dùng
     public List<YeuThich> getYeuThichByNguoiDung(Long nguoiDungId) {
         try {

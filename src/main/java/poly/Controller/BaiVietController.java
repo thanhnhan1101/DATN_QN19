@@ -12,6 +12,7 @@ import poly.entity.BaiViet;
 import poly.entity.NguoiDung;
 import poly.service.BaiVietService;
 import poly.service.DanhMucService;
+import poly.service.YeuThichService;
 
 import java.time.LocalDateTime;
 import java.util.Base64;
@@ -28,6 +29,9 @@ public class BaiVietController {
 
     @Autowired 
     private DanhMucService danhMucService;
+
+    @Autowired
+    private YeuThichService yeuThichService;
 
     @GetMapping
     public String list(@RequestParam(required = false) Long edit, Model model) {
@@ -232,5 +236,40 @@ public class BaiVietController {
     @ResponseBody
     public BaiViet getDetail(@PathVariable Long id) {
         return baiVietService.findById(id).orElse(null);
+    }
+
+    @GetMapping("/edit/{id}")
+    public String edit(@PathVariable Long id, Model model) {
+        try {
+            BaiViet baiViet = baiVietService.findById(id).orElse(new BaiViet());
+            model.addAttribute("baiviet", baiViet);
+            model.addAttribute("baiViets", baiVietService.getAll()); // Thêm danh sách bài viết
+            model.addAttribute("danhmucs", danhMucService.getAllDanhMuc());
+            return "Admin/baiviet"; // Sửa lại return về template chính xác
+        } catch (Exception e) {
+            return "redirect:/admin/baiviet";
+        }
+    }
+
+    @GetMapping("/bai-viet/{id}")
+    public String getBaiVietDetail(@PathVariable Long id, Model model, HttpSession session) {
+        BaiViet baiViet = baiVietService.findById(id).orElse(null);
+        if (baiViet != null) {
+            // Add existing code...
+            
+            // Add like status
+            NguoiDung user = (NguoiDung) session.getAttribute("user");
+            boolean isLiked = false;
+            if (user != null) {
+                isLiked = yeuThichService.isLiked(user.getMaNguoiDung(), id);
+            }
+            long likeCount = yeuThichService.countLikesByBaiViet(id);
+            
+            model.addAttribute("isLiked", isLiked);
+            model.addAttribute("likeCount", likeCount);
+            
+            return "baiviet-detail";
+        }
+        return "redirect:/";
     }
 }

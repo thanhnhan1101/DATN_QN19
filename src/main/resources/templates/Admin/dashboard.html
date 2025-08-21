@@ -21,24 +21,29 @@
             background-color: #343a40;
             width: 250px;
         }
+
         .main-content {
             margin-left: 250px;
             padding: 20px;
         }
+
         .nav-link {
             color: #fff;
             padding: 1rem;
         }
+
         .nav-link:hover {
             color: #fff;
-            background-color: rgba(255,255,255,.1);
+            background-color: rgba(255, 255, 255, .1);
         }
+
         .nav-link.active {
-            background-color: rgba(255,255,255,.2);
+            background-color: rgba(255, 255, 255, .2);
         }
+
         .card {
             margin-bottom: 1.5rem;
-            box-shadow: 0 .15rem 1.75rem 0 rgba(58,59,69,.15);
+            box-shadow: 0 .15rem 1.75rem 0 rgba(58, 59, 69, .15);
         }
     </style>
 </head>
@@ -75,6 +80,18 @@
                         Quản lý người dùng
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/admin/quangcao">
+                        <i class="fas fa-ad me-2"></i>
+                        Quản lý quảng cáo
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/">
+                        <i class="fas fa-home me-2"></i>
+                        Trang chủ
+                    </a>
+                </li>
             </ul>
         </div>
     </nav>
@@ -92,9 +109,13 @@
                             <span th:text="${session.admin != null} ? ${session.admin.hoTen} : 'Admin'">Admin</span>
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="/admin/profile"><i class="fas fa-user me-2"></i>Hồ sơ</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="/logout"><i class="fas fa-sign-out-alt me-2"></i>Đăng xuất</a></li>
+                            <li><a class="dropdown-item" href="/admin/profile"><i class="fas fa-user me-2"></i>Hồ sơ</a>
+                            </li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item" href="/logout"><i class="fas fa-sign-out-alt me-2"></i>Đăng
+                                    xuất</a></li>
                         </ul>
                     </div>
                 </div>
@@ -206,7 +227,7 @@
     <script th:inline="javascript">
         // Monthly Posts Chart
         const postsCtx = document.getElementById('postsChart').getContext('2d');
-        const monthlyData = /*[[${monthlyStats}]]*/ [];
+        const monthlyData = /*[[${monthlyStats}]]*/[];
         new Chart(postsCtx, {
             type: 'line',
             data: {
@@ -231,7 +252,7 @@
 
         // Categories Chart
         const categoriesCtx = document.getElementById('categoriesChart').getContext('2d');
-        const categoryData = /*[[${categoryStats}]]*/ [];
+        const categoryData = /*[[${categoryStats}]]*/[];
         new Chart(categoriesCtx, {
             type: 'doughnut',
             data: {
@@ -254,4 +275,5 @@
         });
     </script>
 </body>
+
 </html>

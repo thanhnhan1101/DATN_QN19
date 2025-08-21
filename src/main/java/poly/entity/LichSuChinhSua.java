@@ -14,23 +14,16 @@ public class LichSuChinhSua {
     private Long maLichSu;
 
     @ManyToOne
-    @JoinColumn(name = "MaBaiViet", foreignKey = @ForeignKey(name = "FK_LichSuChinhSua_BaiViet"))
+    @JoinColumn(name = "MaBaiViet")
     private BaiViet baiViet;
 
     @ManyToOne
-    @JoinColumn(name = "MaNguoiSua", foreignKey = @ForeignKey(name = "FK_LichSuChinhSua_NguoiDung"))
+    @JoinColumn(name = "MaNguoiSua")
     private NguoiDung nguoiSua;
 
-    @Column(name = "NgayChinhSua", columnDefinition = "DATETIME DEFAULT GETDATE()")
-    private LocalDateTime ngayChinhSua;
+    @Column(name = "NgayChinhSua")
+    private LocalDateTime ngayChinhSua = LocalDateTime.now();
 
     @Column(name = "NoiDungCu", columnDefinition = "NVARCHAR(MAX)")
     private String noiDungCu;
-
-    @PrePersist
-    protected void onCreate() {
-        if (ngayChinhSua == null) {
-            ngayChinhSua = LocalDateTime.now();
-        }
-    }
 }

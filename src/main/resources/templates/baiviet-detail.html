@@ -43,13 +43,16 @@
                          <i class="fas fa-eye"></i>
                          <span th:text="${baiViet.luotXem}">0</span> lượt xem
                      </div>
+                     <!-- Replace the existing like button in meta-item -->
                      <div class="meta-item">
-                         <button class="like-button" th:attr="data-bai-viet-id=${baiViet.maBaiViet}" 
-                                 th:class="${isLiked ? 'like-button liked' : 'like-button'}">
-                             <i class="fas fa-heart"></i>
-                             <span class="like-count" th:text="${likeCount}">0</span>
-                         </button>
-                     </div>
+                        <button id="likeButton" 
+                                class="like-button" 
+                                th:data-id="${baiViet.maBaiViet}"
+                                th:classappend="${isLiked ? 'active' : ''}">
+                            <i class="fas fa-heart"></i>
+                            <span class="like-count" th:text="${likeCount}">0</span>
+                        </button>
+                    </div>
                     <div class="meta-item" th:if="${baiViet.danhMuc}">
                         <i class="fas fa-tag"></i>
                         <span th:text="${baiViet.danhMuc.tenDanhMuc}">Danh mục</span>

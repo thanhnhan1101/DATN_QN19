@@ -264,3 +264,66 @@ document.addEventListener('DOMContentLoaded', function() {
     // Convert base64 images
     convertBase64ToImage();
 });
+
+document.addEventListener('DOMContentLoaded', function() {
+    const likeButton = document.getElementById('likeButton');
+    if (likeButton) {
+        likeButton.addEventListener('click', function() {
+            const baiVietId = this.getAttribute('data-id');
+            toggleLike(baiVietId);
+        });
+    }
+});
+
+function toggleLike(baiVietId) {
+    fetch(`/api/yeuthich/toggle/${baiVietId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            updateLikeButton(data.liked, data.likeCount);
+            showToast(data.message, 'success');
+        } else {
+            if (data.message.includes("đăng nhập")) {
+                window.location.href = '/login';
+            } else {
+                showToast(data.message, 'error');
+            }
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showToast('Đã xảy ra lỗi', 'error');
+    });
+}
+
+function updateLikeButton(isLiked, likeCount) {
+    const likeButton = document.getElementById('likeButton');
+    const icon = likeButton.querySelector('i');
+    const countSpan = likeButton.querySelector('.like-count');
+    
+    if (isLiked) {
+        likeButton.classList.add('active');
+        icon.style.color = '#ff4757';
+    } else {
+        likeButton.classList.remove('active');
+        icon.style.color = '#666';
+    }
+    
+    countSpan.textContent = likeCount;
+}
+
+function showToast(message, type) {
+    Swal.fire({
+        text: message,
+        icon: type,
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000
+    });
+}

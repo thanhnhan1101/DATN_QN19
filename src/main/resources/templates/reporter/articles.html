@@ -60,6 +60,37 @@
             background-color: #f8f9fc;
             border-bottom: 1px solid #e3e6f0;
         }
+
+        .history-content {
+            max-height: 200px;
+            overflow-y: auto;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+        
+        .history-content strong {
+            color: #2c3e50;
+        }
+        
+        #historyModal .modal-dialog {
+            max-width: 800px;
+        }
+        
+        #historyModal .table td {
+            vertical-align: middle;
+        }
+
+        .history-content pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            background-color: #f8f9fa;
+            padding: 10px;
+            margin: 0;
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: inherit;
+        }
     </style>
 </head>
 <body>
@@ -114,7 +145,9 @@
             <!-- Article Form Card -->
             <div class="card shadow mb-4">
                 <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Thêm/Sửa bài viết</h6>
+                    <h6 class="m-0 font-weight-bold text-primary" 
+                        th:text="${baiviet.maBaiViet == null ? 'Thêm bài viết mới' : 'Cập nhật bài viết'}">
+                    </h6>
                 </div>
                 <div class="card-body">
                     <form id="baiVietForm" th:action="@{/reporter/baiviet/save}" method="post" 
@@ -208,7 +241,9 @@
                             <button type="submit" class="btn btn-primary">
                                 <span th:text="${baiviet.maBaiViet == null ? 'Thêm bài viết' : 'Cập nhật'}"></span>
                             </button>
-                            <button type="button" class="btn btn-secondary" onclick="resetBaiVietForm()">Reset</button>
+                            <a th:href="@{/reporter/articles}" class="btn btn-secondary">
+                                <i class="fas fa-redo"></i> Làm mới
+                            </a>
                         </div>
                     </form>
                 </div>
@@ -229,6 +264,7 @@
                                     <th>Tiêu đề</th>
                                     <th>Danh mục</th>
                                     <th>Trạng thái</th>
+                                    <th>Lý do từ chối</th>  <!-- Add this column -->
                                     <th>Lượt xem</th>
                                     <th>Ngày tạo</th>
                                     <th>Thao tác</th>
@@ -251,13 +287,33 @@
                                                           (bv.trangThai == 'Từ chối' ? 'badge bg-danger' : 'badge bg-secondary'))}">
                                         </span>
                                     </td>
+                                    <td>
+                                        <!-- Add rejection reason with view button if exists -->
+                                        <button th:if="${bv.lyDoTuChoi != null}" 
+                                                class="btn btn-sm btn-outline-danger"
+                                                type="button"
+                                                data-bs-toggle="popover"
+                                                th:data-bs-content="${bv.lyDoTuChoi}"
+                                                data-bs-trigger="focus"
+                                                title="Lý do từ chối">
+                                            <i class="fas fa-exclamation-circle"></i> Xem lý do
+                                        </button>
+                                    </td>
                                     <td th:text="${bv.luotXem}"></td>
                                     <td th:text="${#temporals.format(bv.ngayTao, 'dd/MM/yyyy HH:mm')}"></td>
                                     <td>
                                         <div class="btn-group">
-                                            <button type="button" class="btn btn-sm btn-warning"
-                                                    th:onclick="'loadBaiViet(' + ${bv.maBaiViet} + ')'">
+                                            <!-- Modify edit button to show for rejected articles -->
+                                            <a th:if="${bv.trangThai == 'Từ chối' || bv.trangThai == 'Nháp'}"
+                                               th:href="@{'/reporter/baiviet/edit/' + ${bv.maBaiViet}}" 
+                                               class="btn btn-sm btn-warning">
                                                 <i class="fas fa-edit"></i>
+                                            </a>
+                                            <!-- Add resubmit button for rejected articles -->
+                                            <button th:if="${bv.trangThai == 'Từ chối'}" type="button"
+                                                    class="btn btn-sm btn-success"
+                                                    th:onclick="'resubmitArticle(' + ${bv.maBaiViet} + ')'">
+                                                <i class="fas fa-sync"></i>
                                             </button>
                                             <button type="button" class="btn btn-sm btn-danger"
                                                     th:onclick="'confirmDelete(' + ${bv.maBaiViet} + ')'">
@@ -267,6 +323,11 @@
                                                     class="btn btn-sm btn-success"
                                                     th:onclick="'submitArticle(' + ${bv.maBaiViet} + ')'">
                                                 <i class="fas fa-paper-plane"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-info" 
+                                                    th:onclick="'viewHistory(' + ${bv.maBaiViet} + ')'"
+                                                    title="Xem lịch sử">
+                                                <i class="fas fa-history"></i>
                                             </button>
                                         </div>
                                     </td>
@@ -279,7 +340,36 @@
         </div>
     </main>
 
-   
+    <!-- History Modal -->
+    <div class="modal fade" id="historyModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Lịch sử chỉnh sửa bài viết</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th width="20%">Thời gian</th>
+                                    <th width="20%">Người sửa</th>
+                                    <th width="60%">Nội dung cũ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="historyTableBody">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
@@ -343,15 +433,32 @@
             });
         }
 
+        function resubmitArticle(id) {
+            Swal.fire({
+                title: 'Gửi lại bài viết?',
+                text: "Bài viết sẽ được gửi duyệt lại sau khi chỉnh sửa!",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Gửi lại',
+                cancelButtonText: 'Hủy'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch(`/reporter/baiviet/resubmit/${id}`, { method: 'POST' })
+                        .then(response => {
+                            if (response.ok) {
+                                showToast('Gửi lại bài viết thành công');
+                                setTimeout(() => window.location.reload(), 1000);
+                            }
+                        });
+                }
+            });
+        }
+
         function resetBaiVietForm() {
             document.getElementById('baiVietForm').reset();
-            const maBaiVietInput = document.querySelector('#baiVietForm input[name="maBaiViet"]');
-            if (maBaiVietInput) maBaiVietInput.value = '';
-            const submitBtn = document.querySelector('#baiVietForm button[type="submit"] span');
-            if (submitBtn) submitBtn.textContent = 'Thêm bài viết';
-            // Xóa preview ảnh
-            const previews = document.querySelectorAll('#baiVietForm img');
-            previews.forEach(preview => preview.remove());
+            document.querySelector('[name="maBaiViet"]').value = '';
         }
 
         function loadBaiViet(id) {
@@ -368,6 +475,56 @@
                     document.querySelector('#baiVietForm button[type="submit"] span').textContent = 'Cập nhật';
                 });
         }
+
+        function viewHistory(id) {
+            fetch(`/reporter/baiviet/${id}/history`)
+                .then(response => response.json())
+                .then(data => {
+                    const tbody = document.getElementById('historyTableBody');
+                    tbody.innerHTML = ''; // Clear existing content
+                    
+                    if (data.length === 0) {
+                        tbody.innerHTML = `
+                            <tr>
+                                <td colspan="3" class="text-center">Không có lịch sử chỉnh sửa</td>
+                            </tr>`;
+                        return;
+                    }
+
+                    data.forEach(history => {
+                        const row = `
+                            <tr>
+                                <td>${history.ngayChinhSua}</td>
+                                <td>${history.nguoiSua}</td>
+                                <td>
+                                    <div class="history-content">
+                                        <pre>${history.noiDungCu}</pre>
+                                    </div>
+                                </td>
+                            </tr>`;
+                        tbody.innerHTML += row;
+                    });
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Lỗi',
+                        text: 'Không thể tải lịch sử chỉnh sửa'
+                    });
+                });
+
+            const modal = new bootstrap.Modal(document.getElementById('historyModal'));
+            modal.show();
+        }
+
+        // Initialize popovers
+        document.addEventListener('DOMContentLoaded', function() {
+            var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
+            var popoverList = popoverTriggerList.map(function(popoverTriggerEl) {
+                return new bootstrap.Popover(popoverTriggerEl)
+            });
+        });
     </script>
 </body>
 </html>

@@ -76,6 +76,12 @@
                         Quản lý người dùng
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/admin/quangcao">
+                        <i class="fas fa-ad me-2"></i>
+                        Quản lý quảng cáo
+                    </a>
+                </li>
             </ul>
         </div>
     </nav>
@@ -139,97 +145,59 @@
             </div>
         </div>
 
-        <!-- Posts List -->
+        <!-- Pending Posts Table -->
         <div class="card shadow mb-4">
-            <div class="card-header">
-                <ul class="nav nav-tabs card-header-tabs">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="#pending" data-bs-toggle="tab">Chờ duyệt</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#published" data-bs-toggle="tab">Đã xuất bản</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#rejected" data-bs-toggle="tab">Đã từ chối</a>
-                    </li>
-                </ul>
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Danh sách bài viết chờ duyệt</h6>
             </div>
             <div class="card-body">
-                <div class="tab-content">
-                    <!-- Pending Posts Tab -->
-                    <div class="tab-pane fade show active" id="pending">
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Tiêu đề</th>
-                                        <th>Tác giả</th>
-                                        <th>Danh mục</th>
-                                        <th>Ngày gửi</th>
-                                        <th>Thao tác</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr th:each="post : ${baiViets}" th:if="${post.trangThai == 'Chờ duyệt'}">
-                                        <td>
-                                            <a th:href="@{'/admin/baiviet/view/' + ${post.maBaiViet}}"
-                                               th:text="${post.tieuDe}">
-                                            </a>
-                                        </td>
-                                        <td th:text="${post.tacGia.hoTen}"></td>
-                                        <td th:text="${post.danhMuc.tenDanhMuc}"></td>
-                                        <td th:text="${#temporals.format(post.ngayTao, 'dd/MM/yyyy HH:mm')}"></td>
-                                        <td>
-                                            <form th:action="@{/admin/baiviet/approve}" method="post" class="d-inline" 
-                                                  onsubmit="approvePost(this, event)">
-                                                <input type="hidden" name="id" th:value="${post.maBaiViet}">
-                                                <button type="submit" class="btn btn-success btn-sm">
-                                                    <i class="fas fa-check"></i> Duyệt
-                                                </button>
-                                            </form>
-                                            <button type="button" class="btn btn-danger btn-sm" 
-                                                    th:onclick="'showRejectModal(' + ${post.maBaiViet} + ')'">
-                                                <i class="fas fa-times"></i> Từ chối
-                                            </button>
-                                            <a th:href="@{'/admin/baiviet/view/' + ${post.maBaiViet}}"
-                                               class="btn btn-info btn-sm">
-                                                <i class="fas fa-eye"></i> Xem
-                                            </a>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Hình ảnh</th>
+                                <th>Tiêu đề</th>
+                                <th>Tác giả</th>
+                                <th>Danh mục</th>
+                                <th>Ngày gửi</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="post : ${baiViets}" th:if="${post.trangThai == 'Chờ duyệt'}">
+                                <td th:text="${post.maBaiViet}"></td>
+                                <td>
+                                    <img th:if="${post.duongDanAnh1}" 
+                                        th:src="'data:image/jpeg;base64,' + ${post.duongDanAnh1}"
+                                        style="max-width: 50px; height: auto;">
+                                </td>
+                                <td th:text="${post.tieuDe}"></td>
+                                <td th:text="${post.tacGia.hoTen}"></td>
+                                <td th:text="${post.danhMuc.tenDanhMuc}"></td>
+                                <td th:text="${#temporals.format(post.ngayTao, 'dd/MM/yyyy HH:mm')}"></td>
+                                <td>
+                                    <a th:href="@{'/admin/baiviet/view/' + ${post.maBaiViet}}"
+                                       class="btn btn-info btn-sm">
+                                        <i class="fas fa-eye"></i> Xem
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
-    </main>
-<!-- Reject Modal -->
-<div class="modal fade" id="rejectModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Từ chối bài viết</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <form th:action="@{/admin/baiviet/reject}" method="post">
-                <div class="modal-body">
-                    <input type="hidden" name="id" id="rejectPostId">
-                    <div class="mb-3">
-                        <label class="form-label">Lý do từ chối <span class="text-danger">*</span></label>
-                        <textarea class="form-control" name="lyDo" rows="3" required
-                                placeholder="Nhập lý do từ chối và hướng dẫn chỉnh sửa..."></textarea>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="submit" class="btn btn-danger">Xác nhận từ chối</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
 
+        <form th:action="@{/admin/baiviet/save}" method="post" 
+              th:object="${baiviet}" enctype="multipart/form-data">
+            <input type="hidden" th:field="*{maBaiViet}">
+            <!-- ... rest of the form fields ... -->
+        </form>
+
+    </main>
+
+    <!-- Bootstrap JS (optional) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

@@ -26,5 +26,14 @@ public interface YeuThichRepository extends JpaRepository<YeuThich, Long> {
     
     // Xóa yêu thích theo người dùng và bài viết
     void deleteByNguoiDungAndBaiViet(NguoiDung nguoiDung, BaiViet baiViet);
+    
+    // Tìm yêu thích theo mã người dùng và mã bài viết
+    YeuThich findByNguoiDungMaNguoiDungAndBaiVietMaBaiViet(Long maNguoiDung, Long maBaiViet);
+    
+    // Đếm số lượt thích theo mã bài viết
+    long countByBaiVietMaBaiViet(Long maBaiViet);
+    
+    // Lấy danh sách yêu thích của người dùng theo mã người dùng
+    List<YeuThich> findByNguoiDungMaNguoiDungOrderByNgayTaoDesc(Long maNguoiDung);
 }
 

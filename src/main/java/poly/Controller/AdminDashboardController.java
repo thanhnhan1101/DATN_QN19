@@ -63,81 +63,12 @@ public class AdminDashboardController {
         model.addAttribute("baiViets", baiVietRepository.findAll());
         model.addAttribute("baiviet", new BaiViet()); // for form
         
-        // Data cho tab danh mục
-        model.addAttribute("danhmucs", danhMucRepository.findAll());
-        model.addAttribute("danhmuc", new DanhMuc()); // for form
-        
         // Data cho tab người dùng
         model.addAttribute("nguoiDungs", nguoiDungRepository.findAll());
         model.addAttribute("nguoiDung", new NguoiDung()); // for form
 
-        // Set active tab from flash attribute
-        if (activeTab != null && !activeTab.isEmpty()) {
-            model.addAttribute("activeTab", activeTab);
-        }
-        
         return "admin/dashboard";
     }
 
-    // Thêm mới/Cập nhật danh mục
-    @PostMapping("/danhmuc/save")
-    public String saveDanhMuc(@ModelAttribute DanhMuc danhMuc, RedirectAttributes ra) {
-        try {
-            boolean isEdit = danhMuc.getMaDanhMuc() != null;
-            danhMucService.save(danhMuc);
-            ra.addFlashAttribute("message", isEdit ? "Cập nhật danh mục thành công!" : "Thêm danh mục thành công!");
-            ra.addFlashAttribute("messageType", "success");
-            ra.addFlashAttribute("activeTab", "categories"); // Đảm bảo tab categories được active
-        } catch (Exception e) {
-            ra.addFlashAttribute("message", "Có lỗi xảy ra: " + e.getMessage());
-            ra.addFlashAttribute("messageType", "error");
-            ra.addFlashAttribute("activeTab", "categories");
-        }
-        return "redirect:/admin/dashboard#categories"; // Thêm #categories vào URL redirect
-    }
-
-    // Lấy danh mục để sửa
-    @GetMapping("/danhmuc/edit/{id}")
-    public String editDanhMuc(@PathVariable Integer id, Model model) {
-        try {
-            DanhMuc danhMuc = danhMucService.findById(id);
-            if (danhMuc == null) {
-                return "redirect:/admin/dashboard#categories";
-            }
-            
-            // Thêm data cho view
-            model.addAttribute("danhmuc", danhMuc);
-            model.addAttribute("danhmucs", danhMucService.getAllDanhMuc());
-            model.addAttribute("activeTab", "categories");
-            
-            return "admin/dashboard"; // Bỏ #categories
-        } catch (Exception e) {
-            return "redirect:/admin/dashboard#categories";
-        }
-    }
-
-    // Xóa danh mục
-    @GetMapping("/danhmuc/delete/{id}")
-    public String deleteDanhMuc(@PathVariable Integer id, RedirectAttributes ra) {
-        try {
-            danhMucService.deleteById(id);
-            ra.addFlashAttribute("message", "Xóa danh mục thành công!");
-            ra.addFlashAttribute("messageType", "success");
-            ra.addFlashAttribute("activeTab", "categories");
-        } catch (Exception e) {
-            ra.addFlashAttribute("message", "Có lỗi xảy ra: " + e.getMessage());
-            ra.addFlashAttribute("messageType", "error");
-            ra.addFlashAttribute("activeTab", "categories");
-        }
-        return "redirect:/admin/dashboard#categories";
-    }
-
-    // Lấy danh sách danh mục (cho AJAX refresh)
-    @GetMapping("/danhmuc/list")
-    @ResponseBody
-    public List<DanhMuc> getDanhMucs() {
-        return danhMucService.getAllDanhMuc();
-    }
-
-    // Add
+   
 }

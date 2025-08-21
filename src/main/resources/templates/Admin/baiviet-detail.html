@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi tiết bài viết - Admin Dashboard</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .sidebar {
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 100;
+            padding: 48px 0 0;
+            box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
+            background-color: #343a40;
+            width: 250px;
+        }
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+        }
+        .nav-link {
+            color: #fff;
+            padding: 1rem;
+        }
+        .nav-link:hover {
+            color: #fff;
+            background-color: rgba(255,255,255,.1);
+        }
+        .nav-link.active {
+            background-color: rgba(255,255,255,.2);
+        }
+        .card {
+            margin-bottom: 1.5rem;
+            box-shadow: 0 .15rem 1.75rem 0 rgba(58,59,69,.15);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Sidebar -->
+    <nav class="col-md-3 col-lg-2 d-md-block sidebar">
+        <div class="sidebar-sticky">
+            <div class="text-center mb-4">
+                <h5 class="text-white mt-2">Bảng điều khiển quản trị</h5>
+            </div>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link" href="/admin/dashboard">
+                        <i class="fas fa-tachometer-alt me-2"></i>
+                        Tổng quan
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="/admin/baiviet">
+                        <i class="fas fa-newspaper me-2"></i>
+                        Quản lý bài viết
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/admin/danhmuc">
+                        <i class="fas fa-folder me-2"></i>
+                        Quản lý danh mục
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/admin/nguoidung">
+                        <i class="fas fa-users me-2"></i>
+                        Quản lý người dùng
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/admin/quangcao">
+                        <i class="fas fa-ad me-2"></i>
+                        Quản lý quảng cáo
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main content -->
+    <main class="main-content">
+        <!-- Top navbar -->
+        <nav class="navbar navbar-light bg-light mb-4 shadow-sm">
+            <div class="container-fluid">
+                <div class="d-flex align-items-center">
+                    <a href="/admin/baiviet" class="btn btn-outline-secondary me-3">
+                        <i class="fas fa-arrow-left"></i>
+                    </a>
+                    <span class="navbar-brand mb-0 h1">Chi tiết bài viết</span>
+                </div>
+                <div class="d-flex">
+                    <div class="dropdown">
+                        <button class="btn btn-link dropdown-toggle text-dark" type="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-user-circle"></i>
+                            <span th:text="${session.admin != null} ? ${session.admin.hoTen} : 'Admin'">Admin</span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="/admin/profile"><i class="fas fa-user me-2"></i>Hồ sơ</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="/logout"><i class="fas fa-sign-out-alt me-2"></i>Đăng xuất</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Post Detail Card -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                <h6 class="m-0 font-weight-bold text-primary">Thông tin bài viết</h6>
+                <div th:if="${baiViet.trangThai == 'Chờ duyệt'}">
+                    <form th:action="@{/admin/baiviet/approve}" method="post" class="d-inline">
+                        <input type="hidden" name="id" th:value="${baiViet.maBaiViet}">
+                        <button type="submit" class="btn btn-success" 
+                                onclick="return confirm('Bạn có chắc muốn duyệt bài viết này?')">
+                            <i class="fas fa-check"></i> Duyệt bài
+                        </button>
+                    </form>
+                    <button type="button" class="btn btn-danger ms-2" data-bs-toggle="modal" 
+                            data-bs-target="#rejectModal">
+                        <i class="fas fa-times"></i> Từ chối
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <h4 class="card-title mb-4" th:text="${baiViet.tieuDe}">Tiêu đề bài viết</h4>
+                
+                <div class="row mb-4">
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <p class="mb-1"><strong>Tác giả:</strong> <span th:text="${baiViet.tacGia.hoTen}"></span></p>
+                                <p class="mb-1"><strong>Danh mục:</strong> <span th:text="${baiViet.danhMuc.tenDanhMuc}"></span></p>
+                                <p class="mb-0"><strong>Ngày gửi:</strong> <span th:text="${#temporals.format(baiViet.ngayTao, 'dd/MM/yyyy HH:mm')}"></span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h6 class="m-0">Tóm tắt</h6>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-0" th:text="${baiViet.tomTat}"></p>
+                    </div>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h6 class="m-0">Nội dung</h6>
+                    </div>
+                    <div class="card-body">
+                        <div th:utext="${baiViet.noiDung}"></div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="m-0">Hình ảnh và nội dung mô tả</h6>
+                    </div>
+                    <div class="card-body">
+                        <!-- Ảnh chính - row 1 -->
+                        <div class="row mb-4">
+                            <div class="col-md-4" th:if="${baiViet.duongDanAnh1}">
+                                <div class="card h-100">
+                                    <div class="card-header">
+                                        <h6 class="m-0">Ảnh chính</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <img th:src="'data:image/jpeg;base64,' + ${baiViet.duongDanAnh1}"
+                                             class="img-fluid rounded mb-2">
+                                        <p class="card-text">
+                                            <strong>Mô tả:</strong>
+                                            <span th:text="${baiViet.noiDungAnh1}"></span>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Ảnh phụ - row 2 -->
+                        <div class="row">
+                            <!-- Ảnh phụ 1 -->
+                            <div class="col-md-4 mb-4" th:if="${baiViet.duongDanAnh2}">
+                                <div class="card h-100">
+                                    <div class="card-header">
+                                        <h6 class="m-0">Ảnh phụ 1</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <img th:src="'data:image/jpeg;base64,' + ${baiViet.duongDanAnh2}"
+                                             class="img-fluid rounded mb-2">
+                                        <p class="card-text">
+                                            <strong>Mô tả:</strong>
+                                            <span th:text="${baiViet.noiDungAnh2}"></span>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Ảnh phụ 2 -->
+                            <div class="col-md-4 mb-4" th:if="${baiViet.duongDanAnh3}">
+                                <div class="card h-100">
+                                    <div class="card-header">
+                                        <h6 class="m-0">Ảnh phụ 2</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <img th:src="'data:image/jpeg;base64,' + ${baiViet.duongDanAnh3}"
+                                             class="img-fluid rounded mb-2">
+                                        <p class="card-text">
+                                            <strong>Mô tả:</strong>
+                                            <span th:text="${baiViet.noiDungAnh3}"></span>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reject Modal -->
+        <div class="modal fade" id="rejectModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Từ chối bài viết</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <form th:action="@{/admin/baiviet/reject}" method="post">
+                        <div class="modal-body">
+                            <input type="hidden" name="id" th:value="${baiViet.maBaiViet}">
+                            <div class="mb-3">
+                                <label class="form-label">Lý do từ chối <span class="text-danger">*</span></label>
+                                <textarea class="form-control" name="lyDo" rows="3" required
+                                    placeholder="Nhập lý do từ chối và hướng dẫn chỉnh sửa..."></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                            <button type="submit" class="btn btn-danger">Xác nhận từ chối</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
