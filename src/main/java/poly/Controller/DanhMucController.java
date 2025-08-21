@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import org.springframework.ui.Model;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.http.ResponseEntity;
 
 @Controller
 @RequestMapping("/admin/danhmuc")
@@ -126,7 +127,15 @@ public class DanhMucController {
 
     @GetMapping("/api/{id}")
     @ResponseBody
-    public DanhMuc getDanhMuc(@PathVariable Integer id) {
-        return danhMucService.findById(id);
+    public ResponseEntity<?> getDanhMucApi(@PathVariable Integer id) {
+        try {
+            DanhMuc danhMuc = danhMucService.findById(id);
+            if (danhMuc != null) {
+                return ResponseEntity.ok(danhMuc);
+            }
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
     }
 }

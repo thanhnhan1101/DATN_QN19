@@ -5,23 +5,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-
 import poly.repository.BaiVietRepository;
 import poly.repository.DanhMucRepository;
 import poly.repository.NguoiDungRepository;
 import poly.entity.BaiViet;
-import poly.entity.DanhMuc;
 import poly.entity.NguoiDung;
-import poly.service.DanhMucService;
-
-import java.util.List;
 
 @Controller
 @RequestMapping("/admin")
@@ -35,9 +26,6 @@ public class AdminDashboardController {
 
     @Autowired
     private DanhMucRepository danhMucRepository;
-
-    @Autowired
-    private DanhMucService danhMucService;
 
     @GetMapping("/dashboard")
     public String showDashboard(Model model, @ModelAttribute("activeTab") String activeTab) {
