@@ -3,6 +3,7 @@ package poly.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -42,4 +43,32 @@ public interface BaiVietRepository extends JpaRepository<BaiViet, Long> {
            "WHERE b.tacGia.maNguoiDung = :maNguoiDung " +
            "GROUP BY d.tenDanhMuc")
     List<Object[]> getCategoryStatsByAuthor(@Param("maNguoiDung") Long maNguoiDung);
+
+    @Query("SELECT FUNCTION('MONTH', b.ngayTao) as month, COUNT(b) " +
+           "FROM BaiViet b " +
+           "WHERE FUNCTION('YEAR', b.ngayTao) = FUNCTION('YEAR', CURRENT_DATE) " +
+           "GROUP BY FUNCTION('MONTH', b.ngayTao) " +
+           "ORDER BY month")
+    List<Object[]> getMonthlyPostStats();
+
+    @Query("SELECT d.tenDanhMuc, COUNT(b) " +
+           "FROM BaiViet b JOIN b.danhMuc d " +
+           "GROUP BY d.tenDanhMuc")
+    List<Object[]> getPostsByCategory();
+
+    @Query("SELECT b.tacGia.hoTen, COUNT(b), " +
+           "SUM(CASE WHEN b.trangThai = 'Đã xuất bản' THEN 1 ELSE 0 END) " +
+           "FROM BaiViet b " +
+           "GROUP BY b.tacGia " +
+           "ORDER BY COUNT(b) DESC")
+    List<Object[]> getReporterActivityStats();
+
+    @Query("SELECT CAST(b.ngayTao as date) as ngay, " +
+           "SUM(b.luotXem) as luotXem, " +
+           "(SELECT COUNT(y) FROM YeuThich y WHERE CAST(y.ngayTao as date) = CAST(b.ngayTao as date)) as luotThich " +
+           "FROM BaiViet b " +
+           "WHERE b.ngayTao >= :startDate " +
+           "GROUP BY CAST(b.ngayTao as date) " +
+           "ORDER BY ngay DESC")
+    List<Object[]> getInteractionStats(@Param("startDate") LocalDateTime startDate);
 }

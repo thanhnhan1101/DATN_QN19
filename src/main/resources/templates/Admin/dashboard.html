@@ -193,6 +193,60 @@
             </div>
         </div>
 
+        <!-- Add after Statistics Cards -->
+        <div class="row">
+            <!-- Biểu đồ số lượng bài viết theo tháng -->
+            <div class="col-xl-8 col-lg-7">
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">Thống kê bài viết theo tháng</h6>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="postsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Biểu đồ phân bố bài viết theo danh mục -->
+            <div class="col-xl-4 col-lg-5">
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">Phân bố theo danh mục</h6>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="categoriesChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Thêm row mới cho 2 biểu đồ bổ sung -->
+        <div class="row">
+            <!-- Biểu đồ tương tác người dùng -->
+            <div class="col-xl-6">
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">Tương tác người dùng</h6>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="interactionChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Biểu đồ hoạt động phóng viên -->
+            <div class="col-xl-6">
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">Hoạt động phóng viên</h6>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="reporterChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
@@ -244,6 +298,68 @@
                 plugins: {
                     legend: {
                         position: 'bottom'
+                    }
+                }
+            }
+        });
+
+        // Interaction Chart (New)
+        const interactionCtx = document.getElementById('interactionChart').getContext('2d');
+        const interactionData = /*[[${interactionStats}]]*/[];
+        new Chart(interactionCtx, {
+            type: 'bar',
+            data: {
+                labels: interactionData.map(item => item[0]),
+                datasets: [{
+                    label: 'Tương tác',
+                    data: interactionData.map(item => item[1]),
+                    backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Tương tác người dùng theo thời gian'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Reporter Activity Chart (New)
+        const reporterCtx = document.getElementById('reporterChart').getContext('2d');
+        const reporterData = /*[[${reporterStats}]]*/[];
+        new Chart(reporterCtx, {
+            type: 'line',
+            data: {
+                labels: reporterData.map(item => item[0]),
+                datasets: [{
+                    label: 'Hoạt động',
+                    data: reporterData.map(item => item[1]),
+                    backgroundColor: 'rgba(255, 99, 132, 0.6)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Hoạt động phóng viên theo thời gian'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
                     }
                 }
             }

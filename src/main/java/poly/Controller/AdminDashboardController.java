@@ -1,5 +1,7 @@
 package poly.Controller;
 
+import java.util.List;
+import java.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -54,6 +56,23 @@ public class AdminDashboardController {
         // Data cho tab người dùng
         model.addAttribute("nguoiDungs", nguoiDungRepository.findAll());
         model.addAttribute("nguoiDung", new NguoiDung()); // for form
+
+        // Thống kê bài viết theo tháng
+        List<Object[]> monthlyStats = baiVietRepository.getMonthlyPostStats();
+        model.addAttribute("monthlyStats", monthlyStats);
+
+        // Thống kê theo danh mục
+        List<Object[]> categoryStats = baiVietRepository.getPostsByCategory();
+        model.addAttribute("categoryStats", categoryStats);
+
+        // Thống kê tương tác (lượt xem, yêu thích) trong 7 ngày gần nhất
+        LocalDateTime startDate = LocalDateTime.now().minusDays(7);
+        List<Object[]> interactionStats = baiVietRepository.getInteractionStats(startDate);
+        model.addAttribute("interactionStats", interactionStats);
+
+        // Thống kê hoạt động phóng viên
+        List<Object[]> reporterStats = baiVietRepository.getReporterActivityStats();
+        model.addAttribute("reporterStats", reporterStats);
 
         return "admin/dashboard";
     }
