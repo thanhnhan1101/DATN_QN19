@@ -3,19 +3,19 @@ package poly.Controller;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-
+import org.springframework.web.bind.annotation.ModelAttribute;
 import poly.service.DanhMucService;
 import poly.entity.BaiViet;
 import poly.entity.DanhMuc;
 import poly.entity.NguoiDung;
 import poly.service.BaiVietService;
 import poly.service.YeuThichService;
+import poly.service.ThongBaoService;
 import jakarta.servlet.http.HttpSession;
 
 @Controller
@@ -28,6 +28,9 @@ public class IndexController {
 
     @Autowired
     private YeuThichService yeuThichService;
+    
+    @Autowired
+    private ThongBaoService thongBaoService;
 
     @GetMapping("/")
     public String index(Model model) {
@@ -158,5 +161,15 @@ public class IndexController {
             // Ignore
         }
         return "redirect:/";
+    }
+    
+    // Thêm vào các controller có sử dụng Nav
+    @ModelAttribute
+    public void addCommonAttributes(Model model, HttpSession session) {
+        NguoiDung user = (NguoiDung) session.getAttribute("user");
+        if (user != null) {
+            long unreadCount = thongBaoService.demThongBaoChuaDoc(user.getMaNguoiDung());
+            model.addAttribute("unreadNotifications", unreadCount);
+        }
     }
 }

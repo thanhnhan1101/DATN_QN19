@@ -3,6 +3,7 @@ package poly.Controller;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
@@ -25,40 +26,74 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
+import poly.service.ThongBaoService;
+import poly.repository.NguoiDungRepository;
 
 @Controller
 @RequestMapping("/reporter")
 public class ReporterDashboardController {
+
     @Autowired
     private BaiVietService baiVietService;
-    
+
     @Autowired
     private DanhMucService danhMucService;
 
     @Autowired
     private LichSuChinhSuaService lichSuChinhSuaService;
 
+    @Autowired
+    private ThongBaoService thongBaoService;
+
+    @Autowired
+    private NguoiDungRepository nguoiDungRepository;
+
     @GetMapping("/dashboard")
     public String showDashboard(Model model, HttpSession session) {
-        NguoiDung reporter = (NguoiDung) session.getAttribute("user");
-        
-        // Lấy thống kê
-        model.addAttribute("totalPosts", baiVietService.countByTacGia(reporter));
-        model.addAttribute("pendingPosts", baiVietService.countByTacGiaAndTrangThai(reporter, "Chờ duyệt"));
-        model.addAttribute("totalViews", baiVietService.sumLuotXemByTacGia(reporter));
-        
-        // Lấy danh sách bài viết của phóng viên
-        Page<BaiViet> baiViets = baiVietService.findByTacGia(
-            reporter,
-            PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "ngayTao"))
-        );
-        model.addAttribute("baiViets", baiViets);
-        
-        // Form data
-        model.addAttribute("baiviet", new BaiViet());
-        model.addAttribute("danhmucs", danhMucService.getAllDanhMuc());
-        
-        return "reporter/dashboard";
+        try {
+            NguoiDung phongVien = (NguoiDung) session.getAttribute("user");
+            if (phongVien == null) {
+                return "redirect:/login";
+            }
+
+            // Thống kê cơ bản 
+            model.addAttribute("totalPosts", baiVietService.countByTacGia(phongVien));
+            model.addAttribute("pendingPosts", baiVietService.countByTacGiaAndTrangThai(phongVien, "Chờ duyệt"));
+            model.addAttribute("totalViews", baiVietService.sumLuotXemByTacGia(phongVien));
+
+            Long maNguoiDung = phongVien.getMaNguoiDung();
+
+            // Thống kê theo tháng
+            List<Object[]> monthlyStats = baiVietService.getMonthlyStatsByAuthor(maNguoiDung);
+            model.addAttribute("monthlyStats", monthlyStats);
+            System.out.println("Monthly Stats: " + monthlyStats); // Debug log
+
+            // Thống kê theo danh mục
+            List<Object[]> categoryStats = baiVietService.getCategoryStatsByAuthor(maNguoiDung);
+            model.addAttribute("categoryStats", categoryStats);
+            System.out.println("Category Stats: " + categoryStats); // Debug log
+
+            // Thống kê lượt xem 7 ngày gần nhất
+            LocalDateTime startDate = LocalDateTime.now().minusDays(7);
+            List<Object[]> viewStats = baiVietService.getViewStatsByAuthor(maNguoiDung, startDate);
+            model.addAttribute("viewStats", viewStats);
+            System.out.println("View Stats: " + viewStats); // Debug log
+
+            // Thống kê trạng thái
+            List<Long> statusStats = Arrays.asList(
+                baiVietService.countByTacGiaAndTrangThai(phongVien, "Nháp"),
+                baiVietService.countByTacGiaAndTrangThai(phongVien, "Chờ duyệt"),
+                baiVietService.countByTacGiaAndTrangThai(phongVien, "Đã xuất bản"),
+                baiVietService.countByTacGiaAndTrangThai(phongVien, "Từ chối")
+            );
+            model.addAttribute("statusStats", statusStats);
+            System.out.println("Status Stats: " + statusStats); // Debug log
+
+            return "reporter/dashboard";
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "redirect:/error";
+        }
     }
 
     @GetMapping("/articles")
@@ -193,15 +228,31 @@ public class ReporterDashboardController {
 
     @PostMapping("/baiviet/submit/{id}")
     public String submitBaiViet(@PathVariable Long id, HttpSession session) {
-        NguoiDung reporter = (NguoiDung) session.getAttribute("user");
-        BaiViet baiViet = baiVietService.findById(id).orElse(null);
-        
-        if (baiViet != null && baiViet.getTacGia().equals(reporter)) {
-            baiViet.setTrangThai("Chờ duyệt");
-            baiVietService.save(baiViet);
+        try {
+            NguoiDung reporter = (NguoiDung) session.getAttribute("user");
+            BaiViet baiViet = baiVietService.findById(id).orElse(null);
+            
+            if (baiViet != null && baiViet.getTacGia().equals(reporter)) {
+                // Cập nhật trạng thái bài viết
+                baiViet.setTrangThai("Chờ duyệt");
+                baiVietService.save(baiViet);
+
+                // Gửi thông báo cho tất cả admin
+                List<NguoiDung> admins = nguoiDungRepository.findByVaiTro("admin");
+                for (NguoiDung admin : admins) {
+                    thongBaoService.taoThongBao(
+                        "Bài viết mới cần duyệt",
+                        "Phóng viên " + reporter.getHoTen() + " đã gửi bài viết \"" + baiViet.getTieuDe() + "\" cần được duyệt",
+                        admin
+                    );
+                }
+            }
+            
+            return "redirect:/reporter/articles";
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "redirect:/error";
         }
-        
-        return "redirect:/reporter/articles";  // Changed from dashboard to articles
     }
 
     // Add method to get chart data
@@ -244,9 +295,20 @@ public class ReporterDashboardController {
             
             if (baiViet != null && baiViet.getTacGia().equals(reporter)) {
                 baiViet.setTrangThai("Chờ duyệt");
-                baiViet.setLyDoTuChoi(null); // Clear rejection reason
+                baiViet.setLyDoTuChoi(null);
                 baiViet.setNgayCapNhat(LocalDateTime.now());
                 baiVietService.save(baiViet);
+
+                // Gửi thông báo cho tất cả admin khi gửi lại bài
+                List<NguoiDung> admins = nguoiDungRepository.findByVaiTro("admin");
+                for (NguoiDung admin : admins) {
+                    thongBaoService.taoThongBao(
+                        "Bài viết đã được chỉnh sửa và gửi lại",
+                        "Phóng viên " + reporter.getHoTen() + " đã chỉnh sửa và gửi lại bài viết \"" + baiViet.getTieuDe() + "\" cần được duyệt",
+                        admin
+                    );
+                }
+
                 return ResponseEntity.ok().build();
             }
             return ResponseEntity.badRequest().build();

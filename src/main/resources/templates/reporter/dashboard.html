@@ -163,25 +163,53 @@
                 </div>
             </div>
 
-            <!-- Add charts section -->
             <div class="row">
+                <!-- Biểu đồ số lượng bài viết theo tháng -->
                 <div class="col-xl-8 col-lg-7">
                     <div class="card shadow mb-4">
                         <div class="card-header py-3">
                             <h6 class="m-0 font-weight-bold text-primary">Thống kê bài viết theo tháng</h6>
                         </div>
                         <div class="card-body">
-                            <canvas id="myArticlesChart"></canvas>
+                            <canvas id="monthlyChart"></canvas>
                         </div>
                     </div>
                 </div>
+
+                <!-- Biểu đồ phân bố bài viết theo danh mục -->
                 <div class="col-xl-4 col-lg-5">
                     <div class="card shadow mb-4">
                         <div class="card-header py-3">
-                            <h6 class="m-0 font-weight-bold text-primary">Thống kê theo danh mục</h6>
+                            <h6 class="m-0 font-weight-bold text-primary">Phân bố theo danh mục</h6>
                         </div>
                         <div class="card-body">
-                            <canvas id="categoriesChart"></canvas>
+                            <canvas id="categoryChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Biểu đồ lượt xem -->
+                <div class="col-xl-6">
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary">Lượt xem bài viết (7 ngày qua)</h6>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="viewsChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Biểu đồ trạng thái bài viết -->
+                <div class="col-xl-6">
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary">Trạng thái bài viết</h6>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="statusChart"></canvas>
                         </div>
                     </div>
                 </div>
@@ -194,6 +222,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script>
         function showToast(message, type = 'success') {
@@ -277,6 +306,102 @@
                     document.querySelector('#baiVietForm button[type="submit"] span').textContent = 'Cập nhật';
                 });
         }
+
+        // Lấy dữ liệu từ Thymeleaf
+        const monthlyStats = /*[[${thongKeThang}]]*/ [];
+        const categoryStats = /*[[${thongKeDanhMuc}]]*/ [];
+        const viewStats = /*[[${thongKeLuotXem}]]*/ [];
+        const statusStats = /*[[${thongKeTrangThai}]]*/ [];
+
+        // Biểu đồ bài viết theo tháng
+        new Chart(document.getElementById('monthlyChart'), {
+            type: 'bar',
+            data: {
+                labels: monthlyStats.map(item => {
+                    const months = ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6', 
+                                    'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'];
+                    return months[item[0] - 1];
+                }),
+                datasets: [{
+                    label: 'Số bài viết',
+                    data: monthlyStats.map(item => item[1]),
+                    backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {y: {beginAtZero: true}}
+            }
+        });
+
+        // Biểu đồ phân bố theo danh mục
+        new Chart(document.getElementById('categoryChart'), {
+            type: 'doughnut',
+            data: {
+                labels: categoryStats.map(item => item[0]),
+                datasets: [{
+                    data: categoryStats.map(item => item[1]),
+                    backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b']
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {legend: {position: 'bottom'}}
+            }
+        });
+
+        // Biểu đồ lượt xem
+        new Chart(document.getElementById('viewsChart'), {
+            type: 'bar',
+            data: {
+                labels: viewStats.map(item => {
+                    const date = new Date(item[0]);
+                    return date.toLocaleDateString('vi-VN');
+                }),
+                datasets: [{
+                    label: 'Lượt xem',
+                    data: viewStats.map(item => item[1]),
+                    backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {y: {beginAtZero: true}}
+            }
+        });
+
+        // Biểu đồ trạng thái bài viết
+        new Chart(document.getElementById('statusChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Nháp', 'Chờ duyệt', 'Đã xuất bản', 'Từ chối'],
+                datasets: [{
+                    label: 'Số lượng',
+                    data: statusStats,
+                    backgroundColor: [
+                        'rgba(108, 117, 125, 0.6)',
+                        'rgba(255, 193, 7, 0.6)',
+                        'rgba(40, 167, 69, 0.6)',
+                        'rgba(220, 53, 69, 0.6)'
+                    ],
+                    borderColor: [
+                        'rgb(108, 117, 125)',
+                        'rgb(255, 193, 7)',
+                        'rgb(40, 167, 69)',
+                        'rgb(220, 53, 69)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {y: {beginAtZero: true}}
+            }
+        });
     </script>
 </body>
 </html>

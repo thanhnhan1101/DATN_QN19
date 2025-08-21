@@ -32,10 +32,19 @@ public interface BaiVietRepository extends JpaRepository<BaiViet, Long> {
     @Query("SELECT b FROM BaiViet b LEFT JOIN FETCH b.tacGia LEFT JOIN FETCH b.danhMuc")
     List<BaiViet> findAllWithTacGiaAndDanhMuc();
 
-    @Query("SELECT FUNCTION('DATE_FORMAT', b.ngayTao, '%m/%Y') as month, COUNT(b) " +
-           "FROM BaiViet b WHERE b.tacGia.maNguoiDung = :maNguoiDung " +
-           "GROUP BY FUNCTION('DATE_FORMAT', b.ngayTao, '%m/%Y') " +
-           "ORDER BY month")
+    @Query("SELECT FORMAT(b.ngayTao, 'MM/yyyy') as monthYear, COUNT(b) " +
+           "FROM BaiViet b " + 
+           "WHERE b.tacGia.maNguoiDung = :maNguoiDung " +
+           "GROUP BY FORMAT(b.ngayTao, 'MM/yyyy') " +
+           "ORDER BY monthYear")
+    List<Object[]> getMonthlyStatsByAuthorFormat(@Param("maNguoiDung") Long maNguoiDung);
+    
+    // Alternative using MONTH and YEAR functions
+    @Query("SELECT CONCAT(MONTH(b.ngayTao), '/', YEAR(b.ngayTao)) as monthYear, COUNT(b) " +
+           "FROM BaiViet b " +
+           "WHERE b.tacGia.maNguoiDung = :maNguoiDung " +
+           "GROUP BY MONTH(b.ngayTao), YEAR(b.ngayTao) " +
+           "ORDER BY YEAR(b.ngayTao), MONTH(b.ngayTao)")
     List<Object[]> getMonthlyStatsByAuthor(@Param("maNguoiDung") Long maNguoiDung);
 
     @Query("SELECT d.tenDanhMuc, COUNT(b) " +
@@ -71,4 +80,15 @@ public interface BaiVietRepository extends JpaRepository<BaiViet, Long> {
            "GROUP BY CAST(b.ngayTao as date) " +
            "ORDER BY ngay DESC")
     List<Object[]> getInteractionStats(@Param("startDate") LocalDateTime startDate);
+
+    @Query("SELECT CAST(b.ngayTao as date) as ngay, SUM(b.luotXem) as luotXem " +
+           "FROM BaiViet b " +
+           "WHERE b.tacGia.maNguoiDung = :authorId " +
+           "AND b.ngayTao >= :startDate " +
+           "GROUP BY CAST(b.ngayTao as date) " +
+           "ORDER BY ngay DESC")
+    List<Object[]> getViewStatsByAuthor(
+        @Param("authorId") Long authorId, 
+        @Param("startDate") LocalDateTime startDate
+    );
 }

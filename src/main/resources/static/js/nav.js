@@ -201,4 +201,94 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+
+    // Notification Handling
+    const notificationButton = document.getElementById('notificationButton');
+    const notificationDropdown = document.getElementById('notificationDropdown');
+
+    if (notificationButton && notificationDropdown) {
+        // Toggle notification dropdown
+        notificationButton.addEventListener('click', function(e) {
+            e.stopPropagation();
+            notificationDropdown.classList.toggle('show');
+            loadNotifications();
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!notificationDropdown.contains(e.target) && !notificationButton.contains(e.target)) {
+                notificationDropdown.classList.remove('show');
+            }
+        });
+
+        // Load notifications
+        function loadNotifications() {
+            fetch('/api/thongbao/list')
+                .then(response => response.json())
+                .then(notifications => {
+                    const notificationList = document.querySelector('.notification-list');
+                    if (!notifications || notifications.length === 0) {
+                        notificationList.innerHTML = '<div class="no-notifications">Không có thông báo mới</div>';
+                        return;
+                    }
+
+                    notificationList.innerHTML = notifications.map(notification => `
+                        <div class="notification-item ${notification.trangThai === 'Chưa đọc' ? 'unread' : ''}">
+                            <div class="notification-content">
+                                <h4>${notification.tieuDe}</h4>
+                                <p>${notification.noiDung}</p>
+                                <span class="notification-time">
+                                    ${new Date(notification.ngayGui).toLocaleString('vi-VN')}
+                            </div>
+                        </div>
+                    `).join('');
+
+                    // Update badge count
+                    const badge = document.querySelector('.notification-badge');
+                    const unreadCount = notifications.filter(n => n.trangThai === 'Chưa đọc').length;
+                    if (unreadCount > 0) {
+                        badge.textContent = unreadCount;
+                        badge.style.display = 'block';
+                    } else {
+                        badge.style.display = 'none';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading notifications:', error);
+                });
+        }
+
+        // Mark all as read
+        const markAllReadButton = document.querySelector('.mark-all-read');
+        if (markAllReadButton) {
+            markAllReadButton.addEventListener('click', function() {
+                fetch('/api/thongbao/mark-all-read', {
+                    method: 'POST'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    loadNotifications(); // Reload notifications
+                    const badge = document.querySelector('.notification-badge');
+                    badge.style.display = 'none';
+                    // Show success message
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Thành công',
+                        text: 'Đã đánh dấu tất cả thông báo là đã đọc',
+                        timer: 1500
+                    });
+                })
+                .catch(error => {
+                    console.error('Error marking notifications as read:', error);
+                });
+            });
+        }
+    }
+
+    // Auto check for new notifications every minute
+    setInterval(() => {
+        if (notificationButton && notificationDropdown.classList.contains('show')) {
+            loadNotifications();
+        }
+    }, 60000);
 });

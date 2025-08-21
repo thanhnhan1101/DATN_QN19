@@ -8,6 +8,7 @@ import poly.entity.BaiViet;
 import poly.entity.NguoiDung;
 import poly.repository.BaiVietRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -107,5 +108,10 @@ public class BaiVietService {
     // Get category statistics for author
     public List<Object[]> getCategoryStatsByAuthor(Long maNguoiDung) {
         return baiVietRepository.getCategoryStatsByAuthor(maNguoiDung);
+    }
+
+    // Thêm phương thức mới
+    public List<Object[]> getViewStatsByAuthor(Long authorId, LocalDateTime startDate) {
+        return baiVietRepository.getViewStatsByAuthor(authorId, startDate);
     }
 }

@@ -254,18 +254,23 @@
 
     <!-- Chart Initialization -->
     <script th:inline="javascript">
-        // Monthly Posts Chart
+        // Monthly Posts Chart - Chuyển từ line sang bar
         const postsCtx = document.getElementById('postsChart').getContext('2d');
         const monthlyData = /*[[${monthlyStats}]]*/[];
         new Chart(postsCtx, {
-            type: 'line',
+            type: 'bar', // Thay đổi type thành bar
             data: {
-                labels: monthlyData.map(item => item[0]),
+                labels: monthlyData.map(item => {
+                    const months = ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6', 
+                                    'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'];
+                    return months[item[0] - 1];
+                }),
                 datasets: [{
                     label: 'Số bài viết',
                     data: monthlyData.map(item => item[1]),
-                    borderColor: 'rgb(75, 192, 192)',
-                    tension: 0.1
+                    backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
                 }]
             },
             options: {
@@ -275,11 +280,19 @@
                         display: true,
                         text: 'Số lượng bài viết theo tháng'
                     }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
                 }
             }
         });
 
-        // Categories Chart
+        // Categories Chart - Giữ nguyên doughnut chart
         const categoriesCtx = document.getElementById('categoriesChart').getContext('2d');
         const categoryData = /*[[${categoryStats}]]*/[];
         new Chart(categoriesCtx, {
@@ -303,47 +316,25 @@
             }
         });
 
-        // Interaction Chart (New)
+        // Interaction Chart - Đã là bar chart, cập nhật style
         const interactionCtx = document.getElementById('interactionChart').getContext('2d');
         const interactionData = /*[[${interactionStats}]]*/[];
         new Chart(interactionCtx, {
             type: 'bar',
             data: {
-                labels: interactionData.map(item => item[0]),
+                labels: interactionData.map(item => {
+                    const date = new Date(item[0]);
+                    return date.toLocaleDateString('vi-VN');
+                }),
                 datasets: [{
-                    label: 'Tương tác',
+                    label: 'Lượt xem',
                     data: interactionData.map(item => item[1]),
                     backgroundColor: 'rgba(54, 162, 235, 0.6)',
                     borderColor: 'rgba(54, 162, 235, 1)',
                     borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    title: {
-                        display: true,
-                        text: 'Tương tác người dùng theo thời gian'
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                }
-            }
-        });
-
-        // Reporter Activity Chart (New)
-        const reporterCtx = document.getElementById('reporterChart').getContext('2d');
-        const reporterData = /*[[${reporterStats}]]*/[];
-        new Chart(reporterCtx, {
-            type: 'line',
-            data: {
-                labels: reporterData.map(item => item[0]),
-                datasets: [{
-                    label: 'Hoạt động',
-                    data: reporterData.map(item => item[1]),
+                }, {
+                    label: 'Lượt thích',
+                    data: interactionData.map(item => item[2]),
                     backgroundColor: 'rgba(255, 99, 132, 0.6)',
                     borderColor: 'rgba(255, 99, 132, 1)',
                     borderWidth: 1
@@ -354,12 +345,52 @@
                 plugins: {
                     title: {
                         display: true,
-                        text: 'Hoạt động phóng viên theo thời gian'
+                        text: 'Tương tác người dùng theo ngày'
                     }
                 },
                 scales: {
                     y: {
                         beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Reporter Activity Chart - Chuyển từ line sang bar
+        const reporterCtx = document.getElementById('reporterChart').getContext('2d');
+        const reporterData = /*[[${reporterStats}]]*/[];
+        new Chart(reporterCtx, {
+            type: 'bar',
+            data: {
+                labels: reporterData.map(item => item[0]),
+                datasets: [{
+                    label: 'Tổng bài viết',
+                    data: reporterData.map(item => item[1]),
+                    backgroundColor: 'rgba(153, 102, 255, 0.6)',
+                    borderColor: 'rgba(153, 102, 255, 1)',
+                    borderWidth: 1
+                }, {
+                    label: 'Bài đã xuất bản',
+                    data: reporterData.map(item => item[2]),
+                    backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Thống kê bài viết theo phóng viên'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
                     }
                 }
             }
