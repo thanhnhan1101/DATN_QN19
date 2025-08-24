@@ -10,7 +10,7 @@
                     <button type="submit"><i class="fas fa-search"></i></button>
                 </form>
                 <!-- Add notification icon before user menu -->
-                <div class="notification-menu">
+                <div class="notification-menu" th:if="${session.user}">
                     <button class="notification-button" id="notificationButton">
                         <i class="fas fa-bell"></i>
                         <span class="notification-badge" th:if="${unreadNotifications > 0}" 

@@ -2,6 +2,7 @@ package poly.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -39,15 +40,46 @@ public class QuangCao {
     private LocalDate ngayKetThuc;
 
     @Column(name = "TrangThai", length = 20)
-    private String trangThai = "Chờ duyệt";
+    private String trangThai;
 
     @Column(name = "NgayTao")
     private LocalDateTime ngayTao;
 
+    @Column(name = "TenDoanhNghiep", length = 255)
+    private String tenDoanhNghiep;
+
+    @Column(name = "Email", length = 100)
+    private String email;
+
+    @Column(name = "SoDienThoai", length = 15)
+    private String soDienThoai;
+
+    @Column(name = "KichThuocAnh", length = 20)
+    private String kichThuocAnh;
+
+    @Column(name = "ChiPhi", precision = 18, scale = 2)
+    private BigDecimal chiPhi;
+
+    @Column(name = "LuotHienThi")
+    private Integer luotHienThi;
+
+    @Column(name = "LuotClick")
+    private Integer luotClick;
+
+    @Column(name = "LyDoTuChoi", length = 255)
+    private String lyDoTuChoi;
+
+    @Column(name = "NgayCapNhat")
+    private LocalDateTime ngayCapNhat;
+
     @PrePersist
     protected void onCreate() {
-        if (ngayTao == null) {
-            ngayTao = LocalDateTime.now();
-        }
+        ngayTao = LocalDateTime.now();
+        ngayCapNhat = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        ngayCapNhat = LocalDateTime.now();
     }
 }

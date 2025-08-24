@@ -29,6 +29,17 @@
     <!-- Navigation -->
     <div th:replace="~{Giaodien/Nav :: nav}"></div>
 
+    <!-- Quảng cáo trên cùng -->
+    <div th:if="${qcTrangChu != null}">
+        <div th:each="qc : ${qcTrangChu}">
+            <div class="ad-banner ad-top">
+                <a th:href="${qc.duongDanLienKet}" target="_blank">
+                    <img th:src="'data:image/jpeg;base64,' + ${qc.duongDanAnh}" alt="Quảng cáo" style="max-width:100%;height:auto;">
+                </a>
+            </div>
+        </div>
+    </div>
+
     <!-- Main Content -->
     <main class="container">
         <!-- Bài viết nổi bật -->
@@ -100,8 +111,22 @@
                 <p>Chưa có bài viết nào được xuất bản.</p>
             </div>
         </section>
+
+        <div th:if="${searchKeyword != null}">
+            <h2>Kết quả tìm kiếm cho "<span th:text="${searchKeyword}"></span>"</h2>
+        </div>
     </main>
 
+    <!-- Quảng cáo cuối trang đặt trước footer -->
+    <div th:if="${qcCuoiTrang != null}">
+        <div th:each="qc : ${qcCuoiTrang}">
+            <div class="ad-banner ad-bottom">
+                <a th:href="${qc.duongDanLienKet}" target="_blank">
+                    <img th:src="'data:image/jpeg;base64,' + ${qc.duongDanAnh}" alt="Quảng cáo" style="max-width:100%;height:auto;">
+                </a>
+            </div>
+        </div>
+    </div>
     <!-- Footer -->
     <div th:replace="~{Giaodien/Foter :: footer}"></div>
 
@@ -163,5 +188,14 @@
             convertBase64ToImage();
         });
     </script>
+
+    <!-- Quảng cáo bên phải -->
+    <div class="ad-banner ad-right" th:if="${qcBenPhai != null}">
+        <div th:each="qc : ${qcBenPhai}">
+            <a th:href="${qc.duongDanLienKet}" target="_blank">
+                <img th:src="'data:image/jpeg;base64,' + ${qc.duongDanAnh}" alt="Quảng cáo" style="width:100%;height:auto;">
+            </a>
+        </div>
+    </div>
 </body>
 </html>

@@ -158,4 +158,51 @@ ALTER COLUMN DuongDanAnh1 NVARCHAR(MAX) NOT NULL;
 ALTER TABLE BaiViet
 ADD LyDoTuChoi NVARCHAR(500);
 
+--------
+-- Thêm thông tin liên hệ
+ALTER TABLE QuangCao
+ADD TenDoanhNghiep NVARCHAR(255),
+    Email NVARCHAR(100),
+    SoDienThoai NVARCHAR(15);
 
+-- Thêm thông tin kỹ thuật và thống kê
+ALTER TABLE QuangCao
+ADD KichThuocAnh NVARCHAR(20),
+    ChiPhi DECIMAL(18,2),
+    LuotHienThi INT DEFAULT 0,
+    LuotClick INT DEFAULT 0,
+    LyDoTuChoi NVARCHAR(255),
+    NgayCapNhat DATETIME;
+
+SELECT name
+FROM sys.check_constraints
+WHERE parent_object_id = OBJECT_ID('QuangCao');
+
+ALTER TABLE QuangCao
+DROP CONSTRAINT CK_QuangCao_TrangThai;
+
+ALTER TABLE QuangCao
+ADD CONSTRAINT CK_QuangCao_TrangThai
+CHECK (TrangThai IN (N'Nháp', N'Chờ duyệt', N'Đã xuất bản', N'Từ chối', N'Đã ẩn', N'Đã kết thúc'));
+
+
+-- Thêm trigger cập nhật NgayCapNhat
+CREATE TRIGGER TR_QuangCao_UpdateTimestamp
+ON QuangCao
+AFTER UPDATE
+AS
+BEGIN
+    UPDATE QuangCao
+    SET NgayCapNhat = GETDATE()
+    FROM QuangCao Q
+    INNER JOIN inserted i ON Q.MaQuangCao = i.MaQuangCao
+END;
+
+
+
+ALTER TABLE QuangCao
+DROP CONSTRAINT CK__QuangCao__ViTri__5EBF139D;
+
+ALTER TABLE QuangCao
+ADD CONSTRAINT CK_QuangCao_ViTri
+CHECK (ViTri IN (N'Trang chủ', N'Cuối trang', N'Cạnh bên'));

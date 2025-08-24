@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Đăng ký Quảng Cáo - MSN Việt Nam</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/quangcao.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            background: #f7f7f7;
+        }
+        .ad-form-container {
+            max-width: 600px;
+            margin: 40px auto;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+            padding: 32px 36px;
+        }
+        .ad-form-title {
+            text-align: center;
+            font-size: 2rem;
+            font-weight: 700;
+            color: #008080;
+            margin-bottom: 24px;
+        }
+        .ad-form label {
+            font-weight: 500;
+            margin-bottom: 6px;
+            display: block;
+            color: #333;
+        }
+        .ad-form input, .ad-form textarea, .ad-form select {
+            width: 100%;
+            padding: 10px 12px;
+            margin-bottom: 18px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+            background: #fafafa;
+            transition: border 0.2s;
+        }
+        .ad-form input:focus, .ad-form textarea:focus, .ad-form select:focus {
+            border-color: #008080;
+            outline: none;
+        }
+        .ad-form textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+        .ad-form .form-row {
+            display: flex;
+            gap: 16px;
+        }
+        .ad-form .form-row > div {
+            flex: 1;
+        }
+        .ad-form .ad-form-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(90deg,#008080,#00b09b);
+            color: #fff;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .ad-form .ad-form-btn:hover {
+            background: linear-gradient(90deg,#00b09b,#008080);
+        }
+        .ad-form .ad-form-note {
+            font-size: 0.95rem;
+            color: #888;
+            margin-bottom: 12px;
+        }
+        .ad-form .ad-form-icon {
+            color: #008080;
+            margin-right: 8px;
+        }
+        .ad-form .ad-form-img-preview {
+            margin-bottom: 18px;
+            text-align: center;
+        }
+        .ad-form .ad-form-img-preview img {
+            max-width: 180px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+    </style>
+    <script>
+        function previewImage(input) {
+            const preview = document.getElementById('imgPreview');
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                }
+                reader.readAsDataURL(input.files[0]);
+            } else {
+                preview.src = '';
+                preview.style.display = 'none';
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="ad-form-container">
+        <div class="ad-form-title">
+            <i class="fas fa-bullhorn ad-form-icon"></i>
+            Đăng ký Quảng Cáo
+        </div>
+        <div th:if="${message}" style="color:green; text-align:center; margin-bottom:16px;">
+            <span th:text="${message}"></span>
+        </div>
+        <div th:if="${error}" style="color:red; text-align:center; margin-bottom:16px;">
+            <span th:text="${error}"></span>
+        </div>
+        <form class="ad-form" th:action="@{/quangcao/dang-ky}" method="post" enctype="multipart/form-data">
+            <label for="tenDoanhNghiep">Tên doanh nghiệp/cá nhân *</label>
+            <input type="text" id="tenDoanhNghiep" name="tenDoanhNghiep" required placeholder="Nhập tên doanh nghiệp hoặc cá nhân">
+
+            <label for="email">Email liên hệ *</label>
+            <input type="email" id="email" name="email" required placeholder="Nhập email liên hệ">
+
+            <label for="soDienThoai">Số điện thoại *</label>
+            <input type="text" id="soDienThoai" name="soDienThoai" required placeholder="Nhập số điện thoại">
+
+            <label for="tieuDe">Tiêu đề quảng cáo *</label>
+            <input type="text" id="tieuDe" name="tieuDe" required placeholder="Nhập tiêu đề quảng cáo">
+
+            <label for="duongDanLienKet">Đường dẫn liên kết *</label>
+            <input type="text" id="duongDanLienKet" name="duongDanLienKet" required placeholder="Ví dụ: https://website.com">
+
+            <label for="viTri">Vị trí mong muốn hiển thị *</label>
+            <select id="viTri" name="viTri" required>
+                <option value="">-- Chọn vị trí --</option>
+                <option value="Trang chủ">Trang chủ (phần đầu trang)</option>
+                <option value="Cuối trang">Cuối trang (phần cuối trang)</option>
+                <option value="Cạnh bên">Cạnh bên (sidebar)</option>
+            </select>
+
+            <div class="form-row">
+                <div>
+                    <label for="ngayBatDau">Ngày bắt đầu *</label>
+                    <input type="date" id="ngayBatDau" name="ngayBatDau" required>
+                </div>
+                <div>
+                    <label for="ngayKetThuc">Ngày kết thúc *</label>
+                    <input type="date" id="ngayKetThuc" name="ngayKetThuc" required>
+                </div>
+            </div>
+
+            <label for="imageFile">Ảnh quảng cáo *</label>
+            <input type="file" id="imageFile" name="imageFile" accept="image/*" required onchange="previewImage(this)">
+            <div class="ad-form-img-preview">
+                <img id="imgPreview" src="" alt="Ảnh quảng cáo" style="display:none;">
+            </div>
+
+            <label for="chiPhi">Ngân sách/Chi phí dự kiến *</label>
+            <input type="number" id="chiPhi" name="chiPhi" required min="0" step="0.01" placeholder="Nhập số tiền (VNĐ)">
+
+            <div class="ad-form-note">
+                <i class="fas fa-info-circle"></i>
+                Sau khi gửi đăng ký, quảng cáo sẽ được kiểm duyệt trước khi hiển thị.
+            </div>
+            <button type="submit" class="ad-form-btn">
+                <i class="fas fa-paper-plane"></i> Gửi đăng ký
+            </button>
+               </form>
+    </div>
+</body>
+</html>

@@ -127,9 +127,9 @@ public class BaiVietController {
         return "redirect:/admin/baiviet";
     }
 
-    @PostMapping("/approve/{id}")
+    @PostMapping("/approve")
     @ResponseBody
-    public Map<String, Object> approveBaiViet(@PathVariable Long id) {
+    public Map<String, Object> approve(@RequestParam Long id) {
         Map<String, Object> response = new HashMap<>();
         try {
             BaiViet baiViet = baiVietService.findById(id).orElse(null);

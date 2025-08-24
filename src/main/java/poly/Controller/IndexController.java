@@ -9,6 +9,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestParam;
 import poly.service.DanhMucService;
 import poly.entity.BaiViet;
 import poly.entity.DanhMuc;
@@ -17,6 +18,8 @@ import poly.service.BaiVietService;
 import poly.service.YeuThichService;
 import poly.service.ThongBaoService;
 import jakarta.servlet.http.HttpSession;
+import poly.entity.QuangCao;
+import poly.service.QuangCaoService;
 
 @Controller
 public class IndexController {
@@ -31,9 +34,19 @@ public class IndexController {
     
     @Autowired
     private ThongBaoService thongBaoService;
+    
+    @Autowired
+    private QuangCaoService quangCaoService;
 
     @GetMapping("/")
     public String index(Model model) {
+        List<QuangCao> qcTrangChu = quangCaoService.getQuangCaoTheoViTri("Trang chủ");
+        List<QuangCao> qcCuoiTrang = quangCaoService.getQuangCaoTheoViTri("Cuối trang");
+        List<QuangCao> qcBenPhai = quangCaoService.getQuangCaoTheoViTri("Bên phải");
+        model.addAttribute("qcTrangChu", qcTrangChu);
+        model.addAttribute("qcCuoiTrang", qcCuoiTrang);
+        model.addAttribute("qcBenPhai", qcBenPhai);
+
         // Lấy danh sách bài viết đã xuất bản
         List<BaiViet> allPosts = baiVietService.getAll().stream()
             .filter(post -> "Đã xuất bản".equals(post.getTrangThai()))
@@ -171,5 +184,18 @@ public class IndexController {
             long unreadCount = thongBaoService.demThongBaoChuaDoc(user.getMaNguoiDung());
             model.addAttribute("unreadNotifications", unreadCount);
         }
+    }
+    
+    @GetMapping("/tim-kiem")
+    public String search(@RequestParam("q") String keyword, Model model) {
+        List<BaiViet> results = baiVietService.getAll().stream()
+            .filter(post -> "Đã xuất bản".equals(post.getTrangThai()))
+            .filter(post -> post.getTieuDe() != null && post.getTieuDe().toLowerCase().contains(keyword.toLowerCase()))
+            .collect(Collectors.toList());
+        model.addAttribute("baiViets", results);
+        model.addAttribute("searchKeyword", keyword);
+        model.addAttribute("hasArticles", !results.isEmpty());
+        model.addAttribute("danhmucs", danhMucService.getAllDanhMuc());
+        return "index";
     }
 }
