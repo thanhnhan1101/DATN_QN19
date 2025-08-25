@@ -183,7 +183,8 @@ DROP CONSTRAINT CK_QuangCao_TrangThai;
 
 ALTER TABLE QuangCao
 ADD CONSTRAINT CK_QuangCao_TrangThai
-CHECK (TrangThai IN (N'Nháp', N'Chờ duyệt', N'Chờ thanh toán', N'Đã xuất bản', N'Từ chối', N'Đã ẩn', N'Đã kết thúc'));
+CHECK (TrangThai IN (N'Nháp', N'Chờ duyệt', N'Đã xuất bản', N'Từ chối', N'Đã ẩn', N'Đã kết thúc'));
+
 
 -- Thêm trigger cập nhật NgayCapNhat
 CREATE TRIGGER TR_QuangCao_UpdateTimestamp
@@ -206,6 +207,4 @@ ALTER TABLE QuangCao
 ADD CONSTRAINT CK_QuangCao_ViTri
 CHECK (ViTri IN (N'Trang chủ', N'Cuối trang', N'Cạnh bên'));
 
-ALTER TABLE ThongBao ALTER COLUMN NoiDung NVARCHAR(500);
-ALTER TABLE QuangCao
-ADD HoaDon NVARCHAR(MAX) NULL;
+ALTER TABLE LichSuDangNhap ALTER COLUMN ThietBi VARCHAR(512);

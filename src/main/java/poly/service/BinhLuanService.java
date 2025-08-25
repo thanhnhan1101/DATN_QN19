@@ -50,7 +50,5 @@ public class BinhLuanService {
         return WORD_PATTERN.matcher(content.toLowerCase()).find();
     }
 
-    public List<BinhLuan> getByBaiViet(Long maBaiViet) {
-        return binhLuanRepository.findByBaiVietMaBaiVietOrderByNgayTaoDesc(maBaiViet);
-    }
+   
 }
