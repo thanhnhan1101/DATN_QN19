@@ -1,8 +1,16 @@
 package poly.entity;
 
-import jakarta.persistence.*;
-import lombok.Data;
 import java.time.LocalDateTime;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.Table;
+import lombok.Data;
 
 @Data
 @Entity
@@ -10,28 +18,24 @@ import java.time.LocalDateTime;
 public class BinhLuan {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "MaBinhLuan")
     private Long maBinhLuan;
-
-    @ManyToOne
-    @JoinColumn(name = "MaBaiViet")
-    private BaiViet baiViet;
 
     @ManyToOne
     @JoinColumn(name = "MaNguoiDung")
     private NguoiDung nguoiDung;
 
-    @Column(name = "NoiDung", nullable = false, length = 100)
+    @ManyToOne
+    @JoinColumn(name = "MaBaiViet")
+    private BaiViet baiViet;
+
     private String noiDung;
 
-    @Column(name = "TrangThai", length = 15)
-    private String trangThai = "Chờ duyệt";
-
-    @Column(name = "NgayTao")
     private LocalDateTime ngayTao;
 
+    private String trangThai; // "Chờ duyệt", "Đã duyệt"
+
     @PrePersist
-    protected void onCreate() {
-        ngayTao = LocalDateTime.now();
+    public void prePersist() {
+        if (ngayTao == null) ngayTao = LocalDateTime.now();
     }
 }

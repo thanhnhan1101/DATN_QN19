@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Lịch sử đăng nhập</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .history-container {max-width:700px;margin:40px auto;background:#fff;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,0.07);padding:32px;}
+        .history-title {color:#1976d2;font-size:24px;font-weight:700;margin-bottom:24px;text-align:center;}
+        table {width:100%;border-collapse:collapse;}
+        th, td {padding:12px;border-bottom:1px solid #eee;text-align:left;}
+        th {background:#f5f5f5;}
+        .back-link {display:block;text-align:center;margin-top:24px;color:#1976d2;font-size:16px;text-decoration:none;}
+        .back-link:hover {text-decoration:underline;}
+    </style>
+</head>
+<body>
+    <div class="history-container">
+        <div class="history-title"><i class="fas fa-history"></i> Lịch sử đăng nhập</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Thời gian</th>
+                    <th>IP</th>
+                    <th>Thiết bị</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="ls : ${lichSu}">
+                    <td th:text="${#temporals.format(ls.thoiGian, 'dd/MM/yyyy HH:mm:ss')}"></td>
+                    <td th:text="${ls.diaChiIP}"></td>
+                    <td th:text="${ls.thietBi}"></td>
+                </tr>
+            </tbody>
+        </table>
+        <a href="/user/profile" class="back-link"><i class="fas fa-arrow-left"></i> Quay lại thông tin cá nhân</a>
+    </div>
+</body>
+</html>

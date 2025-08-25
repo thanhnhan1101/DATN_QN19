@@ -206,3 +206,5 @@ DROP CONSTRAINT CK__QuangCao__ViTri__5EBF139D;
 ALTER TABLE QuangCao
 ADD CONSTRAINT CK_QuangCao_ViTri
 CHECK (ViTri IN (N'Trang chủ', N'Cuối trang', N'Cạnh bên'));
+
+ALTER TABLE LichSuDangNhap ALTER COLUMN ThietBi VARCHAR(512);

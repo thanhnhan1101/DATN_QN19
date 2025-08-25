@@ -1,22 +1,32 @@
 package poly.Controller;
 
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import poly.entity.LichSuDangNhap;
 import poly.entity.NguoiDung;
 import poly.service.NguoiDungService;
-import java.util.Optional;
 @Controller
 @RequestMapping("/auth")
 public class AuthController {
 
     @Autowired
     private NguoiDungService nguoiDungService;
+
+    @Autowired
+    private poly.repository.LichSuDangNhapRepository lichSuDangNhapRepository;
 
     @PostMapping("/register")
     public String register(@ModelAttribute NguoiDung nguoiDung, 
@@ -48,13 +58,23 @@ public class AuthController {
                        @RequestParam(defaultValue = "false") boolean rememberMe,
                        HttpServletResponse response,
                        HttpSession session,
-                       RedirectAttributes ra) {
+                       RedirectAttributes ra,
+                       HttpServletRequest request) {
         try {
             Optional<NguoiDung> userOpt = nguoiDungService.login(email, matKhau);
             if (userOpt.isPresent()) {
                 NguoiDung user = userOpt.get();
                 session.setAttribute("user", user);
-                
+
+                // Ghi nhận lịch sử đăng nhập
+                String ip = request.getRemoteAddr();
+                String agent = request.getHeader("User-Agent");
+                LichSuDangNhap lichSu = new LichSuDangNhap();
+                lichSu.setNguoiDung(user);
+                lichSu.setDiaChiIP(ip);
+                lichSu.setThietBi(agent);
+                lichSuDangNhapRepository.save(lichSu);
+
                 if (rememberMe) {
                     Cookie cookie = new Cookie("rememberMe", user.getEmail());
                     cookie.setMaxAge(1800);
