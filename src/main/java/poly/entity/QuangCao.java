@@ -72,6 +72,10 @@ public class QuangCao {
     @Column(name = "NgayCapNhat")
     private LocalDateTime ngayCapNhat;
 
+    @Lob
+    @Column(name = "HoaDon", columnDefinition = "NVARCHAR(MAX)")
+    private String hoaDon;
+
     @PrePersist
     protected void onCreate() {
         ngayTao = LocalDateTime.now();

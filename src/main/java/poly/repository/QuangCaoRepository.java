@@ -13,5 +13,5 @@ public interface QuangCaoRepository extends JpaRepository<QuangCao, Long> {
     List<QuangCao> findByTrangThaiAndViTriAndNgayBatDauLessThanEqualAndNgayKetThucGreaterThanEqual(
     String trangThai, String viTri, LocalDate start, LocalDate end
 );
-//
+    QuangCao findByMaQuangCao(Long maQuangCao);
 }

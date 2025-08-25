@@ -4,6 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
+import poly.entity.QuangCao;
 import poly.service.QuangCaoService;
 
 @Controller
@@ -12,6 +14,9 @@ public class AdminQuangCaoController {
 
     @Autowired
     private QuangCaoService quangCaoService;
+
+    @Autowired
+    private poly.service.EmailService emailService;
 
     @GetMapping
     public String listQuangCao(Model model) {
@@ -31,12 +36,19 @@ public class AdminQuangCaoController {
     }
 
     @PostMapping("/accept")
-    public String accept(@RequestParam("id") Long id) {
-        var qc = quangCaoService.findById(id);
-        if (qc != null) {
-            qc.setTrangThai("Đã xuất bản"); // Đúng với constraint mới
-            quangCaoService.save(qc);
+    public String acceptAd(@RequestParam Long id) {
+        QuangCao qc = quangCaoService.findById(id);
+        if ("Chờ xác nhận".equals(qc.getTrangThai())) {
+            qc.setTrangThai("Đã xuất bản");
+        } else {
+            qc.setTrangThai("Chờ thanh toán");
+            // Gửi email cho người dùng như cũ
+            String link = "http://localhost:8080/quangcao/thanh-toan/" + qc.getMaQuangCao();
+            String subject = "Thanh toán quảng cáo MSN";
+            String content = "Quảng cáo của bạn đã được duyệt. Vui lòng thanh toán tại đường link sau:\n" + link;
+            emailService.send(qc.getEmail(), subject, content);
         }
+        quangCaoService.save(qc);
         return "redirect:/admin/quangcao";
     }
 

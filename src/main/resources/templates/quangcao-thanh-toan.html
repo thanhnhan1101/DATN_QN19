@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Thanh toán quảng cáo</title>
+</head>
+<body>
+    <h2>Thanh toán quảng cáo</h2>
+    <p>Vui lòng chuyển khoản theo thông tin sau:</p>
+    <img src="https://img.vietqr.io/image/bidv-6263857640-compact.jpg" alt="QR BIDV" style="max-width:220px;">
+    <p>
+        Chủ tài khoản: HO THANH NHAN<br>
+        Số tài khoản: 6263857640<br>
+        Ngân hàng: BIDV CN PHO NUI<br>
+        Số tiền: <span th:text="${qc.chiPhi}"></span> VNĐ<br>
+        Nội dung chuyển khoản: Quảng cáo MSN - <span th:text="${qc.tenDoanhNghiep}"></span>
+    </p>
+    <form th:action="@{/quangcao/thanh-toan/xac-nhan-thanh-toan}" method="post" enctype="multipart/form-data">
+        <input type="hidden" name="maQuangCao" th:value="${qc.maQuangCao}" />
+        <label for="hoaDon">Upload ảnh hóa đơn chuyển khoản:</label>
+        <input type="file" id="hoaDon" name="hoaDon" accept="image/*" required>
+        <button type="submit">Tôi đã chuyển khoản</button>
+    </form>
+</body>
+</html>

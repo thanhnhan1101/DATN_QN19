@@ -2,6 +2,8 @@ package poly.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
 import poly.entity.QuangCao;
 import poly.repository.QuangCaoRepository;
 
@@ -63,4 +65,36 @@ public class QuangCaoService {
             "Đã xuất bản", viTri, java.time.LocalDate.now(), java.time.LocalDate.now()
         );
     }
+
+    public QuangCao findByMaQuangCao(String maQuangCao) {
+        try {
+            Long id = Long.parseLong(maQuangCao);
+            return quangCaoRepository.findByMaQuangCao(id);
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
+    public void saveHoaDon(Long maQuangCao, MultipartFile hoaDon) {
+        QuangCao qc = quangCaoRepository.findByMaQuangCao(maQuangCao);
+        if (qc != null && hoaDon != null && !hoaDon.isEmpty()) {
+            try {
+                byte[] bytes = hoaDon.getBytes();
+                String base64 = java.util.Base64.getEncoder().encodeToString(bytes);
+                qc.setHoaDon(base64); // Giả sử QuangCao có trường hoaDon kiểu String (base64)
+                quangCaoRepository.save(qc);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void updateTrangThai(Long maQuangCao, String trangThai) {
+        QuangCao qc = quangCaoRepository.findByMaQuangCao(maQuangCao);
+        if (qc != null) {
+            qc.setTrangThai(trangThai);
+            quangCaoRepository.save(qc);
+        }
+    }
+
 }

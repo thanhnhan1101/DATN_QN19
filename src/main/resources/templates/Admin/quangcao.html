@@ -148,7 +148,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr th:each="qc : ${listQuangCao}" th:if="${qc.trangThai == 'Chờ duyệt'}">
+                            <tr th:each="qc : ${listQuangCao}" th:if="${qc.trangThai == 'Chờ duyệt' or qc.trangThai == 'Chờ xác nhận'}">
                                 <td th:text="${qc.maQuangCao}"></td>
                                 <td>
                                     <img th:if="${qc.duongDanAnh != null}" th:src="'data:image/jpeg;base64,' + ${qc.duongDanAnh}" class="img-preview"/>

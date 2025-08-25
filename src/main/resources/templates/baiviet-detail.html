@@ -65,7 +65,7 @@
                     <img th:data-src="${baiViet.duongDanAnh1}"
                          th:alt="${baiViet.noiDungAnh1 != null ? baiViet.noiDungAnh1 : 'Hình ảnh bài viết'}"
                          class="featured-image">
-                    <p class="image-caption" th:if="${baiViet.noiDungAnh1 != null and baiViet.noiDungAnh1 != ''}" th:text="${baiViet.noiDungAnh1}">Mô tả ảnh</p>
+                    <p class="image-caption" th:if="${baiViet.noiDungAnh1 != null and baiViet.noiDungAnh1 != ''}" th:utext="${baiViet.noiDungAnh1}">Mô tả ảnh</p>
                 </div>
 
                 <!-- Article Text -->
@@ -80,13 +80,13 @@
                             <img th:data-src="${baiViet.duongDanAnh2}"
                                  th:alt="${baiViet.noiDungAnh2 != null ? baiViet.noiDungAnh2 : 'Hình ảnh bài viết'}"
                                  class="gallery-image">
-                            <p class="image-caption" th:if="${baiViet.noiDungAnh2 != null and baiViet.noiDungAnh2 != ''}" th:text="${baiViet.noiDungAnh2}">Mô tả ảnh</p>
+                            <p class="image-caption" th:if="${baiViet.noiDungAnh2 != null and baiViet.noiDungAnh2 != ''}" th:utext="${baiViet.noiDungAnh2}">Mô tả ảnh</p>
                         </div>
                         <div class="gallery-item" th:if="${baiViet.duongDanAnh3 != null and baiViet.duongDanAnh3 != ''}">
                             <img th:data-src="${baiViet.duongDanAnh3}"
                                  th:alt="${baiViet.noiDungAnh3 != null ? baiViet.noiDungAnh3 : 'Hình ảnh bài viết'}"
                                  class="gallery-image">
-                            <p class="image-caption" th:if="${baiViet.noiDungAnh3 != null and baiViet.noiDungAnh3 != ''}" th:text="${baiViet.noiDungAnh3}">Mô tả ảnh</p>
+                            <p class="image-caption" th:if="${baiViet.noiDungAnh3 != null and baiViet.noiDungAnh3 != ''}" th:utext="${baiViet.noiDungAnh3}">Mô tả ảnh</p>
                         </div>
                     </div>
                 </div>
@@ -117,45 +117,7 @@
             </div>
         </aside>
 
-        <!-- Comments Section -->
-        <div class="comments-section">
-            <h3>Bình luận</h3>
-            
-            <!-- Comment Form -->
-            <div class="comment-form" th:if="${session.user}">
-                <form id="commentForm">
-                    <textarea 
-                        name="noiDung" 
-                        placeholder="Nhập bình luận của bạn..." 
-                        required
-                        maxlength="100"
-                        rows="3"
-                        class="form-control"></textarea>
-                    <button type="submit" class="btn btn-primary mt-2">
-                        Gửi bình luận
-                    </button>
-                </form>
-            </div>
-            <div class="login-prompt" th:unless="${session.user}">
-                <p>Vui lòng <a th:href="@{/dang-nhap}">đăng nhập</a> để bình luận.</p>
-            </div>
-
-            <!-- Comments List -->
-            <div class="comments-list" th:if="${not #lists.isEmpty(comments)}">
-                <div th:each="comment : ${comments}" class="comment-item">
-                    <div class="comment-header">
-                        <span class="comment-author" th:text="${comment.nguoiDung.hoTen}">Người dùng</span>
-                        <span class="comment-date" 
-                              th:text="${#temporals.format(comment.ngayTao, 'dd/MM/yyyy HH:mm')}">
-                            Thời gian
-                        </span>
-                    </div>
-                    <div class="comment-content" th:text="${comment.noiDung}">
-                        Nội dung bình luận
-                    </div>
-                </div>
-            </div>
-        </div>
+       
     </main>
 
     <!-- Footer -->
