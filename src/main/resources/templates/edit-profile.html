@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Chỉnh sửa thông tin cá nhân</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/nav.css}">
+    <link rel="stylesheet" th:href="@{/css/footer.css}">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        .edit-container {
+            max-width: 500px;
+            margin: 48px auto;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+            padding: 36px 32px;
+        }
+        .edit-title {
+            color: #1976d2;
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 28px;
+            text-align: center;
+        }
+        .edit-form label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            color: #333;
+        }
+        .edit-form input, .edit-form select {
+            width: 100%;
+            padding: 10px 12px;
+            margin-bottom: 18px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+        .save-btn {
+            width: 100%;
+            background: linear-gradient(90deg,#1976d2 60%,#2196f3 100%);
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: 13px 0;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 8px;
+            transition: background 0.2s;
+            box-shadow: 0 2px 8px rgba(33,150,243,0.08);
+        }
+        .save-btn:hover {
+            background: linear-gradient(90deg,#1565c0 60%,#1976d2 100%);
+        }
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 18px;
+            color: #1976d2;
+            font-size: 16px;
+            text-decoration: none;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        @media (max-width: 700px) {
+            .edit-container { padding: 18px 8px; }
+            .edit-title { font-size: 20px; }
+            .edit-form input, .edit-form select { font-size: 15px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <div th:replace="~{Giaodien/Nav :: nav}"></div>
+
+    <main class="container">
+        <div class="edit-container">
+            <div class="edit-title">
+                <i class="fas fa-user-edit"></i> Chỉnh sửa thông tin cá nhân
+            </div>
+            <form class="edit-form" th:action="@{/user/edit-profile}" th:object="${nguoiDung}" method="post">
+                <label>Họ tên:</label>
+                <input type="text" th:field="*{hoTen}" required>
+                <label>Giới tính:</label>
+                <select th:field="*{gioiTinh}">
+                    <option th:value="true" th:text="'Nam'"></option>
+                    <option th:value="false" th:text="'Nữ'"></option>
+                </select>
+                <label>Ngày sinh:</label>
+                <input type="date" th:field="*{ngaySinh}">
+                <label>Số điện thoại:</label>
+                <input type="text" th:field="*{soDienThoai}" pattern="^(0|84)[0-9]{8,9}$" title="Số điện thoại phải bắt đầu bằng 0 hoặc 84 và có 9-11 số" required>
+                <button type="submit" class="save-btn">Lưu thay đổi</button>
+            </form>
+            <a href="/user/profile" class="back-link"><i class="fas fa-arrow-left"></i> Quay lại thông tin cá nhân</a>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <div th:replace="~{Giaodien/Foter :: footer}"></div>
+</body>
+</html>
